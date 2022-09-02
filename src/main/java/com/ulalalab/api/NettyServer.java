@@ -1,27 +1,30 @@
 package com.ulalalab.api;
 
+import com.ulalalab.api.common.handler.DataHandler;
 import com.ulalalab.api.common.handler.DefaultHandler;
-import com.ulalalab.api.common.model.Device;
 import com.ulalalab.api.common.repository.DeviceRepository;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lombok.RequiredArgsConstructor;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
-import java.util.List;
 
 @Component
 public class NettyServer {
 
+	@Autowired
+	private DeviceRepository deviceRepository;
+
 	@PostConstruct
-	public void init() {
+	public void init() throws InterruptedException {
+		deviceRepository.findByDeviceId("123123");
 
 		System.out.println("##@@ " + "init");
 
@@ -32,11 +35,13 @@ public class NettyServer {
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
+					.handler(new LoggingHandler(LogLevel.DEBUG))
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
-						public void initChannel(SocketChannel ch) throws Exception {
+						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
 							p.addLast(new DefaultHandler());
+							p.addLast(new DataHandler());
 						}
 					});
 			bootstrap.bind(38080).sync().channel().closeFuture().sync();
@@ -44,8 +49,8 @@ public class NettyServer {
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
-			workerGroup.shutdownGracefully();
-			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully().sync();
+			bossGroup.shutdownGracefully().sync();
 		}
 	}
 }

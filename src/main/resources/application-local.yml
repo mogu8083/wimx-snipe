@@ -3,16 +3,19 @@ server:
 
 spring :
   datasource:
+    type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
+    #url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
+    url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
     username: ulalalab
     password: ulalalab12!@
 
 #Log
 logging:
   level:
-    root: info
+    root: debug
     jdbc.sqltiming: info
     p6spy: info
+    com.zaxxer: debug
   file:
     path: ""

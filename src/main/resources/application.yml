@@ -3,14 +3,22 @@ server:
   port: 38080
 
 spring :
-#  datasource:
+  datasource:
 #    hikari:
 #      auto-commit: false
-#      connection-test-query: SELECT 1
-#      minimum-idle: 10
-#      maximum-pool-size: 10
-#      transaction-isolation: TRANSACTION_READ_UNCOMMITTED
-#      pool-name: pool-ulalalab
+#      connectionTimeout: 30000
+#      maximumPoolSize: 10
+#      maxLifetime: 1800000
+#      poolName: HikariCP
+#      readOnly: false
+#      connectionTestQuery: SELECT 1
+      #connection-test-query: SELECT 1
+      #minimum-idle: 10
+      #maximum-pool-size: 10
+      #transaction-isolation: TRANSACTION_READ_UNCOMMITTED
+      #minimum-idle: 30
+      #maximum-pool-size: 30
+      #pool-name: pool-ulalalab
 
   jpa:
     database: postgresql
