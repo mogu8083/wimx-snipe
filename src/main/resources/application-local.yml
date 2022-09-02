@@ -1,18 +1,12 @@
 server:
   port: 38080
 
-#spring :
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: "jdbc:mysql://127.0.0.1:3306/test_db?serverTimezone=Asia/Seoul"
-#    username: root
-#    password: root1234
-#  influxdb:
-#    url: http://127.0.0.1:8086
-#    username: test
-#    password: test1234
-#    database: test_bucket
-#    retention-policy: autogen
+spring :
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
+    username: ulalalab
+    password: ulalalab12!@
 
 #Log
 logging:

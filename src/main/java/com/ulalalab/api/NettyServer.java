@@ -1,6 +1,8 @@
 package com.ulalalab.api;
 
 import com.ulalalab.api.common.handler.DefaultHandler;
+import com.ulalalab.api.common.model.Device;
+import com.ulalalab.api.common.repository.DeviceRepository;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -9,15 +11,18 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Component
 public class NettyServer {
 
 	@PostConstruct
 	public void init() {
+
 		System.out.println("##@@ " + "init");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);

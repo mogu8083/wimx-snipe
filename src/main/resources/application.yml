@@ -3,28 +3,32 @@ server:
   port: 38080
 
 spring :
-  datasource:
-    hikari:
-      auto-commit: false
-      connection-test-query: SELECT 1
-      minimum-idle: 10
-      maximum-pool-size: 10
-      transaction-isolation: TRANSACTION_READ_UNCOMMITTED
-      pool-name: pool-ulalalab
+#  datasource:
+#    hikari:
+#      auto-commit: false
+#      connection-test-query: SELECT 1
+#      minimum-idle: 10
+#      maximum-pool-size: 10
+#      transaction-isolation: TRANSACTION_READ_UNCOMMITTED
+#      pool-name: pool-ulalalab
 
   jpa:
+    database: postgresql
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: none
     properties:
       hibernate:
-        format_sql: false
-        hbm2ddl.auto: update
+        format_sql: true
+        #hbm2ddl.auto: update
         implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     open-in-view: false
-    show-sql: false
+    show-sql: true
     generate-ddl: true
-    web:
-      resources:
-        add-mappings: false
+#    web:
+#      resources:
+#        add-mappings: false
 
   data:
     web:
