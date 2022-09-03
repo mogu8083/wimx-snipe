@@ -4,6 +4,7 @@ import com.ulalalab.api.common.handler.DataHandler;
 import com.ulalalab.api.common.handler.DefaultHandler;
 import com.ulalalab.api.common.repository.DeviceRepository;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -13,6 +14,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
@@ -20,12 +22,13 @@ import javax.annotation.PostConstruct;
 public class NettyServer {
 
 	@Autowired
-	private DeviceRepository deviceRepository;
+	private DefaultHandler defaultHandler;
+
+	@Autowired
+	private DataHandler dataHandler;
 
 	@PostConstruct
 	public void init() throws InterruptedException {
-		deviceRepository.findByDeviceId("123123");
-
 		System.out.println("##@@ " + "init");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -40,8 +43,8 @@ public class NettyServer {
 						@Override
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
-							p.addLast(new DefaultHandler());
-							p.addLast(new DataHandler());
+							p.addLast(defaultHandler);
+							p.addLast(dataHandler);
 						}
 					});
 			bootstrap.bind(38080).sync().channel().closeFuture().sync();

@@ -4,14 +4,14 @@ server:
 
 spring :
   datasource:
-#    hikari:
-#      auto-commit: false
-#      connectionTimeout: 30000
-#      maximumPoolSize: 10
-#      maxLifetime: 1800000
-#      poolName: HikariCP
-#      readOnly: false
-#      connectionTestQuery: SELECT 1
+    hikari:
+      auto-commit: true
+      connectionTimeout: 30000
+      maximumPoolSize: 10
+      maxLifetime: 1800000
+      poolName: HikariCP
+      readOnly: false
+      connectionTestQuery: SELECT 1
       #connection-test-query: SELECT 1
       #minimum-idle: 10
       #maximum-pool-size: 10
@@ -38,8 +38,8 @@ spring :
 #      resources:
 #        add-mappings: false
 
-  data:
-    web:
-      pageable:
-        default-page-size: 10
-        one-indexed-parameters: true
+#  data:
+#    web:
+#      pageable:
+#        default-page-size: 10
+#        one-indexed-parameters: true

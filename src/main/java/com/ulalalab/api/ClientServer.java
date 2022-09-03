@@ -25,7 +25,7 @@ public class ClientServer {
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=0; x<1; x++) {
+			for(int x=0; x<2; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -40,8 +40,8 @@ public class ClientServer {
 				channelGroup.add(channel);
 			}
 
-//			while(true) {
-//				Thread.sleep(1000);
+			while(true) {
+				Thread.sleep(1000);
 
 				Random random = new Random();
 				int s = random.nextInt();
@@ -63,22 +63,27 @@ public class ClientServer {
 					ByteBuf buf = Unpooled.buffer();
 
 					String device = ("WX-")+i++;
-					buf.writeBytes(convertIntToByteArray(device.getBytes().length));
-					buf.writeBytes(device.getBytes());
-					buf.writeBytes(convertDoubleToByteArray(41.1));
-					buf.writeBytes(convertDoubleToByteArray(42.1));
-					buf.writeBytes(convertDoubleToByteArray(43.1));
-					buf.writeBytes(convertDoubleToByteArray(44.1));
-					buf.writeBytes(convertDoubleToByteArray(45.1));
-					buf.writeBytes(convertDoubleToByteArray(46.1));
-					buf.writeBytes(convertDoubleToByteArray(47.1));
-					buf.writeBytes(convertDoubleToByteArray(48.1));
-					buf.writeBytes(convertDoubleToByteArray(49.1));
-					buf.writeBytes(convertDoubleToByteArray(50.1));
+					buf.writeBytes(convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
+					buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+
+					double d = Math.round(Math.random()*100*10)/10.0;
+					buf.writeBytes(convertDoubleToByteArray(d));
+
+					d = Math.round(Math.random()*100*10)/10.0;
+					buf.writeBytes(convertDoubleToByteArray(d));
+
+					d = Math.round(Math.random()*100*10)/10.0;
+					buf.writeBytes(convertDoubleToByteArray(d));
+
+					d = Math.round(Math.random()*100*10)/10.0;
+					buf.writeBytes(convertDoubleToByteArray(d));
+
+					d = Math.round(Math.random()*100*10)/10.0;
+					buf.writeBytes(convertDoubleToByteArray(d));
 					ch.writeAndFlush(buf);
 					//buf.clear();
 				}
-//			}
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

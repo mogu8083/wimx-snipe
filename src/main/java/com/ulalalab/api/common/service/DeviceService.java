@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DeviceService {
@@ -15,7 +16,10 @@ public class DeviceService {
 	private DeviceRepository deviceRepository;
 
 	public void insert(Device device) {
-		System.out.println("##@@ device 등록!");
 		deviceRepository.save(device);
+	}
+
+	public void select(Device device) {
+		deviceRepository.findByDeviceId("111");
 	}
 }

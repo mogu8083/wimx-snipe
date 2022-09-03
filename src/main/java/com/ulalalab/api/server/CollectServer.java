@@ -16,7 +16,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
 
-@Component
+//@Component
 public class CollectServer {
 	private static Logger logger = LogManager.getLogger(CollectServer.class);
 

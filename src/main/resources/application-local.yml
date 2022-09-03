@@ -13,9 +13,10 @@ spring :
 #Log
 logging:
   level:
-    root: debug
+    root: info
     jdbc.sqltiming: info
     p6spy: info
     com.zaxxer: debug
+    org.springframework: info
   file:
     path: ""

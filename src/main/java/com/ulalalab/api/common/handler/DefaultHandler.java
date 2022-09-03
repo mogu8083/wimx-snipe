@@ -1,6 +1,8 @@
 package com.ulalalab.api.common.handler;
 
+import com.ulalalab.api.common.service.DeviceService;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
@@ -8,7 +10,11 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
+@ChannelHandler.Sharable
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 //	public static DeviceRepository deviceRepository;
@@ -23,6 +29,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 //	public void setEntityManager(EntityManager entityManager) {
 //		DefaultHandler.entityManager = entityManager;
 //	}
+
 	private static final Logger logger = LoggerFactory.getLogger(DefaultHandler.class);
 	private static Long receive = 0L;
 	private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -37,7 +44,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	// 수신 데이터 처리 완료
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) {
-		System.out.println("##@@ " + "complete!!");
+		//System.out.println("##@@ " + "complete!!");
 		ctx.flush();
 	}
 
@@ -55,6 +62,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		Channel channel = ctx.channel();
 		channelGroup.remove(channel);
+		ctx.close();
 
 		System.out.println("##@@ " + ctx.channel().toString() + " 연결 해제 / 연결 갯수 : " + channelGroup.size());
 	}
@@ -62,7 +70,6 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		cause.printStackTrace();
-		super.exceptionCaught(ctx, cause);
 		ctx.close();
 	}
 }
