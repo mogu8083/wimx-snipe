@@ -1,40 +1,32 @@
 package com.ulalalab.api.common.handler;
 
 import com.ulalalab.api.common.model.Device;
-import com.ulalalab.api.common.repository.DeviceRepository;
-import com.ulalalab.api.common.service.DeviceService;
+import com.ulalalab.api.server.EventServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.concurrent.AbstractEventExecutor;
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.SingleThreadEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.concurrent.Executors;
 
 @Component
 @ChannelHandler.Sharable
 public class DataHandler extends ChannelInboundHandlerAdapter {
 
-	@Autowired
-	private DeviceService deviceService;
+	private static final Logger logger = LoggerFactory.getLogger(EventServer.class);
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
-		String readMessage = ((ByteBuf) packet).toString(Charset.defaultCharset());
 
 		try {
 			ByteBuf buf = ((ByteBuf) packet);
@@ -82,11 +74,9 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 					, device.getCh4()
 					, device.getCh5()
 			);
-			//System.out.println("##@@ " + device.toString());
-
-			//deviceService.insert(device);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Packet 파싱 오류");
+			//e.printStackTrace();
 		}
 	}
 
@@ -94,8 +84,7 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) {
 		ctx.writeAndFlush(Unpooled.EMPTY_BUFFER) // 대기중인 메시지를 플러시하고 채널을 닫음
-				.addListener(ChannelFutureListener.CLOSE);
-		System.out.println("##@@ " + "data Handler!!");
+			.addListener(ChannelFutureListener.CLOSE);
 	}
 
 	@Override

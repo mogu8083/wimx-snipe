@@ -1,5 +1,6 @@
 package com.ulalalab.api;
 
+import com.ulalalab.api.common.util.ByteUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -25,7 +26,7 @@ public class ClientServer {
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=0; x<2; x++) {
+			for(int x=0; x<1; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -40,7 +41,7 @@ public class ClientServer {
 				channelGroup.add(channel);
 			}
 
-			while(true) {
+//			while(true) {
 				Thread.sleep(1000);
 
 				Random random = new Random();
@@ -63,41 +64,29 @@ public class ClientServer {
 					ByteBuf buf = Unpooled.buffer();
 
 					String device = ("WX-")+i++;
-					buf.writeBytes(convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
+					buf.writeBytes(ByteUtil.convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
 					buf.writeBytes(device.getBytes(Charset.defaultCharset()));
 
 					double d = Math.round(Math.random()*100*10)/10.0;
-					buf.writeBytes(convertDoubleToByteArray(d));
+					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
 					d = Math.round(Math.random()*100*10)/10.0;
-					buf.writeBytes(convertDoubleToByteArray(d));
+					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
 					d = Math.round(Math.random()*100*10)/10.0;
-					buf.writeBytes(convertDoubleToByteArray(d));
+					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
 					d = Math.round(Math.random()*100*10)/10.0;
-					buf.writeBytes(convertDoubleToByteArray(d));
+					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
 					d = Math.round(Math.random()*100*10)/10.0;
-					buf.writeBytes(convertDoubleToByteArray(d));
+					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 					ch.writeAndFlush(buf);
 					//buf.clear();
 				}
-			}
+//			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static byte[] convertDoubleToByteArray(double number) {
-		ByteBuffer byteBuffer = ByteBuffer.allocate(Double.BYTES);
-		byteBuffer.putDouble(number);
-		return byteBuffer.array();
-	}
-
-	private static byte[] convertIntToByteArray(int number) {
-		ByteBuffer byteBuffer = ByteBuffer.allocate(Integer.BYTES);
-		byteBuffer.putInt(number);
-		return byteBuffer.array();
 	}
 }
