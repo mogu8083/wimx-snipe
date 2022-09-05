@@ -1,5 +1,6 @@
 package com.ulalalab.api;
 
+import com.ulalalab.api.common.service.InitService;
 import com.ulalalab.api.common.util.ByteUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -11,17 +12,28 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
+@Component
+@Profile("client")
 public class ClientServer {
 
-	public static void main(String[] args) {
+	private static final Logger logger = LoggerFactory.getLogger(InitService.class);
 
+	@PostConstruct
+	public void start() {
 		try {
+			logger.info("ClientServer 실행");
+
 			EventLoopGroup group = new NioEventLoopGroup();
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -37,8 +49,6 @@ public class ClientServer {
 							}
 						});
 				int mod = x % 10;
-				System.out.println("##@@ " + x);
-				System.out.println("##@@ " + mod);
 				channel = bootstrap.connect("127.0.0.1", Integer.parseInt("3808"+mod)).sync().channel();
 				channelGroup.add(channel);
 			}
