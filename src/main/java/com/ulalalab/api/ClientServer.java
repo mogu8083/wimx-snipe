@@ -63,6 +63,7 @@ public class ClientServer {
 
 				int i = 1;
 				for(Channel ch : channelGroup) {
+					Thread.sleep(10);
 					ByteBuf buf = Unpooled.buffer();
 
 					String device = ("WX-")+i++;
@@ -84,7 +85,6 @@ public class ClientServer {
 					d = Math.round(Math.random()*100*10)/10.0;
 					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 					ch.writeAndFlush(buf);
-					//buf.clear();
 				}
 			}
 		} catch(Exception e) {

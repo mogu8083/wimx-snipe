@@ -54,7 +54,6 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 			device.setCh3(ch3);
 			device.setCh4(ch4);
 			device.setCh5(ch5);
-
 			jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
 					, device.getTime()
 					, device.getDeviceId()
