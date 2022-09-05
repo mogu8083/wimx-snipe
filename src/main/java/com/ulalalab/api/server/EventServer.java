@@ -49,8 +49,16 @@ public class EventServer {
 							p.addLast(dataHandler);
 						}
 					});
-			bootstrap.bind(38080).sync().channel().closeFuture().sync();
-
+			bootstrap.bind(38080);
+			bootstrap.bind(38081);
+			bootstrap.bind(38082);
+			bootstrap.bind(38083);
+			bootstrap.bind(38084);
+			bootstrap.bind(38085);
+			bootstrap.bind(38086);
+			bootstrap.bind(38087);
+			bootstrap.bind(38088);
+			bootstrap.bind(38089).sync().channel().closeFuture().sync();
 		} catch(Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
