@@ -26,7 +26,7 @@ public class ClientServer {
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=0; x<1; x++) {
+			for(int x=1; x<1000; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -36,12 +36,14 @@ public class ClientServer {
 
 							}
 						});
-
-				channel = bootstrap.connect("127.0.0.1", 38080).sync().channel();
+				int mod = x % 10;
+				System.out.println("##@@ " + x);
+				System.out.println("##@@ " + mod);
+				channel = bootstrap.connect("127.0.0.1", Integer.parseInt("3808"+mod)).sync().channel();
 				channelGroup.add(channel);
 			}
 
-//			while(true) {
+			while(true) {
 				Thread.sleep(1000);
 
 				Random random = new Random();
@@ -84,7 +86,7 @@ public class ClientServer {
 					ch.writeAndFlush(buf);
 					//buf.clear();
 				}
-//			}
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -32,7 +32,7 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 			ByteBuf buf = ((ByteBuf) packet);
 
 			int deviceSize = buf.readInt();
-			String deviceId = buf.toString(deviceSize, deviceSize, Charset.defaultCharset());
+			String deviceId = buf.toString(4, deviceSize, Charset.defaultCharset());
 			//
 			buf.readBytes(deviceSize);
 			Double ch1 = buf.readDouble();
