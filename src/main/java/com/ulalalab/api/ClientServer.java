@@ -25,7 +25,7 @@ public class ClientServer {
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=0; x<2; x++) {
+			for(int x=0; x<1000; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -41,7 +41,7 @@ public class ClientServer {
 			}
 
 			while(true) {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 
 				Random random = new Random();
 				int s = random.nextInt();
@@ -60,6 +60,7 @@ public class ClientServer {
 
 				int i = 1;
 				for(Channel ch : channelGroup) {
+					Thread.sleep(10);
 					ByteBuf buf = Unpooled.buffer();
 
 					String device = ("WX-")+i++;
@@ -81,7 +82,6 @@ public class ClientServer {
 					d = Math.round(Math.random()*100*10)/10.0;
 					buf.writeBytes(convertDoubleToByteArray(d));
 					ch.writeAndFlush(buf);
-					//buf.clear();
 				}
 			}
 		} catch(Exception e) {
