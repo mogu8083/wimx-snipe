@@ -41,7 +41,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		Channel channel = ctx.channel();
 		channelGroup.add(channel);
 
-		System.out.println("##@@ " + ctx.channel().toString() + " 연결 / 연결 갯수 : " + channelGroup.size());
+		logger.info(ctx.channel().toString() + " 연결 / 연결 갯수 : " + channelGroup.size());
 	}
 
 	// 장비가 연결 해제 되었을 경우..
@@ -51,7 +51,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		channelGroup.remove(channel);
 		ctx.close();
 
-		System.out.println("##@@ " + ctx.channel().toString() + " 연결 해제 / 연결 갯수 : " + channelGroup.size());
+		logger.info(ctx.channel().toString() + " 연결 해제 / 연결 갯수 : " + channelGroup.size());
 	}
 
 	@Override
