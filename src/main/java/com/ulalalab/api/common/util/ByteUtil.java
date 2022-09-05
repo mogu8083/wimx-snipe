@@ -170,4 +170,22 @@ public class ByteUtil {
         data[1] = (byte) (number & 0xff);
         return data;
     }
+
+    /**
+     * double -> byte 배열 (8byte)
+     */
+    public static byte[] convertDoubleToByteArray(double number) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Double.BYTES);
+        byteBuffer.putDouble(number);
+        return byteBuffer.array();
+    }
+
+    /**
+     * int -> byte 배열 (4byte)
+     */
+    public static byte[] convertIntToByteArray(int number) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Integer.BYTES);
+        byteBuffer.putInt(number);
+        return byteBuffer.array();
+    }
 }

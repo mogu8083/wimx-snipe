@@ -1,23 +1,12 @@
 package com.ulalalab.api.instance;
 
-import com.ulalalab.api.common.repository.DeviceRepository;
-import com.ulalalab.api.server.Client;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-@Component
 public class GlobalInstance {
-    private static Selector selector = null;
-    private static Map<Client, SelectionKey> clientMap = null;
-    private static Thread serverThread = null;
+    //private static Selector selector = null;
+    //private static Map<Client, SelectionKey> clientMap = null;
+    //private static Thread serverThread = null;
+    public static boolean eventServerFlag = false;
 
+    /*
     public static Selector getSelector() throws IOException {
         if(selector==null) {
             selector = Selector.open();
@@ -42,4 +31,5 @@ public class GlobalInstance {
         }
         return serverThread;
     }
+    */
 }

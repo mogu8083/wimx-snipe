@@ -9,10 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 public class MainApplication {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		SpringApplication.run(MainApplication.class, args);
-//		ConfigurableApplicationContext ctx = SpringApplication.run(MainApplication.class, args);
-//
-//		ctx.getBean(NettyServer.class).init();
 	}
 }

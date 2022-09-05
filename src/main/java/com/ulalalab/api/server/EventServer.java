@@ -1,10 +1,9 @@
-package com.ulalalab.api;
+package com.ulalalab.api.server;
 
 import com.ulalalab.api.common.handler.DataHandler;
 import com.ulalalab.api.common.handler.DefaultHandler;
-import com.ulalalab.api.common.repository.DeviceRepository;
+import com.ulalalab.api.instance.GlobalInstance;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -13,13 +12,15 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import javax.annotation.PostConstruct;
 
 @Component
-public class NettyServer {
+public class EventServer {
+
+	private static final Logger logger = LoggerFactory.getLogger(EventServer.class);
 
 	@Autowired
 	private DefaultHandler defaultHandler;
@@ -27,19 +28,20 @@ public class NettyServer {
 	@Autowired
 	private DataHandler dataHandler;
 
-	@PostConstruct
-	public void init() throws InterruptedException {
-		System.out.println("##@@ " + "init");
+	public void start() throws InterruptedException {
+		logger.info("Event Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
+			GlobalInstance.eventServerFlag = true;
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.DEBUG))
+					.handler(new LoggingHandler(LogLevel.INFO))
 					.childHandler(new ChannelInitializer<SocketChannel>() {
+
 						@Override
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
@@ -50,10 +52,12 @@ public class NettyServer {
 			bootstrap.bind(38080).sync().channel().closeFuture().sync();
 
 		} catch(Exception e) {
+			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			workerGroup.shutdownGracefully().sync();
 			bossGroup.shutdownGracefully().sync();
+			GlobalInstance.eventServerFlag = false;
 		}
 	}
 }

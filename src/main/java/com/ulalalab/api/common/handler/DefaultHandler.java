@@ -17,19 +17,6 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
-//	public static DeviceRepository deviceRepository;
-//	public static EntityManager entityManager;
-
-//	@Autowired
-//	public void setDeviceRepository(DeviceRepository deviceRepository) {
-//		DefaultHandler.deviceRepository = deviceRepository;
-//	}
-//
-//	@Autowired
-//	public void setEntityManager(EntityManager entityManager) {
-//		DefaultHandler.entityManager = entityManager;
-//	}
-
 	private static final Logger logger = LoggerFactory.getLogger(DefaultHandler.class);
 	private static Long receive = 0L;
 	private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
