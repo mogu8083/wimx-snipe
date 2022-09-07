@@ -7,7 +7,6 @@ spring :
     hikari:
       auto-commit: true
       connectionTimeout: 30000
-      maximumPoolSize: 10
       maxLifetime: 1800000
       poolName: HikariCP
       readOnly: false

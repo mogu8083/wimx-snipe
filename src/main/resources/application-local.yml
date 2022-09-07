@@ -1,8 +1,14 @@
 server:
   port: 38080
 
-spring :
+spring:
+  redis:
+    host: 211.62.140.72
+    port: 46379
+    password: dak102938$&
   datasource:
+    hikari:
+      maximumPoolSize: 10
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"

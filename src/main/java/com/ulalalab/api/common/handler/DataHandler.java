@@ -12,8 +12,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 
@@ -27,7 +32,10 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 	private ByteBuf buff;
 
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	// 핸들러가 생성
 	@Override
@@ -39,6 +47,9 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) {
 		buff = null;
+
+
+		StringUtils.hasText("123213213");
 	}
 
 	@Override
@@ -80,6 +91,18 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 				device.setCh4(ch4);
 				device.setCh5(ch5);
 
+				// 1. Redis Update
+				String key = "";
+				ValueOperations<String, Object> vop = redisTemplate.opsForValue();
+				JSONObject redisObject = new JSONObject();
+				redisObject.put("ch1", ch1);
+				redisObject.put("ch2", ch2);
+				redisObject.put("ch3", ch3);
+				redisObject.put("ch4", ch4);
+				redisObject.put("ch5", ch5);
+				vop.set(deviceId, redisObject.toString());
+
+				// 2. TimscaleDB Update
 				jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
 						, device.getTime()
 						, device.getDeviceId()
