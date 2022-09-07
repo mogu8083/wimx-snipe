@@ -1,6 +1,7 @@
 package com.ulalalab.api.common.handler;
 
 import com.ulalalab.api.common.model.Device;
+import com.ulalalab.api.common.util.ByteUtil;
 import com.ulalalab.api.server.EventServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -46,52 +47,65 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 		try {
 			ByteBuf buf = ((ByteBuf) packet);
 
+			StringBuffer sb = new StringBuffer();
+			for(int i=0; i<buf.readableBytes(); i++) {
+				sb.append(ByteUtil.byteToHexString(buf.getByte(i)) + " ");
+			}
+			logger.info("Receive HEX : " + sb.toString());
+
+			LocalDateTime now = LocalDateTime.now();
 			int deviceSize = buf.readInt();
-			String deviceId = buf.toString(4, deviceSize, Charset.defaultCharset());
-			//
-			buf.readBytes(deviceSize);
-			Double ch1 = buf.readDouble();
-			Double ch2 = buf.readDouble();
-			Double ch3 = buf.readDouble();
-			Double ch4 = buf.readDouble();
-			Double ch5 = buf.readDouble();
-			//Double ch6 = buf.readDouble();
-			//Double ch7 = buf.readDouble();
-			//Double ch8 = buf.readDouble();
-			//Double ch9 = buf.readDouble();
-			//Double ch10 = buf.readDouble();
 
-			Device device = new Device();
-			device.setTime(LocalDateTime.now());
-			device.setDeviceId(deviceId);
-			device.setCh1(ch1);
-			device.setCh2(ch2);
-			device.setCh3(ch3);
-			device.setCh4(ch4);
-			device.setCh5(ch5);
+			try {
+				String deviceId = buf.toString(4, deviceSize, Charset.defaultCharset());
+				//
+				buf.readBytes(deviceSize);
+				Double ch1 = buf.readDouble();
+				Double ch2 = buf.readDouble();
+				Double ch3 = buf.readDouble();
+				Double ch4 = buf.readDouble();
+				Double ch5 = buf.readDouble();
+				//Double ch6 = buf.readDouble();
+				//Double ch7 = buf.readDouble();
+				//Double ch8 = buf.readDouble();
+				//Double ch9 = buf.readDouble();
+				//Double ch10 = buf.readDouble();
 
-			jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
-					, device.getTime()
-					, device.getDeviceId()
-					, device.getCh1()
-					, device.getCh2()
-					, device.getCh3()
-					, device.getCh4()
-					, device.getCh5()
-			);
+				Device device = new Device();
+				device.setTime(now);
+				device.setDeviceId(deviceId);
+				device.setCh1(ch1);
+				device.setCh2(ch2);
+				device.setCh3(ch3);
+				device.setCh4(ch4);
+				device.setCh5(ch5);
 
-			jdbcTemplate.update("insert into ulalalab_b(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
-					, device.getTime()
-					, device.getDeviceId()
-					, device.getCh1()
-					, device.getCh2()
-					, device.getCh3()
-					, device.getCh4()
-					, device.getCh5()
-			);
-			buf.release();
+				jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
+						, device.getTime()
+						, device.getDeviceId()
+						, device.getCh1()
+						, device.getCh2()
+						, device.getCh3()
+						, device.getCh4()
+						, device.getCh5()
+				);
+
+				jdbcTemplate.update("insert into ulalalab_b(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
+						, device.getTime()
+						, device.getDeviceId()
+						, device.getCh1()
+						, device.getCh2()
+						, device.getCh3()
+						, device.getCh4()
+						, device.getCh5()
+				);
+				buf.release();
+			} catch(Exception e) {
+				logger.error(this.getClass() + " / " + e.getMessage());
+				buf.release();
+			}
 		} catch (Exception e) {
-			logger.error("Packet 파싱 오류");
+			logger.error(this.getClass() + " / " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

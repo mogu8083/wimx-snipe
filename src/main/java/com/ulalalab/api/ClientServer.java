@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -60,9 +59,9 @@ public class ClientServer {
 				channelGroup.add(channel);
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(this.getClass() + " 연결 실패 => " + e.getMessage());
 
+			Thread.sleep(5000);
 			this.start();
 		}
 	}

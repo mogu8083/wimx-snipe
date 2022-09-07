@@ -8,14 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.util.Random;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 	private int deviceId;
-	private ScheduledFuture scheduledFuture;
 
 	public ClientHandler(int deviceId) {
 		this.deviceId = deviceId;
@@ -61,33 +58,45 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 //		}, 1000, TimeUnit.MILLISECONDS);
 
 		while(true) {
-			Thread.sleep(100);
+			if(ctx.channel().isWritable()) {
+				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(50);
 
-			Random random = new Random();
-			int s = random.nextInt();
+				Thread.sleep(500);
 
-			ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer(65);
+				Random random = new Random();
+				int s = random.nextInt();
 
-			String device = ("WX-") + deviceId;
-			buf.writeBytes(ByteUtil.convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
-			buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+				String device = ("WX-") + deviceId;
+				buf.writeBytes(ByteUtil.convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
+				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
 
-			double d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				double d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
 
-			ctx.writeAndFlush(buf);
+				StringBuffer sb = new StringBuffer();
+
+				for (int i = 0; i < buf.readableBytes(); i++) {
+					sb.append(ByteUtil.byteToHexString(buf.getByte(i)) + " ");
+				}
+
+				logger.info("HEX : " + sb.toString());
+				ctx.writeAndFlush(buf);
+				buf.clear();
+			} else {
+				break;
+			}
 		}
 	}
 }
