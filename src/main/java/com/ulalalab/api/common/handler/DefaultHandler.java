@@ -1,6 +1,5 @@
 package com.ulalalab.api.common.handler;
 
-import com.ulalalab.api.common.service.DeviceService;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +9,6 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,6 +54,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		logger.info(this.getClass() + " / " + cause.getMessage());
 		cause.printStackTrace();
 		ctx.close();
 	}

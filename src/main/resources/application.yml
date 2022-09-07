@@ -43,3 +43,10 @@ spring :
 #      pageable:
 #        default-page-size: 10
 #        one-indexed-parameters: true
+
+netty:
+  tcp-port: 38080
+  boss-count: 1
+  worker-count: 10
+  keep-alive: true
+  backlog: 100

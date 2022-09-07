@@ -22,8 +22,23 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventServer.class);
 
+	private int DATA_LENGTH = 1024;
+	private ByteBuf buff;
+
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+
+	// 핸들러가 생성
+	@Override
+	public void handlerAdded(ChannelHandlerContext ctx) {
+		buff = ctx.alloc().buffer(DATA_LENGTH);
+	}
+
+	// 핸들러가 제거될 때 호출되는 메소드
+	@Override
+	public void handlerRemoved(ChannelHandlerContext ctx) {
+		buff = null;
+	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
@@ -54,6 +69,7 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 			device.setCh3(ch3);
 			device.setCh4(ch4);
 			device.setCh5(ch5);
+
 			jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
 					, device.getTime()
 					, device.getDeviceId()
@@ -73,9 +89,10 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 					, device.getCh4()
 					, device.getCh5()
 			);
+			buf.release();
 		} catch (Exception e) {
 			logger.error("Packet 파싱 오류");
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -88,6 +105,7 @@ public class DataHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		logger.error(this.getClass() + " / " +  cause.getCause());
 		cause.printStackTrace();
 		ctx.close();
 	}
