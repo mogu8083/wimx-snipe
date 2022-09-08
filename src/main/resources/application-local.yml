@@ -1,5 +1,5 @@
-server:
-  port: 38080
+#server:
+  #port: 37080
 
 spring:
   redis:
@@ -26,3 +26,7 @@ logging:
     org.springframework: info
   file:
     path: "/log/netty"
+
+#Netty
+netty:
+  tcp-port: 37080

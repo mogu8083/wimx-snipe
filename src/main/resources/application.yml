@@ -1,6 +1,6 @@
-server:
-  error.whitelabel.enabled: false
-  port: 38080
+#server:
+  #error.whitelabel.enabled: false
+  #port: 38080
 
 spring :
   datasource:
@@ -44,7 +44,6 @@ spring :
 #        one-indexed-parameters: true
 
 netty:
-  tcp-port: 38080
   boss-count: 1
   worker-count: 10
   keep-alive: true
