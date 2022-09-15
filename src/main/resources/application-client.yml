@@ -2,19 +2,19 @@
   #port: 37090
 
 spring :
-  redis:
-    host: 211.62.140.72
-    port: 46379
-    password: dak102938$&
-  datasource:
-    hikari:
-      maximumPoolSize: 1
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
-    #url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
-    username: ulalalab
-    password: ulalalab12!@
+#  redis:
+#    host: 211.62.140.72
+#    port: 46379
+#    password: dak102938$&
+#  datasource:
+#    hikari:
+#      maximumPoolSize: 1
+#    type: com.zaxxer.hikari.HikariDataSource
+#    driver-class-name: org.postgresql.Driver
+#    url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
+#    #url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
+#    username: ulalalab
+#    password: ulalalab12!@
 
 #Log
 logging:
@@ -30,3 +30,4 @@ logging:
 #Netty
 netty:
   tcp-port: 37080
+  http-port: 36080

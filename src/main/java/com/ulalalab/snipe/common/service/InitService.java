@@ -2,6 +2,7 @@ package com.ulalalab.snipe.common.service;
 
 import com.ulalalab.snipe.server.EventServer;
 import com.ulalalab.snipe.server.EventServerChecker;
+import com.ulalalab.snipe.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

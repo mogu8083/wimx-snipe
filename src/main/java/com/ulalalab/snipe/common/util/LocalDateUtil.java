@@ -96,9 +96,4 @@ public class LocalDateUtil {
     public static String plusMonth(LocalDate localDate, String DATE_MONTH_FORMAT, int plus) {
         return DateTimeFormatter.ofPattern(DATE_MONTH_FORMAT).format(localDate.plusMonths(plus));
     }
-
-    /**
-     * Date 패턴 포맷터
-     * @param pattern String
-     */
 }

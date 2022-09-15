@@ -38,7 +38,7 @@ public class ClientServer {
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<1000; x++) {
+			for(int x=1; x<500; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)

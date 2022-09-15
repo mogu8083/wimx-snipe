@@ -57,7 +57,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 //			}
 //		}, 1000, TimeUnit.MILLISECONDS);
 
-//		while(true) {
+		while(true) {
 			if(ctx.channel().isWritable()) {
 				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(50);
 
@@ -66,7 +66,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				Random random = new Random();
 				int s = random.nextInt();
 
+
 				String device = ("WX-") + deviceId;
+				buf.writeByte(0x02);
 				buf.writeBytes(ByteUtil.convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
 				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
 
@@ -84,6 +86,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 				d = Math.round(Math.random() * 100 * 10) / 10.0;
 				buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
+				buf.writeByte(0x03);
 
 				StringBuffer sb = new StringBuffer();
 
@@ -95,8 +98,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			} else {
-//				break;
+				break;
 			}
-//		}
+		}
 	}
 }
