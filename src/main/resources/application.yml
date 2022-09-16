@@ -45,6 +45,6 @@ spring :
 
 netty:
   boss-count: 1
-  worker-count: 10
+  worker-count: 100
   keep-alive: true
   backlog: 100

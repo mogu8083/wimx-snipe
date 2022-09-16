@@ -1,10 +1,13 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.common.codec.PacketDecoder;
-import com.ulalalab.snipe.common.handler.*;
+import com.ulalalab.snipe.common.handler.DefaultHandler;
+import com.ulalalab.snipe.common.handler.ProcessHandler;
 import com.ulalalab.snipe.common.instance.GlobalInstance;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -18,16 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
-public class EventServer {
+import javax.annotation.PostConstruct;
 
-	private static final Logger logger = LoggerFactory.getLogger(EventServer.class);
+//@Component
+public class HttpServer {
+
+	private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
 	@Autowired
 	private ProcessHandler processHandler;
-
-	@Value("${netty.tcp-port}")
-	private int tcpPort;
 
 	@Value("${netty.http-port}")
 	private int httpPort;
@@ -38,48 +40,16 @@ public class EventServer {
 	@Value("${netty.worker-count}")
 	private int workerCount;
 
-	EventLoopGroup bossGroup;
-	EventLoopGroup workerGroup;
-
 	public void start() throws InterruptedException {
-		logger.info("Event Server / Http Server 실행");
+		logger.info("Http Server 실행");
 
-		bossGroup = new NioEventLoopGroup(bossCount);
-		workerGroup = new NioEventLoopGroup(workerCount);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
+		EventLoopGroup workerGroup = new NioEventLoopGroup(workerCount);
 
 		try {
 			GlobalInstance.eventServerFlag = true;
-
-			// 1. EventServer
-			ServerBootstrap eventBootstrap = new ServerBootstrap();
-			eventBootstrap.group(bossGroup, workerGroup)
-					.channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.INFO))
-					.childHandler(new ChannelInitializer<SocketChannel>() {
-
-						@Override
-						public void initChannel(SocketChannel ch) {
-							ChannelPipeline p = ch.pipeline();
-
-							// Packet 디코더
-							p.addLast(new PacketDecoder());
-
-							// 기본 ( 연결 관련 )
-							p.addLast(new DefaultHandler());
-
-							// 데이터 가공 처리
-							p.addLast(processHandler);
-						}
-					});
-			eventBootstrap.bind(tcpPort).sync().channel();
-
-			// 2. HttpServer
-			ServerBootstrap httpBootstrap = new ServerBootstrap();
-
-			bossGroup = new NioEventLoopGroup(bossCount);
-			workerGroup = new NioEventLoopGroup(workerCount);
-
-			httpBootstrap.group(bossGroup, workerGroup)
+			ServerBootstrap bootstrap = new ServerBootstrap();
+			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
 					.childHandler(new ChannelInitializer<SocketChannel>() {
@@ -89,18 +59,15 @@ public class EventServer {
 							ChannelPipeline p = ch.pipeline();
 							p.addLast(new HttpRequestDecoder());
 							p.addLast(new HttpResponseEncoder());
-							p.addLast(new HttpResponseHandler());
 						}
 					});
-			httpBootstrap.bind(httpPort).sync().channel().closeFuture().sync();
-
+			bootstrap.bind(httpPort).sync().channel().closeFuture().sync();
 		} catch(Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			workerGroup.shutdownGracefully().sync();
 			bossGroup.shutdownGracefully().sync();
-			GlobalInstance.eventServerFlag = false;
 
 			Thread.sleep(5000);
 			this.start();

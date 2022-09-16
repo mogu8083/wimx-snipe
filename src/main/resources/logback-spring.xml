@@ -16,7 +16,7 @@
     </springProfile>
 
     <!-- Profile : Local -->
-    <springProfile name="local">
+    <springProfile name="local1">
         <appender name="ERROR_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <fileNamePattern>${LOGGING_FILE_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>

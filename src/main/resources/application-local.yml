@@ -25,8 +25,9 @@ logging:
     com.zaxxer: debug
     org.springframework: info
   file:
-    path: "/log/netty"
+    path: "d:/log/netty"
 
 #Netty
 netty:
-  tcp-port: 37080
+  tcp-port: 37081
+  http-port: 36081
