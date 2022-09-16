@@ -57,6 +57,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			);
 		} catch(Exception e) {
 			e.printStackTrace();
+			ctx.close();
 		} finally {
 			ReferenceCountUtil.safeRelease(packet);
 		}

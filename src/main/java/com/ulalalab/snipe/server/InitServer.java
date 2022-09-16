@@ -14,16 +14,22 @@ public class InitServer {
 	private static final Logger logger = LoggerFactory.getLogger(InitServer.class);
 
 	@Autowired
-	private EventServer eventServer;
+	private TcpServer tcpServer;
 
 	@Autowired
-	private EventServerChecker eventServerChecker;
+	private HttpServer httpServer;
+
+//	@Autowired
+//	private EventServerChecker eventServerChecker;
 
 	@PostConstruct
 	public void init() throws Exception {
-		logger.info("Init Service");
+		logger.info("Init Server");
 
-		eventServerChecker.start();
-		eventServer.start();
+		// TCP Server
+		tcpServer.start();
+
+		// Http Server
+		httpServer.start();
 	}
 }

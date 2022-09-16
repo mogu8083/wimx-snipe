@@ -25,44 +25,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		// 1초마다 전송
-//		scheduledFuture = ctx.executor().schedule(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				if(scheduledFuture!=null) {
-//					Random random = new Random();
-//					int s = random.nextInt();
-//
-//					ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer(65);
-//
-//					String device = ("WX-") + deviceId;
-//					buf.writeBytes(ByteUtil.convertIntToByteArray(device.getBytes(Charset.defaultCharset()).length));
-//					buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-//
-//					double d = Math.round(Math.random() * 100 * 10) / 10.0;
-//					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
-//
-//					d = Math.round(Math.random() * 100 * 10) / 10.0;
-//					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
-//
-//					d = Math.round(Math.random() * 100 * 10) / 10.0;
-//					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
-//
-//					d = Math.round(Math.random() * 100 * 10) / 10.0;
-//					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
-//
-//					d = Math.round(Math.random() * 100 * 10) / 10.0;
-//					buf.writeBytes(ByteUtil.convertDoubleToByteArray(d));
-//
-//					ctx.writeAndFlush(buf);
-//					logger.info("##");
-//					ctx.close();
-//				}
-//			}
-//		}, 1000, TimeUnit.MILLISECONDS);
 
-		while(true) {
+		boolean loop = true;
+
+		do {
 			if(ctx.channel().isWritable()) {
 				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
 
@@ -146,9 +112,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				ctx.writeAndFlush(buf);
 
 				buf.clear();
-			} else {
-//				break;
 			}
-		}
+		} while (loop);
 	}
 }

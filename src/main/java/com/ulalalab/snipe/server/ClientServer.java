@@ -1,7 +1,6 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.common.handler.ClientHandler;
-import com.ulalalab.snipe.common.service.InitService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -23,7 +22,7 @@ import javax.annotation.PostConstruct;
 @Profile("client")
 public class ClientServer {
 
-	private static final Logger logger = LoggerFactory.getLogger(InitService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ClientServer.class);
 
 	@Value("${netty.tcp-port}")
 	private int tcpPort;
@@ -33,12 +32,12 @@ public class ClientServer {
 		try {
 			logger.info("ClientServer 실행");
 
-			EventLoopGroup group = new NioEventLoopGroup(100);
+			EventLoopGroup group = new NioEventLoopGroup();
 			ChannelFuture channelFuture;
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<100; x++) {
+			for(int x=1; x<2; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)

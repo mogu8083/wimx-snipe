@@ -1,41 +1,33 @@
 package com.ulalalab.snipe.device.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
-@Entity
-@Table(name="ulalalab_a")
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @ToString
 public class Device {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // UTC 시간
     private LocalDateTime time;
 
     // 장비 이름
-    @Column
     private String deviceId;
 
-    @Column
+    // 채널 1
     private Double ch1;
 
-    @Column
+    // 채널 2
     private Double ch2;
 
-    @Column
+    // 채널 3
     private Double ch3;
 
-    @Column
+    // 채널 4
     private Double ch4;
 
-    @Column
+    // 채널 5
     private Double ch5;
 }

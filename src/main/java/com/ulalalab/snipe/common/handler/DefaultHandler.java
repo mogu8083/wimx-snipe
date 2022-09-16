@@ -44,7 +44,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.info(this.getClass() + " / " + cause.getMessage());
-		cause.printStackTrace();
+		//cause.printStackTrace();
 		ctx.close();
 	}
 }

@@ -1,9 +1,6 @@
 package com.ulalalab.snipe.server;
 
-import com.ulalalab.snipe.common.codec.PacketDecoder;
-import com.ulalalab.snipe.common.handler.DefaultHandler;
-import com.ulalalab.snipe.common.handler.ProcessHandler;
-import com.ulalalab.snipe.common.instance.GlobalInstance;
+import com.ulalalab.snipe.common.handler.HttpResponseHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -17,38 +14,25 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-
-//@Component
+@Component
 public class HttpServer {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
-	@Autowired
-	private ProcessHandler processHandler;
-
 	@Value("${netty.http-port}")
 	private int httpPort;
 
-	@Value("${netty.boss-count}")
-	private int bossCount;
-
-	@Value("${netty.worker-count}")
-	private int workerCount;
-
-	public void start() throws InterruptedException {
+	public void start() throws Exception {
 		logger.info("Http Server 실행");
 
-		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
-		EventLoopGroup workerGroup = new NioEventLoopGroup(workerCount);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		ServerBootstrap bootstrap = new ServerBootstrap();
 
 		try {
-			GlobalInstance.eventServerFlag = true;
-			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
@@ -59,13 +43,13 @@ public class HttpServer {
 							ChannelPipeline p = ch.pipeline();
 							p.addLast(new HttpRequestDecoder());
 							p.addLast(new HttpResponseEncoder());
+							p.addLast(new HttpResponseHandler());
 						}
 					});
-			bootstrap.bind(httpPort).sync().channel().closeFuture().sync();
+			bootstrap.bind(httpPort).sync().channel();//.closeFuture().sync();
 		} catch(Exception e) {
 			logger.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
+
 			workerGroup.shutdownGracefully().sync();
 			bossGroup.shutdownGracefully().sync();
 
