@@ -30,6 +30,17 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 LocalDateTime now = LocalDateTime.now();
 
+                /* 데이터 형식
+                0x02            : STX
+                (x, 가변)         : deviceId
+                Double : 8byte
+                Double : 8byte
+                Double : 8byte
+                Double : 8byte
+                Double : 8byte
+                0x03            : ETX
+                */
+
                 // 0x02
                 in.readByte();
                 int deviceSize = in.readInt();
