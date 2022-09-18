@@ -28,7 +28,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-		boolean loop = false;
+		boolean loop = true;
 
 		do {
 			if(ctx.channel().isWritable()) {

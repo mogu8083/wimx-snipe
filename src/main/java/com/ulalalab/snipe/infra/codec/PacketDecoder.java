@@ -67,8 +67,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh4(ch4);
                 device.setCh5(ch5);
 
-                logger.info(device.toString());
-
                 if(!deviceId.contains("WX")) {
                     throw new Exception("Not Vaild DeviceId -> " + sb.toString() + " / Device : " + device.toString());
                 }

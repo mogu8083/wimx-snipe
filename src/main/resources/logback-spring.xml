@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <springProfile name="local,client">
+    <springProfile name="local1,client">
         <root level="DEBUG">
             <appender-ref ref="STDOUT" />
         </root>
@@ -64,7 +64,7 @@
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] - %-4relative - [ %thread{10} ] %logger{20} : %msg%n </pattern>
             </encoder>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>INFO</level>
+                <level>ERROR</level>
                 <onMatch>ACCEPT</onMatch>
                 <onMismatch>DENY</onMismatch>
             </filter>
@@ -74,7 +74,7 @@
             <appender-ref ref="DECODE_ROLLING" />
         </logger>
 
-        <root level="DEBUG">
+        <root level="INFO">
             <appender-ref ref="ERROR_ROLLING" />
             <appender-ref ref="INFO_ROLLING" />
         </root>
