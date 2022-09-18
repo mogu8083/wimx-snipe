@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.common.config;
+package com.ulalalab.snipe.infra.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.common.handler;
+package com.ulalalab.snipe.infra.handler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;

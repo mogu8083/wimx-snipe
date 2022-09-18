@@ -1,14 +1,16 @@
-package com.ulalalab.snipe.common.handler;
+package com.ulalalab.snipe.infra.handler;
 
-import com.ulalalab.snipe.common.util.ByteUtil;
+import com.ulalalab.snipe.infra.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -26,7 +28,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-		boolean loop = true;
+		boolean loop = false;
 
 		do {
 			if(ctx.channel().isWritable()) {
@@ -110,7 +112,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				}
 				logger.info("HEX : " + sb.toString());
 				ctx.writeAndFlush(buf);
-
 				buf.clear();
 			}
 		} while (loop);

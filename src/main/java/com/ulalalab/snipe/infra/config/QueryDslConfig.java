@@ -1,4 +1,4 @@
-//package com.ulalalab.api.common.config;
+package com.ulalalab.snipe.infra.config;//package com.ulalalab.api.common.config;
 //
 //import com.querydsl.jpa.impl.JPAQueryFactory;
 //import org.springframework.context.annotation.Bean;

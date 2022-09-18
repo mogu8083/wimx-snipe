@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.common.util;
+package com.ulalalab.snipe.infra.util;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

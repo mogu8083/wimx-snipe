@@ -1,6 +1,6 @@
 package com.ulalalab.snipe.server;
 
-import com.ulalalab.snipe.common.handler.ClientHandler;
+import com.ulalalab.snipe.infra.handler.ClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

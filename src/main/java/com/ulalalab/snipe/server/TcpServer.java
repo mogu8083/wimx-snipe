@@ -1,9 +1,12 @@
 package com.ulalalab.snipe.server;
 
-import com.ulalalab.snipe.common.codec.PacketDecoder;
-import com.ulalalab.snipe.common.handler.*;
+import com.ulalalab.snipe.infra.codec.PacketDecoder;
+import com.ulalalab.snipe.infra.handler.DefaultHandler;
+import com.ulalalab.snipe.infra.handler.ProcessHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -35,14 +38,12 @@ public class TcpServer {
 	@Value("${netty.worker-count}")
 	private int workerCount;
 
-	EventLoopGroup bossGroup;
-	EventLoopGroup workerGroup;
 
 	public void start() throws InterruptedException {
 		logger.info("Tcp Server 실행");
 
-		bossGroup = new NioEventLoopGroup(bossCount);
-		workerGroup = new NioEventLoopGroup(workerCount);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
+		EventLoopGroup workerGroup = new NioEventLoopGroup(workerCount);
 
 		try {
 

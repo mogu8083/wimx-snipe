@@ -30,6 +30,6 @@ public class InitServer {
 		tcpServer.start();
 
 		// Http Server
-		httpServer.start();
+		//httpServer.start();
 	}
 }

@@ -1,4 +1,4 @@
-//package com.ulalalab.api.common.config;
+package com.ulalalab.snipe.infra.config;//package com.ulalalab.api.common.config;
 //
 //import org.influxdb.dto.Point;
 //import org.springframework.boot.context.properties.EnableConfigurationProperties;

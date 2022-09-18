@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.common.handler;
+package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
 import io.netty.channel.Channel;

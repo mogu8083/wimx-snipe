@@ -24,6 +24,7 @@ logging:
     p6spy: off
     com.zaxxer: debug
     org.springframework: info
+    com.ulalalab.snipe: info
   file:
     path: "d:/log/netty"
 

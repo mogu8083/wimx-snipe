@@ -1,13 +1,13 @@
-package com.ulalalab.snipe.common.codec;
+package com.ulalalab.snipe.infra.codec;
 
-import com.ulalalab.snipe.common.util.ByteUtil;
 import com.ulalalab.snipe.device.model.Device;
+import com.ulalalab.snipe.infra.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,9 +67,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh4(ch4);
                 device.setCh5(ch5);
 
+                logger.info(device.toString());
+
+                if(!deviceId.contains("WX")) {
+                    throw new Exception("Not Vaild DeviceId -> " + sb.toString() + " / Device : " + device.toString());
+                }
                 out.add(device);
                 in.slice(in.readerIndex(), in.readableBytes());
             } catch (Exception e) {
+                //e.printStackTrace();
                 logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님.");
                 in.clear();
             }
