@@ -23,13 +23,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         //logger.info("in.readableBytes() -> " + in.readableBytes() + " / " + in.readerIndex() + "-> " + in.readerIndex());
 
+        StringBuffer hexString = new StringBuffer();
+
+        for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
+            hexString.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
+        }
+
         if (in.getByte(0)==0x02) {
             try {
-                StringBuffer sb = new StringBuffer();
-                for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
-                    sb.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
-                }
-                logger.info("Receive HEX : " + sb.toString());
+                logger.info("Receive HEX : " + hexString.toString());
 
                 LocalDateTime now = LocalDateTime.now();
 
@@ -70,14 +72,14 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh4(ch4);
                 device.setCh5(ch5);
 
-                if(!deviceId.contains("WX")) {
-                    throw new Exception("Not Vaild DeviceId -> " + sb.toString() + " / Device : " + device.toString());
+                if (!deviceId.contains("WX")) {
+                    throw new Exception("Not Vaild DeviceId -> " + hexString.toString() + " / Device : " + device.toString());
                 }
                 out.add(device);
                 in.slice(in.readerIndex(), in.readableBytes());
             } catch (Exception e) {
-                //e.printStackTrace();
-                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님.");
+                e.printStackTrace();
+                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. -> " + hexString.toString());
                 in.clear();
             }
         }

@@ -110,7 +110,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				for (int i = 0; i < buf.readableBytes(); i++) {
 					sb.append(ByteUtil.byteToHexString(buf.getByte(i)) + " ");
 				}
-				logger.info("HEX : " + sb.toString());
+				//logger.info("HEX : " + sb.toString());
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
