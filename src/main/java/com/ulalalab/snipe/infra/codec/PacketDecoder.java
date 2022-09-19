@@ -21,17 +21,20 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        //logger.info("in.readableBytes() -> " + in.readableBytes() + " / " + in.readerIndex() + "-> " + in.readerIndex());
+        logger.info("in.readableBytes() -> " + in.readableBytes() + " / in.readerIndex() -> " + in.readerIndex());
 
         StringBuffer hexString = new StringBuffer();
+        int readerIndex = in.readerIndex();
+        int readableBytes = in.readableBytes();
 
-        for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
+        for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
             hexString.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
         }
+        logger.info("Receive HEX : " + hexString.toString());
 
-        if (in.getByte(0)==0x02) {
+        if (in.getByte(readerIndex)==0x02 && in.getByte(readableBytes + readerIndex-1)==0x03) {
             try {
-                logger.info("Receive HEX : " + hexString.toString());
+                //logger.info("Receive HEX : " + hexString.toString());
 
                 LocalDateTime now = LocalDateTime.now();
 

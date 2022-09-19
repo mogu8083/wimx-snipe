@@ -38,7 +38,7 @@ public class ChoiceProtocolHandler extends ByteToMessageDecoder {
         final int first = in.getUnsignedByte(in.readerIndex());
         final int second = in.getUnsignedByte(in.readerIndex() + 1);
 
-        logger.info("first : "  + first + " / second : " + second);
+        //logger.info("first : "  + first + " / second : " + second);
 
         if(this.isHttp(first, second)) {
             httpHandler(ctx);
