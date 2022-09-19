@@ -20,8 +20,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         //logger.info("in.readableBytes() -> " + in.readableBytes() + " / " + in.readerIndex() + "-> " + in.readerIndex());
 
-        if (in.readableBytes() >= 40) {
-            try {
+        StringBuffer hexString = new StringBuffer();
+
+        for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
+            hexString.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
+        }
+
+        try {
+
+            if (in.readableBytes() >= 40) {
                 StringBuffer sb = new StringBuffer();
                 for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
                     sb.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
@@ -72,11 +79,11 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 }
                 out.add(device);
                 in.slice(in.readerIndex(), in.readableBytes());
-            } catch (Exception e) {
-                //e.printStackTrace();
-                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님.");
-                in.clear();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. -> " + hexString.toString());
+            in.clear();
         }
     }
 }
