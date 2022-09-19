@@ -13,11 +13,14 @@ import javax.annotation.PostConstruct;
 public class InitServer {
 	private static final Logger logger = LoggerFactory.getLogger(InitServer.class);
 
-	@Autowired
-	private TcpServer tcpServer;
+	//@Autowired
+	//private TcpServer tcpServer;
+
+	//@Autowired
+	//private HttpServer httpServer;
 
 	@Autowired
-	private HttpServer httpServer;
+	private MainServer mainServer;
 
 //	@Autowired
 //	private EventServerChecker eventServerChecker;
@@ -26,8 +29,8 @@ public class InitServer {
 	public void init() throws Exception {
 		logger.info("Init Server");
 
-		// TCP Server
-		tcpServer.start();
+		// Main Server
+		mainServer.start();
 
 		// Http Server
 		//httpServer.start();

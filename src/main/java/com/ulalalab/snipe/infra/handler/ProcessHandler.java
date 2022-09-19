@@ -1,6 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
+import com.ulalalab.snipe.infra.util.BeansUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,13 +13,11 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.BootstrapContextClosedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
-//@Scope(value = "prototype")
-@ChannelHandler.Sharable
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessHandler.class);
@@ -27,11 +26,21 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	//private int DATA_LENGTH = 1024;
 	//private ByteBuf buff;
 
+	/*
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	 */
+
+	private RedisTemplate<String, Object> redisTemplate;
+	private JdbcTemplate jdbcTemplate;
+
+	public ProcessHandler() {
+		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtil.getBean("redisTemplate");
+		this.jdbcTemplate = (JdbcTemplate) BeansUtil.getBean("jdbcTemplate");
+	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -68,7 +77,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	public void channelReadComplete(ChannelHandlerContext ctx) {
 		//ctx.writeAndFlush(Unpooled.EMPTY_BUFFER) // 대기중인 메시지를 플러시하고 채널을 닫음
 			//.addListener(ChannelFutureListener.CLOSE);
-		//logger.info(this.getClass() + " => channelReadComplete");\
+		//logger.info(this.getClass() + " => channelReadComplete");
 		//logger.info(this.getClass() + " / channelReadComplete!!");
 	}
 

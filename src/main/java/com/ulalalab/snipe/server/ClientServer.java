@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 
 @Component
@@ -32,12 +31,12 @@ public class ClientServer {
 		try {
 			logger.info("ClientServer 실행");
 
-			EventLoopGroup group = new NioEventLoopGroup(100);
+			EventLoopGroup group = new NioEventLoopGroup(50);
 			ChannelFuture channelFuture;
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<101; x++) {
+			for(int x=1; x<50; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)

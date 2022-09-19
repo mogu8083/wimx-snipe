@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class HttpServer {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
@@ -28,7 +28,7 @@ public class HttpServer {
 	public void start() throws Exception {
 		logger.info("Http Server 실행");
 
-		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(4);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		ServerBootstrap bootstrap = new ServerBootstrap();
 

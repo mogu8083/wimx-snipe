@@ -3,15 +3,18 @@ package com.ulalalab.snipe.infra.codec;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.ByteUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
+//@Component
 public class PacketDecoder extends ByteToMessageDecoder {
 
     private static final Logger logger = LoggerFactory.getLogger(PacketDecoder.class);
@@ -20,13 +23,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         //logger.info("in.readableBytes() -> " + in.readableBytes() + " / " + in.readerIndex() + "-> " + in.readerIndex());
 
-        if (in.readableBytes() >= 40) {
+        if (in.getByte(0)==0x02) {
             try {
                 StringBuffer sb = new StringBuffer();
                 for (int i = in.readerIndex(); i < in.readableBytes() + in.readerIndex(); i++) {
                     sb.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
                 }
-                //logger.info("Receive HEX : " + sb.toString());
+                logger.info("Receive HEX : " + sb.toString());
 
                 LocalDateTime now = LocalDateTime.now();
 

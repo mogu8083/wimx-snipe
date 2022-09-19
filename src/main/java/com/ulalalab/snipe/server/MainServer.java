@@ -1,9 +1,6 @@
 package com.ulalalab.snipe.server;
 
-import com.ulalalab.snipe.infra.codec.PacketDecoder;
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
-import com.ulalalab.snipe.infra.handler.DefaultHandler;
-import com.ulalalab.snipe.infra.handler.ProcessHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -19,17 +16,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-//@Component
-public class TcpServer {
+@Component
+public class MainServer {
 
-	private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainServer.class);
 
 	//@Autowired
 	//private ProcessHandler processHandler;
 
+	/*
 	@Autowired
 	private ChoiceProtocolHandler choiceProtocolHandler;
 
+
+	 */
 	@Value("${netty.tcp-port}")
 	private int tcpPort;
 
@@ -62,6 +62,7 @@ public class TcpServer {
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
 
+							//
 							//p.addLast(new DefaultHandler());
 
 							// 기본 ( 연결 관련 )
@@ -73,8 +74,8 @@ public class TcpServer {
 							// 데이터 가공 처리
 							//p.addLast(processHandler);
 
-							//p.addLast(new ChoiceProtocolHandler());
-							p.addLast(choiceProtocolHandler);
+							p.addLast(new ChoiceProtocolHandler());
+							//p.addLast(choiceProtocolHandler);
 						}
 					});
 			bootstrap.bind(tcpPort).sync().channel();

@@ -8,11 +8,15 @@ import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+//@Component
+//@Scope("prototype")
 public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseHandler.class);
@@ -61,7 +65,8 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
             }
         } catch(Exception e) {
             e.printStackTrace();
-            ctx.fireChannelRead(msg);
+            //ctx.fireChannelRead(msg);
+            ctx.close();
         }
     }
 
