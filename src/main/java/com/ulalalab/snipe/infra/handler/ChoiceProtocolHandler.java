@@ -83,7 +83,7 @@ public class ChoiceProtocolHandler extends ByteToMessageDecoder {
         ChannelPipeline p = ctx.pipeline();
 
         // 연결 관련
-        p.addLast(new DefaultHandler());
+        //p.addLast(new DefaultHandler());
 
         // Packet 디코더
         p.addLast(new PacketDecoder());

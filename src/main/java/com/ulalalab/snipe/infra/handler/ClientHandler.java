@@ -34,7 +34,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 			if(ctx.channel().isWritable()) {
 				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
 
-				Thread.sleep(500);
+				Thread.sleep(300);
 
 				Random random = new Random();
 				int s = random.nextInt();

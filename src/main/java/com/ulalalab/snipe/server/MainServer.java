@@ -2,7 +2,9 @@ package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -47,7 +49,7 @@ public class MainServer {
 		logger.info("Tcp Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
-		EventLoopGroup workerGroup = new NioEventLoopGroup(workerCount);
+		EventLoopGroup workerGroup = new NioEventLoopGroup(1);
 
 		try {
 
@@ -56,6 +58,7 @@ public class MainServer {
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
+					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 
 						@Override

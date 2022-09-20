@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,34 +21,39 @@ public class PacketDecoder extends ByteToMessageDecoder {
     private static final Logger logger = LoggerFactory.getLogger(PacketDecoder.class);
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        logger.info("in.readableBytes() -> " + in.readableBytes() + " / in.readerIndex() -> " + in.readerIndex());
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
-        StringBuffer hexString = new StringBuffer();
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
+
+        if (in.readableBytes() < 49) {
+            return;
+        }
+
+        if (in.getByte(readerIndex) != 0x02 || in.getByte(readableBytes + readerIndex - 1) != 0x03) {
+            return;
+        }
+        //logger.info("in.readableBytes() -> " + in.readableBytes() + " / in.readerIndex() -> " + in.readerIndex());
+
+        StringBuffer hexString = new StringBuffer();
 
         for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
             hexString.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
         }
         logger.info("Receive HEX : " + hexString.toString());
 
-        if (in.getByte(readerIndex)==0x02 && in.getByte(readableBytes + readerIndex-1)==0x03) {
+        do {
             try {
-                //logger.info("Receive HEX : " + hexString.toString());
-
-                LocalDateTime now = LocalDateTime.now();
-
-                /* 데이터 형식
-                0x02            : STX
-                (x, 가변)         : deviceId
-                Double : 8byte
-                Double : 8byte
-                Double : 8byte
-                Double : 8byte
-                Double : 8byte
-                0x03            : ETX
-                */
+                    /* 데이터 형식
+                    0x02            : STX
+                    (x, 가변)         : deviceId
+                    Double : 8byte
+                    Double : 8byte
+                    Double : 8byte
+                    Double : 8byte
+                    Double : 8byte
+                    0x03            : ETX
+                    */
 
                 // 0x02
                 in.readByte();
@@ -67,7 +73,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 // Data Setting
                 Device device = new Device();
-                device.setTime(now);
+                device.setTime(LocalDateTime.now());
                 device.setDeviceId(deviceId);
                 device.setCh1(ch1);
                 device.setCh2(ch2);
@@ -82,9 +88,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 in.slice(in.readerIndex(), in.readableBytes());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. -> " + hexString.toString());
+                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. clear -> " + hexString.toString());
                 in.clear();
             }
-        }
+        } while(in.readableBytes() > 49);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.error(this.getClass() + " -> PacketDecoder Error ! -> " + cause.getCause());
+        cause.printStackTrace();
     }
 }

@@ -55,6 +55,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			logger.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
 
 			// 1. TimscaleDB Update
+			/*
 			jdbcTemplate.update("insert into ulalalab_a(time, device_id, ch1, ch2, ch3, ch4, ch5) values(?, ?, ?, ?, ?, ?, ?)"
 					, device.getTime()
 					, device.getDeviceId()
@@ -64,11 +65,11 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					, device.getCh4()
 					, device.getCh5()
 			);
+			*/
 		} catch(Exception e) {
-			e.printStackTrace();
-			ctx.close();
+			logger.error(e.getMessage());
 		} finally {
-			ReferenceCountUtil.safeRelease(packet);
+			ReferenceCountUtil.release(packet);
 		}
 	}
 
