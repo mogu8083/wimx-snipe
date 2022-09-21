@@ -14,7 +14,6 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +48,7 @@ public class MainServer {
 		logger.info("Tcp Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
-		EventLoopGroup workerGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup(30);
 
 		try {
 

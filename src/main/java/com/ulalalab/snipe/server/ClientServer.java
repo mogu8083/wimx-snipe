@@ -31,12 +31,12 @@ public class ClientServer {
 		try {
 			logger.info("ClientServer 실행");
 
-			EventLoopGroup group = new NioEventLoopGroup(10);
+			EventLoopGroup group = new NioEventLoopGroup(30);
 			ChannelFuture channelFuture;
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<10; x++) {
+			for(int x=1; x<3; x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)

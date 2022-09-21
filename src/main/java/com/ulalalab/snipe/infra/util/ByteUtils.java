@@ -3,7 +3,8 @@ package com.ulalalab.snipe.infra.util;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class ByteUtil {
+public final class ByteUtils {
+
     /**
      * Hex -> 10진수 변환
      */
@@ -171,12 +172,22 @@ public class ByteUtil {
         return data;
     }
 
+
     /**
      * double -> byte 배열 (8byte)
      */
     public static byte[] convertDoubleToByteArray(double number) {
         ByteBuffer byteBuffer = ByteBuffer.allocate(Double.BYTES);
         byteBuffer.putDouble(number);
+        return byteBuffer.array();
+    }
+
+    /**
+     * float -> byte 배열 (4byte)
+     */
+    public static byte[] convertFloatToByteArray(float number) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Float.BYTES);
+        byteBuffer.putFloat(number);
         return byteBuffer.array();
     }
 

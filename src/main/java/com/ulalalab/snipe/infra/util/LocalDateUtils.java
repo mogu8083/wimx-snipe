@@ -7,12 +7,11 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 
-public class LocalDateUtil {
+public final class LocalDateUtils {
 
     public final static String DATE_MONTH_FORMAT = "yyyyMM";
     public final static String DATE_FORMAT = "yyyyMMdd";
     public final static String DATE_TIME_FORMAT = "yyyyMMddHHmmss";
-
     public final static String DATE_MONTH_FORMAT_STATS ="yyyy/MM";
 
     /**
@@ -96,9 +95,4 @@ public class LocalDateUtil {
     public static String plusMonth(LocalDate localDate, String DATE_MONTH_FORMAT, int plus) {
         return DateTimeFormatter.ofPattern(DATE_MONTH_FORMAT).format(localDate.plusMonths(plus));
     }
-
-    /**
-     * Date 패턴 포맷터
-     * @param pattern String
-     */
 }

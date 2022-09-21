@@ -1,16 +1,12 @@
 package com.ulalalab.snipe.infra.codec;
 
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.util.ByteUtil;
+import com.ulalalab.snipe.infra.util.ByteUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +34,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
         StringBuffer hexString = new StringBuffer();
 
         for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
-            hexString.append(ByteUtil.byteToHexString(in.getByte(i)) + " ");
+            hexString.append(ByteUtils.byteToHexString(in.getByte(i)) + " ");
         }
         logger.info("Receive HEX : " + hexString.toString());
 

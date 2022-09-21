@@ -3,7 +3,7 @@ package com.ulalalab.snipe.infra.util;
 import com.ulalalab.snipe.infra.handler.ApplicationContextProvider;
 import org.springframework.context.ApplicationContext;
 
-public class BeansUtil {
+public class BeansUtils {
     public static Object getBean(String beanId) {
 
         ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();

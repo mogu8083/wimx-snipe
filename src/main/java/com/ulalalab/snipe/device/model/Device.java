@@ -30,4 +30,7 @@ public class Device {
 
     // 채널 5
     private Double ch5;
+
+    // 계산식
+    private String source;
 }

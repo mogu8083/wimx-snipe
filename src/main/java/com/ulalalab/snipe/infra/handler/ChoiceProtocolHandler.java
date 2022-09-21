@@ -1,8 +1,8 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.infra.codec.PacketDecoder;
+import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -10,9 +10,8 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.util.List;
 
 public class ChoiceProtocolHandler extends ByteToMessageDecoder {
@@ -32,6 +31,12 @@ public class ChoiceProtocolHandler extends ByteToMessageDecoder {
     @Autowired
     private HttpResponseHandler httpResponseHandler;
      */
+
+    private JdbcTemplate jdbcTemplate;
+
+    public ChoiceProtocolHandler() {
+        this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
@@ -86,10 +91,13 @@ public class ChoiceProtocolHandler extends ByteToMessageDecoder {
         //p.addLast(new DefaultHandler());
 
         // Packet 디코더
-        p.addLast(new PacketDecoder());
+        p.addLast("packetDecoder", new PacketDecoder());
+
+        // 계산식 핸들러
+        p.addLast("caculateHandler", new CaculateHandler());
 
         // 데이터 가공 처리
-        p.addLast(new ProcessHandler());
+        p.addLast("processHandler", new ProcessHandler());
         p.remove(this);
     }
 }
