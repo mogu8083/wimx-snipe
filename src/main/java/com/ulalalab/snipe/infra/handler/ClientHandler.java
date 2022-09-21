@@ -19,7 +19,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 	private int deviceId;
-	ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+	//ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
 	public ClientHandler(int deviceId) {
 		this.deviceId = deviceId;
@@ -27,8 +27,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
-		boolean loop = false;
+		int index = 0;
+		int end = 10;
 
 		do {
 			if(ctx.channel().isWritable()) {
@@ -112,10 +112,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				for (int i = 0; i < buf.readableBytes(); i++) {
 					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
 				}
-				//logger.info("HEX : " + sb.toString());
+				logger.info("HEX : " + sb.toString());
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
-		} while (loop);
+		} while (index++ < end);
 	}
 }

@@ -2,20 +2,20 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.BeansUtils;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
+import java.util.List;
 
-import java.util.Map;
-
+@ChannelHandler.Sharable
 public class CaculateHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(CaculateHandler.class);
 	private JdbcTemplate jdbcTemplate;
-	private Map<String, Object> resultMap;
 	private boolean initFlag = true;
 
 	public CaculateHandler() {
@@ -27,28 +27,29 @@ public class CaculateHandler extends ChannelInboundHandlerAdapter {
 		try {
 			Device device = (Device) packet;
 
+			//System.out.println("##@@ 1111 : " + packet);
+
 			if(initFlag) {
 				initFlag = false;
 
-				System.out.println(device.toString());
-
+				List<String> sourceList;
 				String source = "";
 
-				try {
-					source = jdbcTemplate.queryForObject("select source from device_filter where device_id = ?", String.class, device.getDeviceId());
-				} catch(Exception e) {
-					logger.error(e.getMessage());
+				sourceList = jdbcTemplate.queryForList("select source from device_filter where device_id = ?", String.class, device.getDeviceId());
+				if(sourceList.size() > 0) {
+					source = sourceList.get(0);
 				}
+
 				if(StringUtils.hasText(source)) {
 					device.setSource(source);
 				} else {
-					ctx.pipeline().remove("caculateHandler");
+					ctx.pipeline().remove(this);
 				}
 			}
 			ctx.fireChannelRead(packet);
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
+			logger.error(this.getClass() + " / " + e.getMessage());
+			ctx.pipeline().remove(this);
 		}
 	}
 }

@@ -3,15 +3,18 @@ package com.ulalalab.snipe.infra.codec;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.ByteUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//@Component
+@Component
 public class PacketDecoder extends ByteToMessageDecoder {
 
     private static final Logger logger = LoggerFactory.getLogger(PacketDecoder.class);
@@ -69,6 +72,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 // Data Setting
                 Device device = new Device();
+
                 device.setTime(LocalDateTime.now());
                 device.setDeviceId(deviceId);
                 device.setCh1(ch1);
@@ -76,6 +80,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh3(ch3);
                 device.setCh4(ch4);
                 device.setCh5(ch5);
+
+                System.out.println("##@@ " + device.toString());
 
                 if (!deviceId.contains("WX")) {
                     throw new Exception("Not Vaild DeviceId -> " + hexString.toString() + " / Device : " + device.toString());

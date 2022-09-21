@@ -1,6 +1,7 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
+import com.ulalalab.snipe.infra.handler.DefaultHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -48,7 +49,7 @@ public class MainServer {
 		logger.info("Tcp Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
-		EventLoopGroup workerGroup = new NioEventLoopGroup(30);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
 
@@ -64,7 +65,6 @@ public class MainServer {
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
 
-							//
 							//p.addLast(new DefaultHandler());
 
 							// 기본 ( 연결 관련 )

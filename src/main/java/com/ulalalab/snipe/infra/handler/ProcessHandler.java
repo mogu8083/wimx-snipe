@@ -14,47 +14,56 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.script.Invocable;
+import javax.script.ScriptException;
 
-@ChannelHandler.Sharable
+@Component
+//@ChannelHandler.Sharable
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessHandler.class);
 	private static Long receive = 0L;
 	private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
+
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private Invocable invocable;
 
-//	public ProcessHandler(String javascriptSource) {
+//	public ProcessHandler() {
 //		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
 //		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
-//
-//		if(javascriptSource!=null) {
-//			this.invocable = ScriptUtils.getInvocable(javascriptSource);
-//		}
 //	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
 		try {
+			System.out.println("##@@ 222 " + packet);
+
 			boolean suffix = false;
 			Device device = (Device) packet;
 
-			if(StringUtils.hasText(device.getSource())) {
+			if (StringUtils.hasText(device.getSource())) {
 				this.invocable = ScriptUtils.getInvocable(device.getSource());
 			}
 
 			Double cvCh1 = device.getCh1();
 
-			if(invocable!=null) {
+			if (invocable != null) {
 				cvCh1 = (Double) invocable.invokeFunction("add", cvCh1);
 				device.setCh1(cvCh1);
+
+				if(cvCh1.isNaN()) {
+					throw new ScriptException("isNaN");
+				}
 			}
 			logger.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
 
@@ -67,32 +76,21 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					, device.getCh4()
 					, device.getCh5()
 			);
+		} catch(ScriptException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+
+			invocable = null;
+			ctx.pipeline().remove("caculateHandler");
+			logger.error(this.getClass() + " -> caculateHandler 제거!");
 		} catch(Exception e) {
 			logger.error(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			// 참조 해체
 			ReferenceCountUtil.release(packet);
 		}
 	}
-
-	@Override
-	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		logger.info(ctx.channel().toString() + " 연결 / 연결 갯수 : " + channelGroup.size());
-
-		Channel channel = ctx.channel();
-		channelGroup.add(channel);
-	}
-
-	@Override
-	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		logger.info(ctx.channel().toString() + " 연결 해제 / 연결 갯수 : " + channelGroup.size());
-
-		Channel channel = ctx.channel();
-		channelGroup.remove(channel);
-		ctx.close();
-	}
-
-
 
 	// 수신 데이터 처리 완료
 	@Override
