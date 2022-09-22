@@ -1,11 +1,15 @@
 package com.ulalalab.snipe.infra.codec;
 
 import com.ulalalab.snipe.device.model.Device;
+import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.ByteUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

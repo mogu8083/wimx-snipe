@@ -2,7 +2,6 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.BeansUtils;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -11,7 +10,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 import java.util.List;
 
-@ChannelHandler.Sharable
 public class CaculateHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(CaculateHandler.class);
@@ -26,8 +24,6 @@ public class CaculateHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
 		try {
 			Device device = (Device) packet;
-
-			//System.out.println("##@@ 1111 : " + packet);
 
 			if(initFlag) {
 				initFlag = false;

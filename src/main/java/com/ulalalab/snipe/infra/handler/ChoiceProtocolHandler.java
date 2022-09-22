@@ -7,33 +7,15 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-
-@Component
 public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(ChoiceProtocolHandler.class);
-
-    @Autowired
-    private ProcessHandler processHandler;
-
-    @Autowired
-    private PacketDecoder packetDecoder;
-
-//    @Autowired
-//    private DefaultHandler defaultHandler;
-
-//    @Autowired
-//    private HttpResponseHandler httpResponseHandler;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packet) {
@@ -41,8 +23,6 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
         final int first = in.getUnsignedByte(in.readerIndex());
         final int second = in.getUnsignedByte(in.readerIndex() + 1);
-
-        //logger.info("first : "  + first + " / second : " + second);
 
         if(this.isHttp(first, second)) {
             httpHandler(ctx);
@@ -86,32 +66,40 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
      * @param ctx
      */
     private void httpHandler(ChannelHandlerContext ctx) {
+//        ChannelPipeline p = ctx.pipeline();
+//        p.addLast(new HttpRequestDecoder());
+//        p.addLast(new HttpResponseEncoder());
+//        p.addLast(new HttpResponseHandler());
+//        p.remove(this);
+
         ChannelPipeline p = ctx.pipeline();
-        p.addLast(new HttpRequestDecoder());
-        p.addLast(new HttpResponseEncoder());
-        //p.addLast(httpResponseHandler);
-        p.addLast(new HttpResponseHandler());
-        p.remove(this);
+        this.removePipeline(p, ProtocolType.HTTP.name());
+    }
+
+    private void tcpHandler(ChannelHandlerContext ctx) {
+        ChannelPipeline p = ctx.pipeline();
+        this.removePipeline(p, ProtocolType.TCP.name());
     }
 
     /**
-     * Tcp 핸들러 파이프라인
-     * @param ctx
+     * 관련 없는 파이프라인 삭제
      */
-    private void tcpHandler(ChannelHandlerContext ctx) {
-        ChannelPipeline p = ctx.pipeline();
+    private void removePipeline(ChannelPipeline channelPipeline, String prefixName) {
+        channelPipeline.forEach(c -> {
+            if(!c.getKey().contains(prefixName)) {
+                channelPipeline.remove(c.getKey());
+                logger.info(c.getKey() + " 파이프라인 삭제 !!");
+            }
+        });
+    }
 
-        // 연결 정보
-        p.addLast(new DefaultHandler());
+    private enum ProtocolType {
+        TCP("TCP"), HTTP("HTTP"), MQTT("MQTT");
 
-        // Packet 디코더
-        p.addLast(packetDecoder);
+        private String protocol;
 
-        // 계산식 핸들러
-        //p.addLast(new CaculateHandler());
-
-        // 데이터 가공 처리
-        p.addLast(processHandler);
-        p.remove(this);
+        ProtocolType(String protocol) {
+            this.protocol = protocol;
+        }
     }
 }

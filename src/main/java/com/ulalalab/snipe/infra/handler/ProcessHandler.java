@@ -1,6 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
+import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import com.ulalalab.snipe.infra.util.RandomUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
@@ -15,6 +16,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -22,32 +24,30 @@ import org.springframework.util.StringUtils;
 
 import javax.script.Invocable;
 import javax.script.ScriptException;
+import java.util.Set;
 
-@Component
-//@ChannelHandler.Sharable
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessHandler.class);
 	private static Long receive = 0L;
-	private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 
-	@Autowired
+//	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
-
-	@Autowired
+//
+//	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
 	private Invocable invocable;
 
-//	public ProcessHandler() {
-//		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
-//		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
-//	}
+	public ProcessHandler() {
+		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
+		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
 		try {
-			System.out.println("##@@ 222 " + packet);
-
 			boolean suffix = false;
 			Device device = (Device) packet;
 
@@ -56,10 +56,23 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			}
 
 			Double cvCh1 = device.getCh1();
+			Double cvCh2 = device.getCh2();
+			Double cvCh3 = device.getCh3();
+			Double cvCh4 = device.getCh4();
+			Double cvCh5 = device.getCh5();
 
 			if (invocable != null) {
 				cvCh1 = (Double) invocable.invokeFunction("add", cvCh1);
+				cvCh2 = (Double) invocable.invokeFunction("add", cvCh2);
+				cvCh3 = (Double) invocable.invokeFunction("add", cvCh3);
+				cvCh4 = (Double) invocable.invokeFunction("add", cvCh4);
+				cvCh5 = (Double) invocable.invokeFunction("add", cvCh5);
+
 				device.setCh1(cvCh1);
+				device.setCh2(cvCh2);
+				device.setCh3(cvCh3);
+				device.setCh4(cvCh4);
+				device.setCh5(cvCh5);
 
 				if(cvCh1.isNaN()) {
 					throw new ScriptException("isNaN");
@@ -71,10 +84,10 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
 					, device.getDeviceId() + (suffix ? "0" : "")
 					, cvCh1
-					, device.getCh2()
-					, device.getCh3()
-					, device.getCh4()
-					, device.getCh5()
+					, cvCh2
+					, cvCh3
+					, cvCh4
+					, cvCh5
 			);
 		} catch(ScriptException e) {
 			logger.error(e.getMessage());
