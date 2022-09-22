@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.util.StringUtils;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -36,35 +37,53 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
         try {
             // 데이터 가공
             JSONObject jsonObject = new JSONObject();
+
+            // TODO : Test
             jsonObject.put("test", "1111");
+            //
 
             if (msg instanceof HttpContent) {
                 HttpContent httpContent = (HttpContent) msg;
                 ByteBuf content = httpContent.content();
 
-                byteBuf.reading(content);
+                if(content.readableBytes() > 0) {
+                    byteBuf.reading(content);
+                }
                 content.release();
 
-                if (byteBuf.isEnd()) {
+                if (byteBuf!=null && byteBuf.isEnd()) {
                     String resultStr = new String(byteBuf.readFull());
-                    logger.info("Request Body : " + resultStr);
-
-                    FullHttpResponse response = new DefaultFullHttpResponse(
-                            HTTP_1_1, OK, Unpooled.wrappedBuffer(jsonObject.toString().getBytes()));
-                    response.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
-                    response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
-                    response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-
-                    ctx.write(response);
-                    ctx.flush();
-                    ctx.close();
+                    logger.info("Http Request Body : " + resultStr);
                 }
+
+                FullHttpResponse response = this.getResponse(jsonObject);
+
+                logger.info("Http response : " +  response.content().toString());
+
+                ctx.write(response);
+                ctx.flush();
+                ctx.close();
             }
         } catch(Exception e) {
             e.printStackTrace();
             //ctx.fireChannelRead(msg);
             ctx.close();
         }
+    }
+
+    /**
+     * Response Get
+     * @param jsonObject : Json 형식 문자열
+     * @return FullHttpResponse
+     */
+    private FullHttpResponse getResponse(JSONObject jsonObject) {
+        FullHttpResponse response = new DefaultFullHttpResponse(
+                HTTP_1_1, OK, Unpooled.wrappedBuffer(jsonObject.toString().getBytes()));
+
+        response.headers().set(CONTENT_TYPE, "application/json; charset=UTF-8");
+        response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
+        response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        return response;
     }
 
     public class ByteBufToBytes {

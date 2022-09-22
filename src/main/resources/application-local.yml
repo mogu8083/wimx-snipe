@@ -20,15 +20,14 @@ spring:
 logging:
   level:
     root: info
-    jdbc.sqltiming: off
-    p6spy: off
-    com.zaxxer: debug
-    org.springframework: info
-    com.ulalalab.snipe: info
+#    jdbc.sqltiming: off
+#    p6spy: off
+#    org.springframework: info
+    com.ulalalab.snipe.infra.handler.ProcessHandler: info
   file:
     path: "d:/log/netty"
 
 #Netty
 netty:
-  tcp-port: 37080
-  http-port: 36080
+  tcp-port: 37081
+  http-port: 36081

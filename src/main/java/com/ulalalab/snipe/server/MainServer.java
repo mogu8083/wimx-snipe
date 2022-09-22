@@ -1,10 +1,8 @@
 package com.ulalalab.snipe.server;
 
+import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.codec.PacketDecoder;
-import com.ulalalab.snipe.infra.handler.CaculateHandler;
-import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
-import com.ulalalab.snipe.infra.handler.DefaultHandler;
-import com.ulalalab.snipe.infra.handler.ProcessHandler;
+import com.ulalalab.snipe.infra.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -16,6 +14,8 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -73,17 +73,23 @@ public class MainServer {
 							// 프로토콜 선택
 							p.addLast(new ChoiceProtocolHandler());
 
+							// 1. TCP
 							// 기본 ( 연결 관련 )
-							p.addLast("TCP.defaultHandler", new DefaultHandler());
+//							p.addLast("TCP.DefaultHandler", new DefaultHandler());
+//
+//							// Packet 디코더 - 패킷 처리
+//							p.addLast("TCP.PacketDecoder", new PacketDecoder());
+//
+//							// 계산식 핸들러
+//							p.addLast("TCP.CaculateHandler", new CaculateHandler());
+//
+//							// 데이터 가공 처리
+//							p.addLast("TCP.ProcessHandler", new ProcessHandler());
 
-							// Packet 디코더 - 패킷 처리
-							p.addLast("TCP.packetDecoder", new PacketDecoder());
-
-							// 계산식 핸들러
-							p.addLast("TCP.caculateHandler", new CaculateHandler());
-
-							// 데이터 가공 처리
-							p.addLast("TCP.processHandler", new ProcessHandler());
+							// 2. HTTP
+//							p.addLast("HTTP.HttpRequestDecoder", new HttpRequestDecoder());
+//							p.addLast("HTTP.HttpResponseEncoder", new HttpResponseEncoder());
+//							p.addLast("HTTP.HttpResponseHandler", new HttpResponseHandler());
 						}
 					});
 			bootstrap.bind(tcpPort).sync().channel();
