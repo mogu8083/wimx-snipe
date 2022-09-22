@@ -35,12 +35,14 @@ public class ClientServer {
 		try {
 			logger.info("ClientServer 실행");
 
-			EventLoopGroup group = new NioEventLoopGroup(30);
+			int threadCnt = 30;
+
+			EventLoopGroup group = new NioEventLoopGroup(threadCnt);
 			ChannelFuture channelFuture;
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<45; x++) {
+			for(int x=1; x<(threadCnt+2); x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -71,7 +73,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		int index = 0;
-		int end = 1000000000;
+		int end = 100000000;
 
 		do {
 			if(ctx.channel().isWritable()) {

@@ -1,33 +1,32 @@
-#server:
-  #port: 37090
-
-spring :
+spring:
   redis:
     host: 211.62.140.72
     port: 46379
     password: dak102938$&
   datasource:
     hikari:
-      maximumPoolSize: 1
+      maximumPoolSize: 10
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
-    #url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
+    #url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
+    url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
     username: ulalalab
     password: ulalalab12!@
 
 #Log
-logging:
-  level:
-    root: info
-    jdbc.sqltiming: info
-    p6spy: info
-    com.zaxxer: debug
-    org.springframework: info
-  file:
-    path: ""
+#logging:
+#  level:
+#    root: info
+##    jdbc.sqltiming: off
+##    p6spy: off
+##    org.springframework: info
+#    com.ulalalab.snipe.infra.handler.ProcessHandler: info
+#  file:
+#    path: "d:/log/netty"
+
+log-file-path:  d:/log/netty
 
 #Netty
 netty:
-  tcp-port: 37080
-  http-port: 36080
+  tcp-port: 37081
+  http-port: 36081

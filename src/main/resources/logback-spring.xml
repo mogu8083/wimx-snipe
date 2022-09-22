@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <springProperty name="LOGGING_FILE_PATH" source="logging.file.path"/>
+    <springProperty name="LOG_FILE_PATH" source="log-file-path"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -10,6 +10,8 @@
     </appender>
 
     <springProfile name="local,client">
+        <logger name="p6spy" level="OFF" />
+
         <root level="INFO">
             <appender-ref ref="STDOUT" />
         </root>
@@ -19,7 +21,7 @@
     <springProfile name="local">
         <appender name="ERROR_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGGING_FILE_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -36,7 +38,7 @@
 
         <appender name="INFO_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGGING_FILE_PATH}/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>500MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -45,34 +47,24 @@
             <encoder>
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] - %-4relative - [ %thread{10} ] %logger{20} : %msg%n </pattern>
             </encoder>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>INFO</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
         </appender>
 
         <appender name="TCP_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGGING_FILE_PATH}/tcp-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/tcp-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>100MB</maxFileSize>
+                    <maxFileSize>500MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
                 <maxHistory>1</maxHistory>
             </rollingPolicy>
             <encoder>
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] - %-4relative - [ %thread{10} ] %logger{20} : %msg%n </pattern>
             </encoder>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>INFO</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
         </appender>
 
         <appender name="HTTP_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGGING_FILE_PATH}/http-%d{yyyy-MM}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/http-%d{yyyy-MM}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -81,26 +73,18 @@
             <encoder>
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] - %-4relative - [ %thread{10} ] %logger{20} : %msg%n </pattern>
             </encoder>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>INFO</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
         </appender>
 
-        <logger name="com.ulalalab.snipe.infra.handler">
+        <logger name="HTTP" level="INFO">
             <appender-ref ref="HTTP_ROLLING" />
         </logger>
 
-        <logger name="com.ulalalab.snipe.infra.handler.ProcessHandler">
+        <logger name="TCP" level="INFO">
             <appender-ref ref="TCP_ROLLING" />
         </logger>
 
         <root level="INFO">
             <appender-ref ref="ERROR_ROLLING" />
-            <appender-ref ref="INFO_ROLLING" />
-            <appender-ref ref="TCP_ROLLING" />
-            <appender-ref ref="HTTP_ROLLING" />
         </root>
     </springProfile>
 </configuration>

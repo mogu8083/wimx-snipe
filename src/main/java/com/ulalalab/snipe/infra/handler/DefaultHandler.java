@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultHandler.class);
+	private final Logger logger = LoggerFactory.getLogger("TCP.DefaultHandler");
 	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 	private final ProtocolEnum protocolEnum;
 
@@ -45,7 +45,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		cause.printStackTrace();
 		logger.error(cause.getMessage());
+		ctx.close();
 	}
 }

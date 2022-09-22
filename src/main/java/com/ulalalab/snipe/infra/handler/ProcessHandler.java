@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProcessHandler.class);
+	private final Logger logger = LoggerFactory.getLogger("TCP.ProcessHandler");
 	private static Long receive = 0L;
 	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 

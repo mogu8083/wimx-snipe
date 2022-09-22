@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class PacketDecoder extends ByteToMessageDecoder {
 
-    private static final Logger logger = LoggerFactory.getLogger(PacketDecoder.class);
+    private final Logger logger = LoggerFactory.getLogger("TCP.PacketDecoder");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -43,7 +43,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
         for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
             hexString.append(ByteUtils.byteToHexString(in.getByte(i)) + " ");
         }
-        logger.info("Receive HEX : " + hexString.toString());
+        //logger.info("Receive HEX : " + hexString.toString());
 
         do {
             try {
@@ -84,8 +84,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh3(ch3);
                 device.setCh4(ch4);
                 device.setCh5(ch5);
-
-                System.out.println("##@@ " + device.toString());
 
                 if (!deviceId.contains("WX")) {
                     throw new Exception("Not Vaild DeviceId -> " + hexString.toString() + " / Device : " + device.toString());

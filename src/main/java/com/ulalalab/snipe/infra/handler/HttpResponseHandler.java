@@ -17,7 +17,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 //@Component
 public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponseHandler.class);
+    private final Logger logger = LoggerFactory.getLogger("HTTP.HttpResponseHandler");
 
     private ByteBufToBytes byteBuf;
 

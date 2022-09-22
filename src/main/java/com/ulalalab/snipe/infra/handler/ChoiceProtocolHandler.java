@@ -2,7 +2,9 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.infra.codec.PacketDecoder;
 import com.ulalalab.snipe.infra.constant.ProtocolEnum;
+import com.ulalalab.snipe.infra.manage.ChannelManager;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
@@ -10,13 +12,16 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(ChoiceProtocolHandler.class);
 
+    private static Set<Channel> channelGroup = ChannelManager.getInstance();
+
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object packet) {
+    public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
         ByteBuf in = (ByteBuf) packet;
 
         final int first = in.getUnsignedByte(in.readerIndex());
@@ -24,8 +29,13 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
         if(this.isHttp(first, second)) {
             httpHandler(ctx);
+
+            logger.info(ctx.channel().remoteAddress() + " Http 연결 !!");
         } else {
             tcpHandler(ctx);
+
+            channelGroup.add(ctx.channel());
+            logger.info(ctx.channel().remoteAddress() + " 연결 !! / 연결 갯수 : " + channelGroup.size());
         }
         ctx.fireChannelRead(packet);
     }
@@ -50,7 +60,7 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
      */
     private void httpHandler(ChannelHandlerContext ctx) {
         ChannelPipeline p = ctx.pipeline();
-        //this.removePipeline(p, ProtocolType.HTTP.name());
+
         p.addLast("HTTP.DefaultHandler", new DefaultHandler(ProtocolEnum.HTTP));
         p.addLast("HTTP.HttpRequestDecoder", new HttpRequestDecoder());
         p.addLast("HTTP.HttpResponseEncoder", new HttpResponseEncoder());

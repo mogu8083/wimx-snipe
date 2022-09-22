@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CaculateHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger logger = LoggerFactory.getLogger(CaculateHandler.class);
+	private final Logger logger = LoggerFactory.getLogger("TCP."+ this.getClass());
 	private JdbcTemplate jdbcTemplate;
 	private boolean initFlag = true;
 
