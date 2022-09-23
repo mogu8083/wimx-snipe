@@ -14,6 +14,7 @@ plugins {
 bootJar {
 	archiveBaseName = ''
 	archiveFileName = 'api.jar'
+	destinationDir new File("D:/")
 }
 
 group = 'com.ulalalab'

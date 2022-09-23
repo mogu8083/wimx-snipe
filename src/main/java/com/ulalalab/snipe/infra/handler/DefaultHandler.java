@@ -5,10 +5,12 @@ import com.ulalalab.snipe.infra.manage.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
 
+@Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	private final Logger logger = LoggerFactory.getLogger("TCP.DefaultHandler");
@@ -26,7 +28,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 			channelGroup.add(ctx.channel());
 			logger.info(ctx.channel().remoteAddress() + " 연결 !! / 연결 갯수 : " + channelGroup.size());
 		} else if(protocolEnum==ProtocolEnum.HTTP) {
-			logger.info(ctx.channel().remoteAddress() + " Http 연결 !!");
+			log.info(ctx.channel().remoteAddress() + " Http 연결 !!");
 		}
 	}
 
@@ -36,9 +38,9 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		if(protocolEnum==ProtocolEnum.TCP) {
 			Channel channel = ctx.channel();
 			channelGroup.remove(channel);
-			logger.info(ctx.channel().remoteAddress() + " 연결 해제 !! / 연결 갯수 : " + channelGroup.size());
+			log.info("{} 연결 해제 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelGroup.size());
 		} else {
-			logger.info(ctx.channel().remoteAddress() + " Http 연결 해제 !!");
+			log.info("{} -> Http 연결 해제 !!", ctx.channel().remoteAddress());
 		}
 		ctx.close();
 	}

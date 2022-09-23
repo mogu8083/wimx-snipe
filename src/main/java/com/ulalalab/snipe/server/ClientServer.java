@@ -11,6 +11,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 @Component
+@Slf4j
 @Profile("client")
 public class ClientServer {
-
-	private static final Logger logger = LoggerFactory.getLogger(ClientServer.class);
 
 	@Value("${netty.tcp-port}")
 	private int tcpPort;
@@ -33,16 +33,17 @@ public class ClientServer {
 	@PostConstruct
 	public void start() throws InterruptedException {
 		try {
-			logger.info("ClientServer 실행");
 
-			int threadCnt = 30;
+			log.info("ClientServer 실행");
+
+			int threadCnt = 500;
 
 			EventLoopGroup group = new NioEventLoopGroup(threadCnt);
 			ChannelFuture channelFuture;
 			Channel channel;
 			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-			for(int x=1; x<(threadCnt+2); x++) {
+			for(int x=1; x<(threadCnt+1); x++) {
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(group)
 						.channel(NioSocketChannel.class)
@@ -50,9 +51,10 @@ public class ClientServer {
 
 				channel = bootstrap.connect("127.0.0.1", tcpPort).sync().channel();
 				channelGroup.add(channel);
+				log.info("channelGroup.size() : " + channelGroup.size());
 			}
 		} catch(Exception e) {
-			logger.error(this.getClass() + " 연결 실패 => " + e.getMessage());
+			log.error(this.getClass() + " 연결 실패 => " + e.getMessage());
 
 			Thread.sleep(5000);
 			this.start();
@@ -79,7 +81,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 			if(ctx.channel().isWritable()) {
 				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
 
-				Thread.sleep(300);
+				Thread.sleep(1000);
 
 				Random random = new Random();
 				int s = random.nextInt();
@@ -108,55 +110,55 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 				buf.writeByte(0x03);
 
-				s = random.nextInt();
+//				s = random.nextInt();
+//
+//				buf.writeByte(0x02);
+//				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+//				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//				buf.writeByte(0x03);
+//
+//				s = random.nextInt();
+//
+//				buf.writeByte(0x02);
+//				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+//				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//				buf.writeByte(0x03);
 
-				buf.writeByte(0x02);
-				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x03);
-
-				s = random.nextInt();
-
-				buf.writeByte(0x02);
-				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x03);
-
-				StringBuffer sb = new StringBuffer();
-
-				for (int i = 0; i < buf.readableBytes(); i++) {
-					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
-				}
+//				StringBuffer sb = new StringBuffer();
+//
+//				for (int i = 0; i < buf.readableBytes(); i++) {
+//					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
+//				}
 				//logger.info("HEX : " + sb.toString());
 				ctx.writeAndFlush(buf);
 				buf.clear();

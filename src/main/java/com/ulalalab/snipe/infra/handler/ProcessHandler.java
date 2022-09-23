@@ -3,32 +3,22 @@ package com.ulalalab.snipe.infra.handler;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
-import com.ulalalab.snipe.infra.util.RandomUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import javax.script.Invocable;
 import javax.script.ScriptException;
 import java.util.Set;
 
+@Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-	private final Logger logger = LoggerFactory.getLogger("TCP.ProcessHandler");
 	private static Long receive = 0L;
 	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 
@@ -78,10 +68,10 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-			logger.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
+			log.info("받은 데이터 [{}, 클라이언트 Count : {}] => {}", receive++, channelGroup.size(), device);
 
 			// 1. TimscaleDB Update
-			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
+				jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
 					, device.getDeviceId() + (suffix ? "0" : "")
 					, cvCh1
 					, cvCh2
@@ -90,14 +80,14 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					, cvCh5
 			);
 		} catch(ScriptException e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 			e.printStackTrace();
 
 			invocable = null;
 			ctx.pipeline().remove("caculateHandler");
-			logger.error(this.getClass() + " -> caculateHandler 제거!");
+			log.error("{} -> caculateHandler 제거!", this.getClass());
 		} catch(Exception e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			// 참조 해체
@@ -116,7 +106,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error(this.getClass() + " / " +  cause.getCause());
+		log.error("{} / {}", this.getClass(), cause.getCause());
 		cause.printStackTrace();
 		ctx.close();
 	}
