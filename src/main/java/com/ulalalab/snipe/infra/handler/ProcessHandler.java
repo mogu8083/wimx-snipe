@@ -8,16 +8,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
-<<<<<<< HEAD
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-=======
 import lombok.extern.slf4j.Slf4j;
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
@@ -28,11 +25,7 @@ import java.util.Set;
 @Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-<<<<<<< HEAD
 	private static Long receive = 1L;
-=======
-	private static Long receive = 0L;
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 
 //	@Autowired
@@ -81,19 +74,11 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-<<<<<<< HEAD
 			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
 
 			// 1. TimscaleDB Update
 			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
 					, device.getDeviceId()
-=======
-			log.info("받은 데이터 [{}, 클라이언트 Count : {}] => {}", receive++, channelGroup.size(), device);
-
-			// 1. TimscaleDB Update
-				jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
-					, device.getDeviceId() + (suffix ? "0" : "")
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 					, cvCh1
 					, cvCh2
 					, cvCh3
@@ -109,11 +94,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 			invocable = null;
 			ctx.pipeline().remove("caculateHandler");
-<<<<<<< HEAD
-			log.error(this.getClass() + " -> caculateHandler 제거!");
-=======
 			log.error("{} -> caculateHandler 제거!", this.getClass());
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 		} catch(Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
@@ -134,11 +115,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-<<<<<<< HEAD
-		log.error(this.getClass() + " / " +  cause.getCause());
-=======
 		log.error("{} / {}", this.getClass(), cause.getCause());
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 		cause.printStackTrace();
 		ctx.close();
 	}
