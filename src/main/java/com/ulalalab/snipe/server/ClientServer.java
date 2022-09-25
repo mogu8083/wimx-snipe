@@ -8,9 +8,16 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+<<<<<<< HEAD
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+=======
+import io.netty.util.concurrent.GlobalEventExecutor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -26,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Profile("client")
 public class ClientServer {
 
+<<<<<<< HEAD
 	@Value("#{systemProperties['tcp.ip']}")
 	private String TCP_IP;
 
@@ -39,10 +47,15 @@ public class ClientServer {
 
 	EventLoopGroup eventLoopGroup;
 
+=======
+	@Value("${netty.tcp-port}")
+	private int tcpPort;
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 
 	@PostConstruct
 	public void run() throws Exception {
 		try {
+<<<<<<< HEAD
 			this.threadCnt = NumberUtils.parseNumber(THREAD_COUNT, Integer.class);
 			this.eventLoopGroup = new NioEventLoopGroup(threadCnt);
 
@@ -53,6 +66,33 @@ public class ClientServer {
 			}
 		} catch(Exception e) {
 			log.error("{} 연결 실패 => {}", this.getClass(), e.getMessage());
+=======
+
+			log.info("ClientServer 실행");
+
+			int threadCnt = 500;
+
+			EventLoopGroup group = new NioEventLoopGroup(threadCnt);
+			ChannelFuture channelFuture;
+			Channel channel;
+			ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+			for(int x=1; x<(threadCnt+1); x++) {
+				Bootstrap bootstrap = new Bootstrap();
+				bootstrap.group(group)
+						.channel(NioSocketChannel.class)
+						.handler(new ClientHandler(x));
+
+				channel = bootstrap.connect("127.0.0.1", tcpPort).sync().channel();
+				channelGroup.add(channel);
+				log.info("channelGroup.size() : " + channelGroup.size());
+			}
+		} catch(Exception e) {
+			log.error(this.getClass() + " 연결 실패 => " + e.getMessage());
+
+			Thread.sleep(5000);
+			this.start();
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 		}
 	}
 
@@ -172,12 +212,21 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 //				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 //				buf.writeByte(0x03);
 
+<<<<<<< HEAD
 				StringBuffer sb = new StringBuffer();
 
 				for (int i = 0; i < buf.readableBytes(); i++) {
 					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
 				}
 				log.info("HEX : {}", sb.toString());
+=======
+//				StringBuffer sb = new StringBuffer();
+//
+//				for (int i = 0; i < buf.readableBytes(); i++) {
+//					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
+//				}
+				//logger.info("HEX : " + sb.toString());
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}

@@ -1,26 +1,30 @@
 package com.ulalalab.snipe.server;
 
+<<<<<<< HEAD
 import com.ulalalab.snipe.infra.handler.*;
+=======
+import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+<<<<<<< HEAD
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+import lombok.extern.slf4j.Slf4j;
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -28,11 +32,17 @@ import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 @Component
+<<<<<<< HEAD
 @Slf4j(topic = "TCP.MainServer")
 public class MainServer {
 
 	private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+=======
+@Slf4j
+public class MainServer {
+
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 //	@Autowired
 //	private DefaultHandler defaultHandler;
 
@@ -50,9 +60,13 @@ public class MainServer {
 
 
 	public void start() throws InterruptedException {
+<<<<<<< HEAD
 		log.info("Main Server 실행");
+=======
+		log.info("Tcp Server 실행");
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 
-		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
+		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
@@ -69,8 +83,11 @@ public class MainServer {
 						@Override
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
+<<<<<<< HEAD
 
 							// 프로토콜 선택 핸들러
+=======
+>>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 							p.addLast(new ChoiceProtocolHandler());
 						}
 					});

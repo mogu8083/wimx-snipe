@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.server;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 @Service
+@Slf4j
 @Profile("local")
 public class InitServer {
-	private static final Logger logger = LoggerFactory.getLogger(InitServer.class);
 
 	//@Autowired
 	//private TcpServer tcpServer;
@@ -27,7 +28,7 @@ public class InitServer {
 
 	@PostConstruct
 	public void init() throws Exception {
-		logger.info("Init Server");
+		log.info("Init Server");
 
 		// Main Server
 		mainServer.start();

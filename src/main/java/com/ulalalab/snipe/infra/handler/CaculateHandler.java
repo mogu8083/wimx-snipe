@@ -4,15 +4,14 @@ import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 import java.util.List;
 
+@Slf4j(topic = "TCP.")
 public class CaculateHandler extends ChannelInboundHandlerAdapter {
 
-	private final Logger logger = LoggerFactory.getLogger("TCP."+ this.getClass());
 	private JdbcTemplate jdbcTemplate;
 	private boolean initFlag = true;
 
@@ -30,8 +29,9 @@ public class CaculateHandler extends ChannelInboundHandlerAdapter {
 
 				List<String> sourceList;
 				String source = "";
+				String sql = "select source from device_filter where device_id = ?";
+				sourceList = jdbcTemplate.queryForList(sql, String.class, device.getDeviceId());
 
-				sourceList = jdbcTemplate.queryForList("select source from device_filter where device_id = ?", String.class, device.getDeviceId());
 				if(sourceList.size() > 0) {
 					source = sourceList.get(0);
 				}
@@ -44,7 +44,7 @@ public class CaculateHandler extends ChannelInboundHandlerAdapter {
 			}
 			ctx.fireChannelRead(packet);
 		} catch (Exception e) {
-			logger.error(this.getClass() + " / " + e.getMessage());
+			log.error("{} / {}", this.getClass(), e.getMessage());
 			ctx.pipeline().remove(this);
 		}
 	}
