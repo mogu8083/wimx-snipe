@@ -26,7 +26,7 @@ import java.util.Set;
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private static Long receive = 1L;
-	private static Set<Channel> channelGroup = ChannelManager.getInstance();
+	private static ChannelManager channelManager = ChannelManager.getInstance();
 
 //	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
@@ -36,6 +36,8 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private Invocable invocable;
 
+	private String deviceId = null;
+
 	public ProcessHandler() {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
 		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
@@ -44,11 +46,15 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
 		try {
-			boolean suffix = false;
 			Device device = (Device) packet;
 
 			if (StringUtils.hasText(device.getSource())) {
 				this.invocable = ScriptUtils.getInvocable(device.getSource());
+			}
+
+			if(deviceId==null) {
+				DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
+				defaultHandler.deviceId = device.getDeviceId();
 			}
 
 			Double cvCh1 = device.getCh1();
@@ -74,7 +80,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
+			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelManager.channelSize() + "] => {}", device);
 
 			// 1. TimscaleDB Update
 			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
@@ -111,12 +117,5 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			//.addListener(ChannelFutureListener.CLOSE);
 		//logger.info(this.getClass() + " => channelReadComplete");
 		//logger.info(this.getClass() + " / channelReadComplete!!");
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error("{} / {}", this.getClass(), cause.getCause());
-		cause.printStackTrace();
-		ctx.close();
 	}
 }

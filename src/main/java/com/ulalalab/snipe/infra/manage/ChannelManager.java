@@ -6,13 +6,26 @@ import java.util.Set;
 
 public class ChannelManager {
 
-    private static Set<Channel> channelGroup;
+    private Set<Channel> channelGroup = new HashSet<>();
+    private static ChannelManager channelManager;
 
     static {
-        channelGroup = new HashSet<>();
+        channelManager = new ChannelManager();
     }
 
-    public static Set<Channel> getInstance() {
-        return channelGroup;
+    public static ChannelManager getInstance() {
+        return channelManager;
+    }
+
+    public synchronized void addChannel(Channel channel) {
+        channelGroup.add(channel);
+    }
+
+    public synchronized void removeChannel(Channel channel) {
+        channelGroup.remove(channel);
+    }
+
+    public int channelSize() {
+        return channelGroup.size();
     }
 }

@@ -20,8 +20,10 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class ConnectionListener implements ChannelFutureListener {
 
     private ClientServer clientServer;
+    private Integer deviceId;
 
-    public ConnectionListener(ClientServer clientServer) {
+    public ConnectionListener(ClientServer clientServer, Integer deviceId) {
+        this.deviceId = deviceId;
         this.clientServer = clientServer;
     }
 
@@ -34,7 +36,7 @@ public class ConnectionListener implements ChannelFutureListener {
 
             loop.schedule(() -> {
                 try {
-                    clientServer.createBootstrap(new Bootstrap(), loop);
+                    clientServer.createBootstrap(new Bootstrap(), loop, deviceId);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

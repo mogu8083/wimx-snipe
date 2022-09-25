@@ -16,7 +16,7 @@ import java.util.Set;
 @Slf4j
 public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
-    private static Set<Channel> channelGroup = ChannelManager.getInstance();
+    private static ChannelManager channelManager = ChannelManager.getInstance();
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
@@ -31,9 +31,8 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
             log.info("{} Http 연결 !!", ctx.channel().remoteAddress());
         } else {
             tcpHandler(ctx);
-
-            channelGroup.add(ctx.channel());
-            log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelGroup.size());
+            channelManager.addChannel(ctx.channel());
+            log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelManager.channelSize());
         }
         ctx.fireChannelRead(packet);
     }

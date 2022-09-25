@@ -52,15 +52,16 @@ public class ClientServer {
 
 			log.info("ClientServer 실행 / Thread : {} 실행", threadCnt);
 
-			for(int i=0; i<threadCnt; i++) {
-				this.createBootstrap(new Bootstrap(), eventLoopGroup);
+			for(int i=1; i<threadCnt+1; i++) {
+				this.createBootstrap(new Bootstrap(), eventLoopGroup, i);
 			}
 		} catch(Exception e) {
+			e.printStackTrace();
 			log.error("{} 연결 실패 => {}", this.getClass(), e.getMessage());
 		}
 	}
 
-	public Bootstrap createBootstrap(Bootstrap bootstrap, EventLoopGroup eventLoop) throws InterruptedException {
+	public Bootstrap createBootstrap(Bootstrap bootstrap, EventLoopGroup eventLoop, Integer deviceId) throws InterruptedException {
 		ChannelFuture channelFuture;
 		Channel channel;
 
@@ -68,7 +69,7 @@ public class ClientServer {
 				.channel(NioSocketChannel.class)
 				.handler(new LoggingHandler(LogLevel.INFO))
 				.option(ChannelOption.SO_KEEPALIVE, true)
-				.handler(new ClientHandler(this, 1));
+				.handler(new ClientHandler(this, deviceId));
 //				.handler(new ChannelInitializer<SocketChannel>() {
 //					@Override
 //					public void initChannel(SocketChannel ch) throws Exception {
@@ -76,7 +77,7 @@ public class ClientServer {
 //					}
 //				});
 		bootstrap.remoteAddress(TCP_IP, NumberUtils.parseNumber(TCP_PORT, Integer.class));
-		bootstrap.connect().addListener(new ConnectionListener(this));
+		bootstrap.connect().addListener(new ConnectionListener(this, deviceId));
 
 		return bootstrap;
 	}
@@ -105,7 +106,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 			if(ctx.channel().isWritable()) {
 				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
 
-				Thread.sleep(1000);
+				Thread.sleep(500);
 
 				Random random = new Random();
 				int s = random.nextInt();
@@ -132,49 +133,49 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 				buf.writeByte(0x03);
 
-//				s = random.nextInt();
-//
-//				buf.writeByte(0x02);
-//				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-//				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//				buf.writeByte(0x03);
-//
-//				s = random.nextInt();
-//
-//				buf.writeByte(0x02);
-//				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-//				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//
-//				d = Math.round(Math.random() * 100 * 10) / 10.0;
-//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-//				buf.writeByte(0x03);
+				s = random.nextInt();
+
+				buf.writeByte(0x02);
+				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+				buf.writeByte(0x03);
+
+				s = random.nextInt();
+
+				buf.writeByte(0x02);
+				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+
+				d = Math.round(Math.random() * 100 * 10) / 10.0;
+				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+				buf.writeByte(0x03);
 
 				StringBuffer sb = new StringBuffer();
 
@@ -199,7 +200,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 			@Override
 			public void run() {
 				try {
-					clientServer.createBootstrap(new Bootstrap(), eventLoop);
+					clientServer.createBootstrap(new Bootstrap(), eventLoop, deviceId);
 				} catch (InterruptedException e) {
 					log.error(e.getMessage());
 					throw new RuntimeException(e);
