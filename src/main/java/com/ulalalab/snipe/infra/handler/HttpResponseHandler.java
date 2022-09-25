@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -15,17 +16,19 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 //@Component
+@Slf4j(topic = "HTTP.HttpResponseHandler")
 public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
-
-    private final Logger logger = LoggerFactory.getLogger("HTTP.HttpResponseHandler");
 
     private ByteBufToBytes byteBuf;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
+        log.info("@@## : {}", msg.toString());
+
         if (msg instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) msg;
+            String uri = request.uri();
 
             if (HttpUtil.isContentLengthSet(request)) {
                 byteBuf = new ByteBufToBytes((int) HttpUtil.getContentLength(request));
@@ -53,12 +56,15 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
 
                 if (byteBuf!=null && byteBuf.isEnd()) {
                     String resultStr = new String(byteBuf.readFull());
-                    logger.info("Http Request Body : " + resultStr);
+                    log.info("Http Request Body : " + resultStr);
+
+                    JSONObject requestJson = new JSONObject(resultStr);
+
                 }
 
                 FullHttpResponse response = this.getResponse(jsonObject);
 
-                logger.info("Http response : " +  response.content().toString());
+                log.info("Http response : " +  response.content().toString());
 
                 ctx.write(response);
                 ctx.flush();

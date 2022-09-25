@@ -1,27 +1,19 @@
 package com.ulalalab.snipe.infra.codec;
 
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.ByteUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Slf4j(topic = "TCP.PacketDecoder")
 public class PacketDecoder extends ByteToMessageDecoder {
-
-    private final Logger logger = LoggerFactory.getLogger("TCP.PacketDecoder");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -92,7 +84,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 in.slice(in.readerIndex(), in.readableBytes());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. clear -> " + hexString.toString());
+                log.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. clear -> " + hexString.toString());
                 in.clear();
             }
         } while(in.readableBytes() > 49);
@@ -100,7 +92,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error(this.getClass() + " -> PacketDecoder Error ! -> " + cause.getCause());
+        log.error("{} -> PacketDecoder Error ! -> {}", this.getClass(), cause.getCause());
         cause.printStackTrace();
     }
 }

@@ -1,7 +1,5 @@
 package com.ulalalab.snipe.server;
 
-import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.codec.PacketDecoder;
 import com.ulalalab.snipe.infra.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -19,16 +17,20 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.NumberUtils;
+import org.springframework.util.StringUtils;
 
 @Component
+@Slf4j(topic = "TCP.MainServer")
 public class MainServer {
 
-	private static final Logger logger = LoggerFactory.getLogger(MainServer.class);
 	private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
 //	@Autowired
@@ -37,64 +39,44 @@ public class MainServer {
 	//@Autowired
 	//private ProcessHandler processHandler;
 
-	@Value("${netty.tcp-port}")
-	private int tcpPort;
-
-	@Value("${netty.http-port}")
-	private int httpPort;
-
 	@Value("${netty.boss-count}")
 	private int bossCount;
 
 	@Value("${netty.worker-count}")
 	private int workerCount;
 
+	@Value("#{systemProperties['tcp.port']}")
+	private String TCP_PORT;
+
 
 	public void start() throws InterruptedException {
-		logger.info("Tcp Server 실행");
+		log.info("Main Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup(bossCount);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
-
-			// 1. EventServer
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					.childOption(ChannelOption.SO_LINGER, 0)
+					.childOption(ChannelOption.TCP_NODELAY, true)
+					.childOption(ChannelOption.SO_KEEPALIVE, true)
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 
 						@Override
 						public void initChannel(SocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
 
-							// 프로토콜 선택
+							// 프로토콜 선택 핸들러
 							p.addLast(new ChoiceProtocolHandler());
-
-							// 1. TCP
-							// 기본 ( 연결 관련 )
-//							p.addLast("TCP.DefaultHandler", new DefaultHandler());
-//
-//							// Packet 디코더 - 패킷 처리
-//							p.addLast("TCP.PacketDecoder", new PacketDecoder());
-//
-//							// 계산식 핸들러
-//							p.addLast("TCP.CaculateHandler", new CaculateHandler());
-//
-//							// 데이터 가공 처리
-//							p.addLast("TCP.ProcessHandler", new ProcessHandler());
-
-							// 2. HTTP
-//							p.addLast("HTTP.HttpRequestDecoder", new HttpRequestDecoder());
-//							p.addLast("HTTP.HttpResponseEncoder", new HttpResponseEncoder());
-//							p.addLast("HTTP.HttpResponseHandler", new HttpResponseHandler());
 						}
 					});
-			bootstrap.bind(tcpPort).sync().channel();
+			bootstrap.bind(NumberUtils.parseNumber(TCP_PORT, Integer.class)).sync().channel();
 		} catch(Exception e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 
 			workerGroup.shutdownGracefully().sync();
 			bossGroup.shutdownGracefully().sync();

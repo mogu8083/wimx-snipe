@@ -13,6 +13,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,10 @@ import javax.script.Invocable;
 import javax.script.ScriptException;
 import java.util.Set;
 
+@Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-	private final Logger logger = LoggerFactory.getLogger("TCP.ProcessHandler");
-	private static Long receive = 0L;
+	private static Long receive = 1L;
 	private static Set<Channel> channelGroup = ChannelManager.getInstance();
 
 //	@Autowired
@@ -78,26 +79,29 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-			logger.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
+			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelGroup.size() + "] => " + device.toString());
 
 			// 1. TimscaleDB Update
 			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
-					, device.getDeviceId() + (suffix ? "0" : "")
+					, device.getDeviceId()
 					, cvCh1
 					, cvCh2
 					, cvCh3
 					, cvCh4
 					, cvCh5
 			);
+
+			// 2. Redis
+			//
 		} catch(ScriptException e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 			e.printStackTrace();
 
 			invocable = null;
 			ctx.pipeline().remove("caculateHandler");
-			logger.error(this.getClass() + " -> caculateHandler 제거!");
+			log.error(this.getClass() + " -> caculateHandler 제거!");
 		} catch(Exception e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			// 참조 해체
@@ -116,7 +120,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error(this.getClass() + " / " +  cause.getCause());
+		log.error(this.getClass() + " / " +  cause.getCause());
 		cause.printStackTrace();
 		ctx.close();
 	}
