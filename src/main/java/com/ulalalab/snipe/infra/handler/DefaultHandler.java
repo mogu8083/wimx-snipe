@@ -6,11 +6,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-<<<<<<< HEAD
-=======
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import java.util.Set;
 
 @Slf4j(topic = "TCP.DefaultHandler")
@@ -30,11 +25,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 			channelGroup.add(ctx.channel());
 			log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelGroup.size());
 		} else if(protocolEnum==ProtocolEnum.HTTP) {
-<<<<<<< HEAD
 			log.info("{} Http 연결 !!", ctx.channel().remoteAddress());
-=======
-			log.info(ctx.channel().remoteAddress() + " Http 연결 !!");
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 		}
 	}
 
@@ -46,11 +37,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 			channelGroup.remove(channel);
 			log.info("{} 연결 해제 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelGroup.size());
 		} else {
-<<<<<<< HEAD
 			log.info("{} Http 연결 해제 !!", ctx.channel().remoteAddress());
-=======
-			log.info("{} -> Http 연결 해제 !!", ctx.channel().remoteAddress());
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 		}
 		ctx.close();
 	}

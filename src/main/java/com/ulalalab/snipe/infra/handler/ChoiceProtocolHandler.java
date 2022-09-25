@@ -11,11 +11,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import lombok.extern.slf4j.Slf4j;
-<<<<<<< HEAD
-=======
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
 import java.util.Set;
 
 @Slf4j
@@ -33,20 +28,12 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
         if(this.isHttp(first, second)) {
             httpHandler(ctx);
 
-<<<<<<< HEAD
             log.info("{} Http 연결 !!", ctx.channel().remoteAddress());
-=======
-            log.info(ctx.channel().remoteAddress() + " Http 연결 !!");
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
         } else {
             tcpHandler(ctx);
 
             channelGroup.add(ctx.channel());
-<<<<<<< HEAD
             log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelGroup.size());
-=======
-            log.info(ctx.channel().remoteAddress() + " 연결 !! / 연결 갯수 : " + channelGroup.size());
->>>>>>> e9804688e6756cd7b5dabf9696af8a119a5a5914
         }
         ctx.fireChannelRead(packet);
     }
