@@ -199,4 +199,13 @@ public final class ByteUtils {
         byteBuffer.putInt(number);
         return byteBuffer.array();
     }
+
+    /**
+     * long -> byte 배열 (8byte)
+     */
+    public static byte[] convertLongToByteArray(long number) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
+        byteBuffer.putLong(number);
+        return byteBuffer.array();
+    }
 }

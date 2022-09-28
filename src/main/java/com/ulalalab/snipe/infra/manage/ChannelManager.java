@@ -21,7 +21,7 @@ public class ChannelManager {
         channelGroup.add(channel);
     }
 
-    public synchronized void removeChannel(Channel channel) {
+    public void removeChannel(Channel channel) {
         channelGroup.remove(channel);
     }
 

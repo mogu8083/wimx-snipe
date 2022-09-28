@@ -67,14 +67,16 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
                 log.info("Http response : " +  response.content().toString());
 
                 ctx.write(response);
-                ctx.flush();
-                ctx.close();
             }
         } catch(Exception e) {
             e.printStackTrace();
-            //ctx.fireChannelRead(msg);
             ctx.close();
         }
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
     }
 
     /**

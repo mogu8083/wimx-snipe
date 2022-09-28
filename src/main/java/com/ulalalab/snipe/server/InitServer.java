@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 
 @Service
 @Slf4j
-@Profile("local")
+@Profile({"local-server", "dev-server"})
 public class InitServer {
 
 	//@Autowired

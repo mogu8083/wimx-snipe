@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Device {
 
     // UTC 시간
-    private LocalDateTime time;
+    private long time;
 
     // 장비 이름
     private String deviceId;

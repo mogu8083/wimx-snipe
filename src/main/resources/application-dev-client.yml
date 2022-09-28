@@ -5,15 +5,15 @@ spring:
     password: dak102938$&
 
   influxdb:
-    url: http://localhost:8086
-    username: test
-    password: 1234
-    database: testdb
+    url: "http://211.62.140.76:8086"
+    username: ulalalab
+    password: ulalalab12!@
+    database: wimx
     retention-policy: autogen
 
   datasource:
     hikari:
-      maximumPoolSize: 10
+      maximumPoolSize: 1
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
@@ -28,12 +28,14 @@ spring:
 ##    jdbc.sqltiming: off
 ##    p6spy: off
 ##    org.springframework: info
+#    com.ulalalab.snipe.infra.handler.ProcessHandler: info
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path:  d:/log/netty
+log-file-path:  /home/ulalalab/run/log
 
 #Netty
 #netty:
-#  tcp-port: 37080
+#  tcp-ip: 127.0.0.1
+#  tcp-port: 9080
 #  http-port: 36081

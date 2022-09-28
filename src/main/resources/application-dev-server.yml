@@ -5,10 +5,10 @@ spring:
     password: dak102938$&
 
   influxdb:
-    url: http://localhost:8086
-    username: test
-    password: 1234
-    database: testdb
+    url: "http://211.62.140.76:8086"
+    username: ulalalab
+    password: ulalalab12!@
+    database: wimx
     retention-policy: autogen
 
   datasource:
@@ -31,7 +31,7 @@ spring:
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path:  d:/log/netty
+log-file-path:  /home/ulalalab/run/log
 
 #Netty
 #netty:

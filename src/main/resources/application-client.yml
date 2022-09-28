@@ -3,6 +3,14 @@ spring:
     host: 211.62.140.72
     port: 46379
     password: dak102938$&
+
+  influxdb:
+    url: http://localhost:8086
+    username: test
+    password: 1234
+    database: testdb
+    retention-policy: autogen
+
   datasource:
     hikari:
       maximumPoolSize: 1

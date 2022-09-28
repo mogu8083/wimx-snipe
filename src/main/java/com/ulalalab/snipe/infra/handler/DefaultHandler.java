@@ -39,16 +39,16 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	// 클라이언트 연결 해제
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if(protocolEnum==ProtocolEnum.TCP) {
-			Channel channel = ctx.channel();
-			channelManager.removeChannel(channel);
-
-			log.info("{} 연결 해제 !! / 연결 갯수 : {}",
-					StringUtils.hasText(deviceId) ? deviceId : "NoDevice" , channelManager.channelSize());
-		} else {
-			log.info("{} Http 연결 해제 !!", ctx.channel().remoteAddress());
-		}
-		ctx.close();
+//		if(protocolEnum==ProtocolEnum.TCP) {
+//			Channel channel = ctx.channel();
+//			channelManager.removeChannel(channel);
+//
+//			log.info("{} 연결 해제 !! / 연결 갯수 : {}",
+//					StringUtils.hasText(deviceId) ? deviceId : "NoDevice" , channelManager.channelSize());
+//		} else {
+//			log.info("{} Http 연결 해제 !!", ctx.channel().remoteAddress());
+//		}
+//		ctx.close();
 	}
 
 	@Override

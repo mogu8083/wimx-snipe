@@ -2,6 +2,7 @@ package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.listener.ConnectionListener;
 import com.ulalalab.snipe.infra.util.ByteUtils;
+import com.ulalalab.snipe.infra.util.LocalDateUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -22,12 +23,15 @@ import org.springframework.util.NumberUtils;
 import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
-@Profile("client")
+@Profile({"local-client", "dev-client"})
 public class ClientServer {
 
 	@Value("#{systemProperties['tcp.ip']}")
@@ -100,13 +104,13 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 		String deviceSuffix = System.getProperty("device.suffix");
 
 		int index = 0;
-		int end = 100000000;
+		int end = 1000000000;
 
-		do {
+		while (index++ < end) {
 			if(ctx.channel().isWritable()) {
-				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
+				Thread.sleep(1000);
 
-				Thread.sleep(500);
+				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
 
 				Random random = new Random();
 				int s = random.nextInt();
@@ -116,6 +120,8 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				String device = ("WX-") + deviceId + deviceSuffix;
 				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
 				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+
+				buf.writeBytes(ByteUtils.convertLongToByteArray(System.currentTimeMillis()));
 
 				double d = Math.round(Math.random() * 100 * 10) / 10.0;
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
@@ -135,48 +141,6 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 
 				s = random.nextInt();
 
-				buf.writeByte(0x02);
-				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x03);
-
-				s = random.nextInt();
-
-				buf.writeByte(0x02);
-				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-				d = Math.round(Math.random() * 100 * 10) / 10.0;
-				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x03);
-
 				StringBuffer sb = new StringBuffer();
 
 				for (int i = 0; i < buf.readableBytes(); i++) {
@@ -186,27 +150,27 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
-		} while (index++ < end);
+		}
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 
-		log.error("{} 연결해제 !!!", ctx.channel().remoteAddress());
+//		log.error("{} 연결해제 !!!", ctx.channel().remoteAddress());
 
-		final EventLoop eventLoop = ctx.channel().eventLoop();
-		eventLoop.schedule(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					clientServer.createBootstrap(new Bootstrap(), eventLoop, deviceId);
-				} catch (InterruptedException e) {
-					log.error(e.getMessage());
-					throw new RuntimeException(e);
-				}
-			}
-		}, 1L, TimeUnit.SECONDS);
-		super.channelInactive(ctx);
+//		final EventLoop eventLoop = ctx.channel().eventLoop();
+//		eventLoop.schedule(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				try {
+//					clientServer.createBootstrap(new Bootstrap(), eventLoop, deviceId);
+//				} catch (InterruptedException e) {
+//					log.error(e.getMessage());
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 1L, TimeUnit.SECONDS);
+//		super.channelInactive(ctx);
 	}
 }

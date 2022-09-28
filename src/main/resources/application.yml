@@ -3,6 +3,12 @@
   #port: 38080
 
 spring :
+  influxdb:
+    retention-policy: autogen
+    connect-timeout: 10
+    read-timeout: 30
+    write-timeout: 10
+
   datasource:
     hikari:
       auto-commit: true

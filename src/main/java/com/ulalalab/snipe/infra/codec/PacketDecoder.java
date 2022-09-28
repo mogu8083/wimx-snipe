@@ -8,8 +8,10 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TimeZone;
 
 @Component
 @Slf4j(topic = "TCP.PacketDecoder")
@@ -42,6 +44,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                     /* 데이터 형식
                     0x02            : STX
                     (x, 가변)         : deviceId
+                    Long    : 8Byte
                     Double : 8byte
                     Double : 8byte
                     Double : 8byte
@@ -55,8 +58,11 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 int deviceSize = in.readInt();
 
                 String deviceId = in.toString(in.readerIndex(), deviceSize, StandardCharsets.UTF_8);
-
                 in.readBytes(deviceSize);
+
+                Long time = in.readLong();
+                //LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
+
                 Double ch1 = in.readDouble();
                 Double ch2 = in.readDouble();
                 Double ch3 = in.readDouble();
@@ -69,7 +75,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 // Data Setting
                 Device device = new Device();
 
-                device.setTime(LocalDateTime.now());
+                device.setTime(time);
                 device.setDeviceId(deviceId);
                 device.setCh1(ch1);
                 device.setCh2(ch2);

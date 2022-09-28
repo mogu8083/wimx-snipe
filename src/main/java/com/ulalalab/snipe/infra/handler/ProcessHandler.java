@@ -4,23 +4,20 @@ import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import lombok.extern.slf4j.Slf4j;
+import org.influxdb.dto.Point;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 import javax.script.Invocable;
 import javax.script.ScriptException;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
@@ -28,19 +25,19 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	private static Long receive = 1L;
 	private static ChannelManager channelManager = ChannelManager.getInstance();
 
-//	@Autowired
+	//	@Autowired
+	//	private JdbcTemplate jdbcTemplate;
+
 	private RedisTemplate<String, Object> redisTemplate;
-//
-//	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private InfluxDBTemplate<Point> influxDBTemplate;
 
 	private Invocable invocable;
-
 	private String deviceId = null;
 
 	public ProcessHandler() {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
-		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+		this.influxDBTemplate = (InfluxDBTemplate<Point>) BeansUtils.getBean("influxDBTemplate");
+		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
 	}
 
 	@Override
@@ -54,7 +51,9 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 			if(deviceId==null) {
 				DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
+
 				defaultHandler.deviceId = device.getDeviceId();
+				this.deviceId = device.getDeviceId();
 			}
 
 			Double cvCh1 = device.getCh1();
@@ -83,17 +82,44 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelManager.channelSize() + "] => {}", device);
 
 			// 1. TimscaleDB Update
-			jdbcTemplate.update("insert into ulalalab_c(time, device_id, ch1, ch2, ch3, ch4, ch5) values(now(), ?, ?, ?, ?, ?, ?)"
-					, device.getDeviceId()
-					, cvCh1
-					, cvCh2
-					, cvCh3
-					, cvCh4
-					, cvCh5
-			);
+//			jdbcTemplate.update("insert into ulalalab_e(time, insert_time, device_id, ch1, ch2, ch3, ch4, ch5) " +
+//							"values(?, now(), ?, ?, ?, ?, ?, ?)"
+//					, device.getTime()
+//					, device.getDeviceId()
+//					, cvCh1
+//					, cvCh2
+//					, cvCh3
+//					, cvCh4
+//					, cvCh5
+//			);
 
-			// 2. Redis
-			//
+			System.out.println("##@@ " + influxDBTemplate);
+
+			// 1. InfluxDB Insert
+			influxDBTemplate.createDatabase();
+			final Point p = Point.measurement(device.getDeviceId())
+					.time(device.getTime(), TimeUnit.MILLISECONDS)
+					//.tag("test", "default")
+					.addField("ch1", device.getCh1())
+					.addField("ch2", device.getCh2())
+					.addField("ch3", device.getCh3())
+					.addField("ch4", device.getCh4())
+					.addField("ch5", device.getCh5())
+					.addField("insert_time", System.currentTimeMillis())
+					.build();
+			influxDBTemplate.write(p);
+
+			// 2. Redis Update
+			ValueOperations<String, Object> vop = redisTemplate.opsForValue();
+			JSONObject redisObject = new JSONObject();
+			redisObject.put("ch1", device.getCh1());
+			redisObject.put("ch2", device.getCh2());
+			redisObject.put("ch3", device.getCh3());
+			redisObject.put("ch4", device.getCh4());
+			redisObject.put("ch5", device.getCh5());
+			redisObject.put("time", device.getTime());
+			vop.set(deviceId, redisObject.toString());
+
 		} catch(ScriptException e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
