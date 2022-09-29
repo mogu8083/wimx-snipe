@@ -1,17 +1,23 @@
 package com.ulalalab.snipe.device.model;
 
+import com.ulalalab.snipe.infra.util.LocalDateUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 @Getter
 @Setter
 @ToString
 public class Device {
 
-    // UTC 시간
+    // UTC Timestamp
     private long time;
+
+    private LocalDateTime cvtTime;
 
     // 장비 이름
     private String deviceId;
@@ -33,4 +39,9 @@ public class Device {
 
     // 계산식
     private String source;
+
+    public String getCvtTime() {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this.time), TimeZone.getDefault().toZoneId());
+        return LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
+    }
 }

@@ -3,6 +3,7 @@ package com.ulalalab.snipe.infra.handler;
 import com.ulalalab.snipe.infra.constant.ProtocolEnum;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Set;
 
+@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 

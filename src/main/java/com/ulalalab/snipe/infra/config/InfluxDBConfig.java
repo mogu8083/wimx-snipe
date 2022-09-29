@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.infra.config;
 
+import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,4 +41,17 @@ public class InfluxDBConfig {
     public DefaultInfluxDBTemplate defaultTemplate(final InfluxDBConnectionFactory connectionFactory) {
         return new DefaultInfluxDBTemplate(connectionFactory);
     }
+
+    @Bean
+    public InfluxDB influxDBClient(
+            @Qualifier("spring.influxdb-org.springframework.data.influxdb.InfluxDBProperties") final InfluxDBProperties properties) {
+        return new InfluxDBConnectionFactory(properties).getConnection();
+    }
+
+//    @Bean
+//    public InfluxDB influxDBUdpWriter(
+//            @Qualifier("spring.influxdb-org.springframework.data.influxdb.InfluxDBProperties") final InfluxDBProperties properties) {
+//
+//        return new InfluxDBConnectionFactory(properties).getConnection();
+//    }
 }

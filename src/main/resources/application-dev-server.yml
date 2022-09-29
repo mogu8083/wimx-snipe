@@ -9,7 +9,7 @@ spring:
     username: ulalalab
     password: ulalalab12!@
     database: wimx
-    retention-policy: autogen
+    udp-port: 8089
 
   datasource:
     hikari:

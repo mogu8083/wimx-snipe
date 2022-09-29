@@ -20,6 +20,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
+        //ByteBuf in = ctx.alloc().directBuffer(1024);
+
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
 

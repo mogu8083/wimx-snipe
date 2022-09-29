@@ -11,7 +11,7 @@ public final class LocalDateUtils {
 
     public final static String DATE_MONTH_FORMAT = "yyyyMM";
     public final static String DATE_FORMAT = "yyyyMMdd";
-    public final static String DATE_TIME_FORMAT = "yyyyMMddHHmmss";
+    public final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public final static String DATE_MONTH_FORMAT_STATS ="yyyy/MM";
 
     /**

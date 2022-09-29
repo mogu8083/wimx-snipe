@@ -49,7 +49,7 @@ public class MainServer {
 		log.info("Main Server 실행");
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
-		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		EventLoopGroup workerGroup = new NioEventLoopGroup(4);
 
 		try {
 			ServerBootstrap bootstrap = new ServerBootstrap();
@@ -58,7 +58,7 @@ public class MainServer {
 					.handler(new LoggingHandler(LogLevel.INFO))
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.SO_LINGER, 0)
-					.childOption(ChannelOption.TCP_NODELAY, true)
+					//.childOption(ChannelOption.TCP_NODELAY, true)
 					.childOption(ChannelOption.SO_KEEPALIVE, true)
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 

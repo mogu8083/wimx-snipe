@@ -1,28 +1,36 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
+import com.ulalalab.snipe.infra.constant.CommonEnum;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
+import com.ulalalab.snipe.infra.manage.InfluxDBManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.Point;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import javax.script.Invocable;
 import javax.script.ScriptException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Component
+@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-	private static Long receive = 1L;
+	//private static Long receive = 1L;
 	private static ChannelManager channelManager = ChannelManager.getInstance();
 
 	//	@Autowired
@@ -30,18 +38,23 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private RedisTemplate<String, Object> redisTemplate;
 	private InfluxDBTemplate<Point> influxDBTemplate;
+	private InfluxDBManager influxDBManager;
 
 	private Invocable invocable;
 	private String deviceId = null;
 
+	private List<Point> pointList = new ArrayList<>();
+
 	public ProcessHandler() {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
-		this.influxDBTemplate = (InfluxDBTemplate<Point>) BeansUtils.getBean("influxDBTemplate");
-		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+		this.influxDBManager = (InfluxDBManager) BeansUtils.getBean("influxDBManager");
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
+
+		long startTime = System.nanoTime();
+
 		try {
 			Device device = (Device) packet;
 
@@ -79,7 +92,6 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-			log.info("받은 데이터 [" + (receive++) + ", 클라이언트 Count : " + channelManager.channelSize() + "] => {}", device);
 
 			// 1. TimscaleDB Update
 //			jdbcTemplate.update("insert into ulalalab_e(time, insert_time, device_id, ch1, ch2, ch3, ch4, ch5) " +
@@ -93,10 +105,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 //					, cvCh5
 //			);
 
-			System.out.println("##@@ " + influxDBTemplate);
-
 			// 1. InfluxDB Insert
-			influxDBTemplate.createDatabase();
 			final Point p = Point.measurement(device.getDeviceId())
 					.time(device.getTime(), TimeUnit.MILLISECONDS)
 					//.tag("test", "default")
@@ -107,26 +116,53 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					.addField("ch5", device.getCh5())
 					.addField("insert_time", System.currentTimeMillis())
 					.build();
-			influxDBTemplate.write(p);
 
-			// 2. Redis Update
-			ValueOperations<String, Object> vop = redisTemplate.opsForValue();
-			JSONObject redisObject = new JSONObject();
-			redisObject.put("ch1", device.getCh1());
-			redisObject.put("ch2", device.getCh2());
-			redisObject.put("ch3", device.getCh3());
-			redisObject.put("ch4", device.getCh4());
-			redisObject.put("ch5", device.getCh5());
-			redisObject.put("time", device.getTime());
-			vop.set(deviceId, redisObject.toString());
+			pointList.add(p);
+
+			CommonEnum redisSendEnum = CommonEnum.NOT_SEND;
+			CommonEnum influxSendEnum = CommonEnum.NOT_SEND;
+//
+			try {
+				for (Point point : pointList) {
+					influxDBManager.udpWrite(point);
+				}
+				redisSendEnum = CommonEnum.SEND;
+				pointList.clear();
+			} catch (Exception e) {
+				log.error("InfluxDB Exception : {}, {} => {} / pointList : {}", device.getCvtTime(), deviceId, e.getMessage(), pointList.size());
+				//e.printStackTrace();
+			}
+
+			// 2. Redis Insert
+			try {
+				ValueOperations<String, Object> vop = redisTemplate.opsForValue();
+				JSONObject redisObject = new JSONObject();
+				redisObject.put("ch1", device.getCh1());
+				redisObject.put("ch2", device.getCh2());
+				redisObject.put("ch3", device.getCh3());
+				redisObject.put("ch4", device.getCh4());
+				redisObject.put("ch5", device.getCh5());
+				redisObject.put("time", device.getTime());
+				vop.set(deviceId, redisObject.toString());
+
+				influxSendEnum = CommonEnum.SEND;
+			} catch (Exception e) {
+				log.error("Redis Exception : {}", e.getMessage());
+			}
+
+			long endTime = System.nanoTime();
+			double diffTIme = (endTime - startTime)/1000000.0;
+
+			log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
+					, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
 
 		} catch(ScriptException e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
 
 			invocable = null;
-			ctx.pipeline().remove("caculateHandler");
-			log.error("{} -> caculateHandler 제거!", this.getClass());
+			ctx.pipeline().remove("CaculateHandler");
+			log.error("{} -> CaculateHandler 제거!", this.getClass());
 		} catch(Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
@@ -139,6 +175,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	// 수신 데이터 처리 완료
 	@Override
 	public void channelReadComplete(ChannelHandlerContext ctx) {
+		//log.info("{} - Read Complete!!", deviceId);
 		//ctx.writeAndFlush(Unpooled.EMPTY_BUFFER) // 대기중인 메시지를 플러시하고 채널을 닫음
 			//.addListener(ChannelFutureListener.CLOSE);
 		//logger.info(this.getClass() + " => channelReadComplete");

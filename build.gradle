@@ -14,7 +14,7 @@ plugins {
 bootJar {
 	archiveBaseName = ''
 	archiveFileName = 'api.jar'
-	destinationDir new File("D:/")
+	destinationDir new File("D:/run")
 }
 
 group = 'com.ulalalab'
@@ -53,11 +53,6 @@ dependencies {
 	// P6Spy
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
-	// InfluxDB
-	//implementation 'org.influxdb:influxdb-java:2.22'
-	//implementation 'com.influxdb:influxdb-client-java:6.1.0'
-	//implementation 'com.github.miwurster:spring-data-influxdb:1.7'
-
 	// Netty
 	implementation 'io.netty:netty-all:4.1.80.Final'
 
@@ -66,6 +61,10 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// InfluxDB
+	implementation 'org.influxdb:influxdb-java:2.22'
+	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -4,10 +4,12 @@
 
 spring :
   influxdb:
+    database: wimx
     retention-policy: autogen
-    connect-timeout: 10
-    read-timeout: 30
-    write-timeout: 10
+    consistency: all
+    connectTimeout: 1
+    readTimeout: 1
+    writeTimeout: 1
 
   datasource:
     hikari:

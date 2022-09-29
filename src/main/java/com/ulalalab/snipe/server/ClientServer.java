@@ -24,9 +24,11 @@ import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -73,6 +75,7 @@ public class ClientServer {
 				.channel(NioSocketChannel.class)
 				.handler(new LoggingHandler(LogLevel.INFO))
 				.option(ChannelOption.SO_KEEPALIVE, true)
+				.option(ChannelOption.TCP_NODELAY, true)
 				.handler(new ClientHandler(this, deviceId));
 //				.handler(new ChannelInitializer<SocketChannel>() {
 //					@Override
@@ -121,7 +124,9 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
 				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
 
-				buf.writeBytes(ByteUtils.convertLongToByteArray(System.currentTimeMillis()));
+				long ss = System.currentTimeMillis();
+
+				buf.writeBytes(ByteUtils.convertLongToByteArray(ss));
 
 				double d = Math.round(Math.random() * 100 * 10) / 10.0;
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
@@ -139,14 +144,20 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 				buf.writeByte(0x03);
 
-				s = random.nextInt();
+//				s = random.nextInt();
 
-				StringBuffer sb = new StringBuffer();
+//				StringBuffer sb = new StringBuffer();
 
-				for (int i = 0; i < buf.readableBytes(); i++) {
-					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
-				}
+//				for (int i = 0; i < buf.readableBytes(); i++) {
+//					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
+//				}
 				//log.info("HEX : {}", sb.toString());
+
+				LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(ss), TimeZone.getDefault().toZoneId());
+				String time = LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
+
+				log.info("{} / time : {}", device, time);
+
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
