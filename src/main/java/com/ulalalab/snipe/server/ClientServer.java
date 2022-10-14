@@ -12,10 +12,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -23,10 +19,8 @@ import org.springframework.util.NumberUtils;
 import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -156,8 +150,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(ss), TimeZone.getDefault().toZoneId());
 				String time = LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
 
-				log.info("{} / time : {}", device, time);
-
+				//log.info("{} / time : {}", device, time);+
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
@@ -167,21 +160,21 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 
-//		log.error("{} 연결해제 !!!", ctx.channel().remoteAddress());
+		log.error("{} 연결해제 !!!", ctx.channel().remoteAddress());
 
-//		final EventLoop eventLoop = ctx.channel().eventLoop();
-//		eventLoop.schedule(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				try {
-//					clientServer.createBootstrap(new Bootstrap(), eventLoop, deviceId);
-//				} catch (InterruptedException e) {
-//					log.error(e.getMessage());
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}, 1L, TimeUnit.SECONDS);
-//		super.channelInactive(ctx);
+		final EventLoop eventLoop = ctx.channel().eventLoop();
+		eventLoop.schedule(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					clientServer.createBootstrap(new Bootstrap(), eventLoop, deviceId);
+				} catch (InterruptedException e) {
+					log.error(e.getMessage());
+					throw new RuntimeException(e);
+				}
+			}
+		}, 1L, TimeUnit.SECONDS);
+		super.channelInactive(ctx);
 	}
 }

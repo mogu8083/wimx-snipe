@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.util.StringUtils;
 
+import java.net.URI;
+
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -28,7 +30,17 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
 
         if (msg instanceof HttpRequest) {
             HttpRequest request = (HttpRequest) msg;
-            String uri = request.uri();
+            URI uri = new URI(request.uri());
+
+            // 디바이스
+            if(uri.equals("/device/info")) {
+
+                // 정보
+                if(request.method()==HttpMethod.GET) {
+                    QueryStringDecoder querString = new QueryStringDecoder(uri);
+
+                }
+            }
 
             if (HttpUtil.isContentLengthSet(request)) {
                 byteBuf = new ByteBufToBytes((int) HttpUtil.getContentLength(request));
@@ -56,10 +68,6 @@ public class HttpResponseHandler extends ChannelInboundHandlerAdapter {
 
                 if (byteBuf!=null && byteBuf.isEnd()) {
                     String resultStr = new String(byteBuf.readFull());
-                    log.info("Http Request Body : " + resultStr);
-
-                    JSONObject requestJson = new JSONObject(resultStr);
-
                 }
 
                 FullHttpResponse response = this.getResponse(jsonObject);

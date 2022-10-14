@@ -30,17 +30,15 @@ public class ConnectionListener implements ChannelFutureListener {
     @Override
     public void operationComplete(ChannelFuture channelFuture) throws Exception {
         if (!channelFuture.isSuccess()) {
-//            System.out.println("Reconnect");
-//
-//            final EventLoop loop = channelFuture.channel().eventLoop();
-//
-//            loop.schedule(() -> {
-//                try {
-//                    clientServer.createBootstrap(new Bootstrap(), loop, deviceId);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }, 3L, TimeUnit.SECONDS);
+            final EventLoop loop = channelFuture.channel().eventLoop();
+
+            loop.schedule(() -> {
+                try {
+                    clientServer.createBootstrap(new Bootstrap(), loop, deviceId);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }, 3L, TimeUnit.SECONDS);
         }
     }
 }

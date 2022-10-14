@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.infra.handler;
 
+import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.constant.CommonEnum;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
@@ -36,6 +37,8 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	//	@Autowired
 	//	private JdbcTemplate jdbcTemplate;
 
+	private boolean deviceSetFlag = false;
+
 	private RedisTemplate<String, Object> redisTemplate;
 	private InfluxDBTemplate<Point> influxDBTemplate;
 	private InfluxDBManager influxDBManager;
@@ -57,6 +60,15 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 		try {
 			Device device = (Device) packet;
+
+			if(!deviceSetFlag) {
+				ChannelInfo channelInfo = channelManager.getChannelInfo(ctx.channel());
+
+				channelInfo.setDeviceId(device.getDeviceId());
+				log.info(channelInfo.toString());
+
+				this.deviceSetFlag = true;
+			}
 
 			if (StringUtils.hasText(device.getSource())) {
 				this.invocable = ScriptUtils.getInvocable(device.getSource());
@@ -92,18 +104,6 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					throw new ScriptException("isNaN");
 				}
 			}
-
-			// 1. TimscaleDB Update
-//			jdbcTemplate.update("insert into ulalalab_e(time, insert_time, device_id, ch1, ch2, ch3, ch4, ch5) " +
-//							"values(?, now(), ?, ?, ?, ?, ?, ?)"
-//					, device.getTime()
-//					, device.getDeviceId()
-//					, cvCh1
-//					, cvCh2
-//					, cvCh3
-//					, cvCh4
-//					, cvCh5
-//			);
 
 			// 1. InfluxDB Insert
 			final Point p = Point.measurement(device.getDeviceId())

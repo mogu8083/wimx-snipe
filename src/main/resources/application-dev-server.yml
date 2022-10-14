@@ -31,7 +31,7 @@ spring:
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path:  /home/ulalalab/run/log
+log-file-path:  /home/jem/run/log
 
 #Netty
 #netty:

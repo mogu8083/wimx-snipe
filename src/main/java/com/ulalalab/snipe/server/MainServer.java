@@ -48,8 +48,8 @@ public class MainServer {
 	public void start() throws InterruptedException {
 		log.info("Main Server 실행");
 
-		EventLoopGroup bossGroup = new NioEventLoopGroup();
-		EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
 			ServerBootstrap bootstrap = new ServerBootstrap();

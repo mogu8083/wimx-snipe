@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.infra.handler;
 
+import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.infra.codec.PacketDecoder;
 import com.ulalalab.snipe.infra.constant.ProtocolEnum;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
@@ -11,7 +12,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import lombok.extern.slf4j.Slf4j;
-import java.util.Set;
 
 @Slf4j
 public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
@@ -27,11 +27,13 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
         if(this.isHttp(first, second)) {
             httpHandler(ctx);
-
-            log.info("{} Http 연결 !!", ctx.channel().remoteAddress());
         } else {
             tcpHandler(ctx);
-            channelManager.addChannel(ctx.channel());
+
+            Channel channel = ctx.channel();
+            ChannelInfo channelInfo = new ChannelInfo(channel);
+            channelManager.setChannelInfo(ctx.channel(), channelInfo);
+
             log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelManager.channelSize());
         }
         ctx.fireChannelRead(packet);
