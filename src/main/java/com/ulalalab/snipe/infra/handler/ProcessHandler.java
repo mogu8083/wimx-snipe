@@ -7,6 +7,7 @@ import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.manage.InfluxDBManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,17 +23,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import javax.script.Invocable;
 import javax.script.ScriptException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@ChannelHandler.Sharable
+//@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	//private static Long receive = 1L;
-	private static ChannelManager channelManager = ChannelManager.getInstance();
+	private ChannelManager channelManager = ChannelManager.getInstance();
 
 	//	@Autowired
 	//	private JdbcTemplate jdbcTemplate;
@@ -63,9 +65,11 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 			if(!deviceSetFlag) {
 				ChannelInfo channelInfo = channelManager.getChannelInfo(ctx.channel());
+				Channel channel = ctx.channel();
 
 				channelInfo.setDeviceId(device.getDeviceId());
-				log.info(channelInfo.toString());
+				channelInfo.setRemoteAddress(channel.remoteAddress().toString());
+				channelInfo.setConnectTime(LocalDateTime.now());
 
 				this.deviceSetFlag = true;
 			}
@@ -81,13 +85,13 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				this.deviceId = device.getDeviceId();
 			}
 
-			Double cvCh1 = device.getCh1();
-			Double cvCh2 = device.getCh2();
-			Double cvCh3 = device.getCh3();
-			Double cvCh4 = device.getCh4();
-			Double cvCh5 = device.getCh5();
-
 			if (invocable != null) {
+				Double cvCh1 = device.getCh1();
+				Double cvCh2 = device.getCh2();
+				Double cvCh3 = device.getCh3();
+				Double cvCh4 = device.getCh4();
+				Double cvCh5 = device.getCh5();
+
 				cvCh1 = (Double) invocable.invokeFunction("add", cvCh1);
 				cvCh2 = (Double) invocable.invokeFunction("add", cvCh2);
 				cvCh3 = (Double) invocable.invokeFunction("add", cvCh3);
@@ -130,7 +134,6 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				pointList.clear();
 			} catch (Exception e) {
 				log.error("InfluxDB Exception : {}, {} => {} / pointList : {}", device.getCvtTime(), deviceId, e.getMessage(), pointList.size());
-				//e.printStackTrace();
 			}
 
 			// 2. Redis Insert
@@ -153,8 +156,8 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			long endTime = System.nanoTime();
 			double diffTIme = (endTime - startTime)/1000000.0;
 
-			log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
-					, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
+//			log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
+//					, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
 
 		} catch(ScriptException e) {
 			log.error(e.getMessage());

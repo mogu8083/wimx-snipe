@@ -55,7 +55,7 @@ public class MainServer {
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.INFO))
+					.handler(new LoggingHandler(LogLevel.DEBUG))
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.SO_LINGER, 0)
 					//.childOption(ChannelOption.TCP_NODELAY, true)

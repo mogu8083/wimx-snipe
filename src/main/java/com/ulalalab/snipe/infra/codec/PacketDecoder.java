@@ -96,7 +96,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("{} -> PacketDecoder Error ! -> {}", this.getClass(), cause.getCause());
-        cause.printStackTrace();
+        log.error("{} -> PacketDecoder Error ! -> {} / {} / {}", this.getClass(), cause.getMessage(), cause.toString(), cause.getCause());
+        //cause.printStackTrace();
     }
 }

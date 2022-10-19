@@ -12,12 +12,14 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
-    private static ChannelManager channelManager = ChannelManager.getInstance();
-
+    /**
+     * 프로토콜 선택
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
         ByteBuf in = (ByteBuf) packet;
@@ -29,14 +31,10 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
             httpHandler(ctx);
         } else {
             tcpHandler(ctx);
-
-            Channel channel = ctx.channel();
-            ChannelInfo channelInfo = new ChannelInfo(channel);
-            channelManager.setChannelInfo(ctx.channel(), channelInfo);
-
-            log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelManager.channelSize());
         }
+        ctx.fireChannelActive();
         ctx.fireChannelRead(packet);
+        //ctx.fireChannelRead(packet);
     }
 
     /**
@@ -60,7 +58,7 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
     private void httpHandler(ChannelHandlerContext ctx) {
         ChannelPipeline p = ctx.pipeline();
 
-        p.addLast("HTTP.DefaultHandler", new DefaultHandler(ProtocolEnum.HTTP));
+        p.addLast("HTTP.DefaultHandler", new DefaultHandler(ProtocolEnum.HTTP, ctx));
         p.addLast("HTTP.HttpRequestDecoder", new HttpRequestDecoder());
         p.addLast("HTTP.HttpResponseEncoder", new HttpResponseEncoder());
         p.addLast("HTTP.HttpResponseHandler", new HttpResponseHandler());
@@ -74,13 +72,13 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
         ChannelPipeline p = ctx.pipeline();
 
         // 기본 ( 연결 관련 )
-        p.addLast("TCP.DefaultHandler", new DefaultHandler(ProtocolEnum.TCP));
+        p.addLast("TCP.DefaultHandler", new DefaultHandler(ProtocolEnum.TCP, ctx));
 
         // Packet 디코더 - 패킷 처리
         p.addLast("TCP.PacketDecoder", new PacketDecoder());
 
         // 계산식 핸들러
-        p.addLast("TCP.CaculateHandler", new CaculateHandler());
+        p.addLast("TCP.CalculateHandler", new CalculateHandler());
 
         // 데이터 가공 처리
         p.addLast("TCP.ProcessHandler", new ProcessHandler());

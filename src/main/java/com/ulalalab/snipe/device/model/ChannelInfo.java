@@ -1,14 +1,13 @@
 package com.ulalalab.snipe.device.model;
 
-import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
 public class ChannelInfo {
 
     // 디바이스 ID
@@ -23,8 +22,8 @@ public class ChannelInfo {
     // 접속 IP
     private String remoteAddress;
 
-    public ChannelInfo(Channel channel) {
-        this.connectTime = LocalDateTime.now();
-        this.remoteAddress = channel.remoteAddress().toString();
-    }
+//    public ChannelInfo(Channel channel) {
+//        this.connectTime = LocalDateTime.now();
+//        this.remoteAddress = channel.remoteAddress().toString();
+//    }
 }

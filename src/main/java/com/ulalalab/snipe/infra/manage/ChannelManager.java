@@ -1,15 +1,19 @@
 package com.ulalalab.snipe.infra.manage;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
-import io.netty.channel.Channel;
+import com.ulalalab.snipe.infra.handler.CalculateHandler;
+import com.ulalalab.snipe.infra.handler.DefaultHandler;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ChannelManager {
 
-    //private Set<Channel, ChannelInfo> channelGroup = new HashSet<>();
     private Map<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
     private static ChannelManager channelManager;
 
@@ -25,7 +29,7 @@ public class ChannelManager {
         channelGroup.put(channel, channelInfo);
     }
 
-    public void removeChannel(Channel channel) {
+    public synchronized void removeChannel(Channel channel) {
         channelGroup.remove(channel);
     }
 
@@ -33,14 +37,17 @@ public class ChannelManager {
      * 채널 삭제
      * @param deviceId
      */
-    public void removeChannel(String deviceId) {
+    public synchronized void removeChannel(String deviceId) throws Exception {
 
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
 
             if(channelInfo.getDeviceId().equals(deviceId)) {
                 log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
-                channel.close();
+                DefaultHandler handler = (DefaultHandler) channel.pipeline().get("TCP.DefaultHandler");
+                ChannelHandlerContext ctx = handler.getChannelHandlerContext();
+
+                ctx.close();
                 break;
             }
         }
@@ -50,8 +57,8 @@ public class ChannelManager {
         return channelGroup.get(channel);
     }
 
-    public void setChannelInfo(Channel channel, ChannelInfo channelInfo) {
-        channelGroup.put(channel, channelInfo);
+    public synchronized void addChannel(Channel channel) {
+        channelGroup.put(channel, new ChannelInfo());
     }
 
     public Map<Channel, ChannelInfo> getChannelGroup() {
@@ -60,5 +67,27 @@ public class ChannelManager {
 
     public int channelSize() {
         return channelGroup.size();
+    }
+
+    public int calculatePush(String deviceId) {
+        int resultCnt = 0;
+
+        for (Channel channel : channelGroup.keySet()) {
+            ChannelInfo channelInfo = channelGroup.get(channel);
+
+            if(channelInfo.getDeviceId().equals(deviceId)) {
+                log.info("{} DeviceId Filter Change!", channelInfo.getDeviceId());
+                CalculateHandler handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+
+                if(handler == null) {
+                    channel.pipeline().addAfter("TCP.PacketDecoder", "TCP.CalculateHandler", new CalculateHandler());
+                    handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+                }
+                handler.setInitFlag(true);
+                resultCnt++;
+                break;
+            }
+        }
+        return resultCnt;
     }
 }

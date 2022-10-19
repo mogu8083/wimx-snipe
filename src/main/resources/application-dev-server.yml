@@ -33,7 +33,5 @@ spring:
 
 log-file-path:  /home/jem/run/log
 
-#Netty
-#netty:
-#  tcp-port: 37080
-#  http-port: 36081
+server:
+  port: 36080

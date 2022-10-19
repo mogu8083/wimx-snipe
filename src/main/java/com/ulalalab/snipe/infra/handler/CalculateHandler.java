@@ -9,13 +9,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 import java.util.List;
 
-@Slf4j(topic = "TCP.")
-public class CaculateHandler extends ChannelInboundHandlerAdapter {
+@Slf4j(topic = "TCP.CaculateHandler")
+public class CalculateHandler extends ChannelInboundHandlerAdapter {
 
 	private JdbcTemplate jdbcTemplate;
 	private boolean initFlag = true;
 
-	public CaculateHandler() {
+	public CalculateHandler() {
 		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
 	}
 
@@ -47,5 +47,13 @@ public class CaculateHandler extends ChannelInboundHandlerAdapter {
 			log.error("{} / {}", this.getClass(), e.getMessage());
 			ctx.pipeline().remove(this);
 		}
+	}
+
+	/**
+	 * 계산식 다시 조회 Flag
+	 * @param flag
+	 */
+	public void setInitFlag(boolean flag) {
+		this.initFlag = flag;
 	}
 }
