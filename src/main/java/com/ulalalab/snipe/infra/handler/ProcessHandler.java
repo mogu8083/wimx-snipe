@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 //@ChannelHandler.Sharable
@@ -70,6 +71,10 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				channelInfo.setDeviceId(device.getDeviceId());
 				channelInfo.setRemoteAddress(channel.remoteAddress().toString());
 				channelInfo.setConnectTime(LocalDateTime.now());
+				channelInfo.setLocalAddress(channel.localAddress().toString());
+				channelInfo.setCalculateFlag(StringUtils.hasText(device.getSource()));
+				channelInfo.setHandlerList(channel.pipeline().names()
+						.stream().filter(c -> !c.contains("TailContext")).collect(Collectors.toList()));
 
 				this.deviceSetFlag = true;
 			}

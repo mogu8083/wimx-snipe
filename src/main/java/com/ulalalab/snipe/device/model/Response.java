@@ -1,12 +1,11 @@
 package com.ulalalab.snipe.device.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ulalalab.snipe.infra.constant.ResultEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,10 +16,16 @@ public class Response<T> {
     private String code;
     private String message;
     private LocalDateTime timestamp;
+    private Integer size;
     private T data;
 
     public Response(T data) {
         this.init();
+
+        if(data instanceof List) {
+            List list = (List) data;
+            this.size = list.size();
+        }
         this.data = data;
     }
 

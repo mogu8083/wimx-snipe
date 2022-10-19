@@ -40,10 +40,6 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 		log.info("{} 연결 해제 !! / 연결 갯수 : {}",
 				StringUtils.hasText(deviceId) ? deviceId : "NoDevice" , channelManager.channelSize());
-//		ctx.channel().closeFuture();
-//		ctx.channel().close();
-		ctx.channel().eventLoop().shutdownGracefully();
-		ctx.close();
 	}
 
 	@Override

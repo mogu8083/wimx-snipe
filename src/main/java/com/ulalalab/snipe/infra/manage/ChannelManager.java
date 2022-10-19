@@ -3,18 +3,16 @@ package com.ulalalab.snipe.infra.manage;
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.infra.handler.CalculateHandler;
 import com.ulalalab.snipe.infra.handler.DefaultHandler;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ChannelManager {
 
-    private Map<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
     private static ChannelManager channelManager;
 
     static {
@@ -44,10 +42,7 @@ public class ChannelManager {
 
             if(channelInfo.getDeviceId().equals(deviceId)) {
                 log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
-                DefaultHandler handler = (DefaultHandler) channel.pipeline().get("TCP.DefaultHandler");
-                ChannelHandlerContext ctx = handler.getChannelHandlerContext();
-
-                ctx.close();
+                channel.close();
                 break;
             }
         }
@@ -57,12 +52,19 @@ public class ChannelManager {
         return channelGroup.get(channel);
     }
 
-    public synchronized void addChannel(Channel channel) {
+    public void addChannel(Channel channel) {
         channelGroup.put(channel, new ChannelInfo());
     }
 
-    public Map<Channel, ChannelInfo> getChannelGroup() {
-        return channelGroup;
+    public List<ChannelInfo> getChannelGroup() {
+        List<ChannelInfo> list = new ArrayList<>();
+
+        for (Channel channel : channelGroup.keySet()) {
+            ChannelInfo channelInfo = channelGroup.get(channel);
+
+            list.add(channelInfo);
+        }
+        return list;
     }
 
     public int channelSize() {
