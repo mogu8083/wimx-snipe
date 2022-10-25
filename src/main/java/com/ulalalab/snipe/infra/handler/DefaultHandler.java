@@ -44,10 +44,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
-	}
-
-	public ChannelHandlerContext getChannelHandlerContext() {
-		return this.ctx;
+		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getStackTrace().toString());
+		ctx.channel().close();
 	}
 }

@@ -2,9 +2,10 @@ package com.ulalalab.snipe.infra.codec;
 
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.ByteUtils;
-import io.netty.buffer.ByteBuf;
+import io.netty.buffer.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -13,45 +14,22 @@ import java.util.List;
 @Slf4j(topic = "TCP.PacketDecoder")
 public class PacketDecoder extends ByteToMessageDecoder {
 
+    //ByteBuf in = Unpooled.buffer(70);
+    //ByteBuf in = PooledByteBufAllocator.DEFAULT.heapBuffer(70);
+    //ByteBuf in = PooledByteBufAllocator.DEFAULT.directBuffer(70);
+    Device device = new Device();
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
-        //ByteBuf in = ctx.alloc().directBuffer(1024);
+        //ByteBuf in = Unpooled.buffer(70);
+        //in.writeBytes(packet);
 
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
 
-        if (in.readableBytes() < 49) {
-            return;
-        }
-
-        if (in.getByte(readerIndex) != 0x02 || in.getByte(readableBytes + readerIndex - 1) != 0x03) {
-            return;
-        }
-        //logger.info("in.readableBytes() -> " + in.readableBytes() + " / in.readerIndex() -> " + in.readerIndex());
-
-        StringBuffer hexString = new StringBuffer();
-
-        for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
-            hexString.append(ByteUtils.byteToHexString(in.getByte(i)) + " ");
-        }
-        //logger.info("Receive HEX : " + hexString.toString());
-
-        do {
+        if(in.readableBytes() >= 59) {
             try {
-                    /* 데이터 형식
-                    0x02            : STX
-                    (x, 가변)         : deviceId
-                    Long    : 8Byte
-                    Double : 8byte
-                    Double : 8byte
-                    Double : 8byte
-                    Double : 8byte
-                    Double : 8byte
-                    0x03            : ETX
-                    */
-
-                // 0x02
                 in.readByte();
                 int deviceSize = in.readInt();
 
@@ -60,6 +38,16 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 Long time = in.readLong();
                 //LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
+
+                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
+                    StringBuilder hexString = new StringBuilder();
+
+                    for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
+                        hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
+                        hexString.append(" ");
+                    }
+                    log.info("Receive HEX : " + hexString.toString());
+                }
 
                 Double ch1 = in.readDouble();
                 Double ch2 = in.readDouble();
@@ -71,8 +59,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 in.readByte();
 
                 // Data Setting
-                Device device = new Device();
-
                 device.setTime(time);
                 device.setDeviceId(deviceId);
                 device.setCh1(ch1);
@@ -81,22 +67,30 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 device.setCh4(ch4);
                 device.setCh5(ch5);
 
-                if (!deviceId.contains("WX")) {
-                    throw new Exception("Not Vaild DeviceId -> " + hexString.toString() + " / Device : " + device.toString());
-                }
                 out.add(device);
-                in.slice(in.readerIndex(), in.readableBytes());
+
+                if (deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
+                    log.info(device.toString());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님. clear -> " + hexString.toString());
-                in.clear();
+                log.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님 -> 초기화");
+                in.resetReaderIndex();
+                in.resetWriterIndex();
             }
-        } while(in.readableBytes() > 49);
+        }
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        //ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("{} -> PacketDecoder Error ! -> {} / {} / {}", this.getClass(), cause.getMessage(), cause.toString(), cause.getCause());
-        //cause.printStackTrace();
+        //ctx.alloc().heapBuffer().release();
+        //in.clear();
+        cause.printStackTrace();
     }
 }

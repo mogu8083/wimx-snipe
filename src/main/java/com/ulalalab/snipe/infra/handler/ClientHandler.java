@@ -5,6 +5,7 @@ import com.ulalalab.snipe.infra.util.LocalDateUtils;
 import com.ulalalab.snipe.server.ClientServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -38,6 +39,9 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 		log.info("{} -> 클라이언트 연결", deviceName);
 
 		while (true) {
+			//ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
+			ByteBuf buf = Unpooled.buffer(65);
+
 			if(!ctx.channel().isOpen()) {
 				break;
 			}
@@ -45,14 +49,15 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 			if(ctx.channel().isWritable()) {
 				Thread.sleep(1000);
 
-				ByteBuf buf = PooledByteBufAllocator.DEFAULT.heapBuffer(65);
-
 				Random random = new Random();
 				int s = random.nextInt();
 
 				buf.writeByte(0x02);
+				buf.writeByte(0x02);
+				buf.writeByte(0x02);
 
 				String device = deviceName;
+
 				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
 				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
 
@@ -74,7 +79,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 
 				d = Math.round(Math.random() * 100 * 10) / 10.0;
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x03);
+				buf.writeByte(0x04);
 
 				StringBuffer sb = new StringBuffer();
 
@@ -86,7 +91,9 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(ss), TimeZone.getDefault().toZoneId());
 				String time = LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
 
-				log.info("{} / time : {}", device, time);
+				if(device.equals("WX-1A") || device.equals("WX-1Z")) {
+					log.info("{} / time : {}", device, time);
+				}
 				ctx.writeAndFlush(buf);
 				buf.clear();
 			}
@@ -98,20 +105,20 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 		log.warn("channelInactive");
 		log.warn("deviceName : {} -> 연결해제 !!!", deviceName);
 
-		final EventLoop eventLoop = ctx.channel().eventLoop();
-
-		eventLoop.scheduleAtFixedRate(() -> {
-			try {
-				ChannelFuture future = clientServer.bootstrapConnect(deviceId);
-
-				if (future != null) {
-					eventLoop.shutdownGracefully();
-					eventLoop.terminationFuture();
-				}
-			} catch (Exception e) {
-				log.warn(e.getMessage());
-			}
-		}, 3L, 5L, TimeUnit.SECONDS);
+//		final EventLoop eventLoop = ctx.channel().eventLoop();
+//
+//		eventLoop.scheduleAtFixedRate(() -> {
+//			try {
+//				ChannelFuture future = clientServer.bootstrapConnect(deviceId);
+//
+//				if (future != null) {
+//					eventLoop.shutdownGracefully();
+//					eventLoop.terminationFuture();
+//				}
+//			} catch (Exception e) {
+//				log.warn(e.getMessage());
+//			}
+//		}, 3L, 5L, TimeUnit.SECONDS);
 	}
 
 	@Override

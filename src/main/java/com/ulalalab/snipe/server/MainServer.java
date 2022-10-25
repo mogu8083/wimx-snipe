@@ -3,10 +3,7 @@ package com.ulalalab.snipe.server;
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -56,10 +53,14 @@ public class MainServer {
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.DEBUG))
-					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-					.childOption(ChannelOption.SO_LINGER, 0)
+					//.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
+					//.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
+					//.childOption(ChannelOption.SO_LINGER, 0)
 					//.childOption(ChannelOption.TCP_NODELAY, true)
 					.childOption(ChannelOption.SO_KEEPALIVE, true)
+			//ChannelOption.SO_RCVBUF, 256 * 1024);
+			//ChannelOption.SO_BACKLOG, 1024);
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 
 						@Override

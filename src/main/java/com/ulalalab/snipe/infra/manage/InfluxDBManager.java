@@ -23,4 +23,8 @@ public class InfluxDBManager {
     public void udpWrite(Point point) {
         this.influxDBClient.write(UDP_PORT, point);
     }
+
+    public void write(Point point) {
+        this.influxDBClient.write(point);
+    }
 }

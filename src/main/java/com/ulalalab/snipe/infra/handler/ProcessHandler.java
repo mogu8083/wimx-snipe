@@ -8,13 +8,11 @@ import com.ulalalab.snipe.infra.manage.InfluxDBManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import com.ulalalab.snipe.infra.util.ScriptUtils;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.dto.Point;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,12 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "TCP.ProcessHandler")
 public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
-	//private static Long receive = 1L;
 	private ChannelManager channelManager = ChannelManager.getInstance();
-
-	//	@Autowired
-	//	private JdbcTemplate jdbcTemplate;
-
 	private boolean deviceSetFlag = false;
 
 	private RedisTemplate<String, Object> redisTemplate;
@@ -51,9 +44,12 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 
 	private List<Point> pointList = new ArrayList<>();
 
+	JSONObject redisObject = new JSONObject();
+
 	public ProcessHandler() {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
 		this.influxDBManager = (InfluxDBManager) BeansUtils.getBean("influxDBManager");
+		this.influxDBTemplate = (InfluxDBTemplate<Point>) BeansUtils.getBean("influxDBTemplate");
 	}
 
 	@Override
@@ -134,17 +130,19 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			try {
 				for (Point point : pointList) {
 					influxDBManager.udpWrite(point);
+					//influxDBManager.write(point);
 				}
+				//influxDBTemplate.write(pointList);
 				redisSendEnum = CommonEnum.SEND;
 				pointList.clear();
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.error("InfluxDB Exception : {}, {} => {} / pointList : {}", device.getCvtTime(), deviceId, e.getMessage(), pointList.size());
 			}
 
 			// 2. Redis Insert
 			try {
 				ValueOperations<String, Object> vop = redisTemplate.opsForValue();
-				JSONObject redisObject = new JSONObject();
 				redisObject.put("ch1", device.getCh1());
 				redisObject.put("ch2", device.getCh2());
 				redisObject.put("ch3", device.getCh3());
@@ -161,9 +159,10 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 			long endTime = System.nanoTime();
 			double diffTIme = (endTime - startTime)/1000000.0;
 
-//			log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
-//					, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
-
+			if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
+				log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
+						, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
+			}
 		} catch(ScriptException e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
@@ -177,6 +176,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 		} finally {
 			// 참조 해체
 			ReferenceCountUtil.release(packet);
+			//ctx.alloc().heapBuffer().release();
 		}
 	}
 

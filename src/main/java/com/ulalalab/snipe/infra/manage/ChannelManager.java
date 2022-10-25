@@ -2,9 +2,9 @@ package com.ulalalab.snipe.infra.manage;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.infra.handler.CalculateHandler;
-import com.ulalalab.snipe.infra.handler.DefaultHandler;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,10 +40,15 @@ public class ChannelManager {
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
 
-            if(channelInfo.getDeviceId().equals(deviceId)) {
+            if(StringUtils.hasText(deviceId) && channelInfo.getDeviceId().equals(deviceId)) {
                 log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
                 channel.close();
                 break;
+            }
+
+            if(deviceId == null) {
+                log.info("DeviceId Null Channel Close!");
+                channel.close();
             }
         }
     }
