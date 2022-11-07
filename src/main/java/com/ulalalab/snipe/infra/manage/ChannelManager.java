@@ -6,13 +6,16 @@ import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class ChannelManager {
 
-    private ConcurrentHashMap<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
+    //private ConcurrentHashMap<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
+    private Map<Channel, ChannelInfo> channelGroup = new HashMap<>();
     private static ChannelManager channelManager;
 
     static {
@@ -27,7 +30,7 @@ public class ChannelManager {
         channelGroup.put(channel, channelInfo);
     }
 
-    public synchronized void removeChannel(Channel channel) {
+    public void removeChannel(Channel channel) {
         channelGroup.remove(channel);
     }
 
@@ -39,16 +42,19 @@ public class ChannelManager {
 
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
+            String channelDeviceId = channelInfo.getDeviceId();
 
-            if(StringUtils.hasText(deviceId) && channelInfo.getDeviceId().equals(deviceId)) {
-                log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
-                channel.close();
-                break;
-            }
-
-            if(deviceId == null) {
-                log.info("DeviceId Null Channel Close!");
-                channel.close();
+            if(StringUtils.hasText(channelDeviceId)) {
+                if(channelDeviceId.equals(deviceId)) {
+                    log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
+                    channel.close();
+                    break;
+                }
+            } else {
+                if(deviceId == null) {
+                    log.info("DeviceId Null Channel Close!");
+                    channel.close();
+                }
             }
         }
     }
@@ -57,7 +63,7 @@ public class ChannelManager {
         return channelGroup.get(channel);
     }
 
-    public void addChannel(Channel channel) {
+    public synchronized void addChannel(Channel channel) {
         channelGroup.put(channel, new ChannelInfo());
     }
 
@@ -82,17 +88,24 @@ public class ChannelManager {
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
 
-            if(channelInfo.getDeviceId().equals(deviceId)) {
-                log.info("{} DeviceId Filter Change!", channelInfo.getDeviceId());
-                CalculateHandler handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+            String channelDeviceId = channelInfo.getDeviceId();
 
-                if(handler == null) {
-                    channel.pipeline().addAfter("TCP.PacketDecoder", "TCP.CalculateHandler", new CalculateHandler());
-                    handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+            if(StringUtils.hasText(channelDeviceId)) {
+                if(channelDeviceId.equals(deviceId)) {
+                    log.info("{} DeviceId Filter Change!", channelInfo.getDeviceId());
+                    CalculateHandler handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+
+                    if(handler == null) {
+                        channel.pipeline().addAfter("TCP.PacketDecoder", "TCP.CalculateHandler", new CalculateHandler());
+                        handler = (CalculateHandler) channel.pipeline().get("TCP.CalculateHandler");
+                    }
+                    handler.setInitFlag(true);
+                    resultCnt++;
+                    break;
                 }
-                handler.setInitFlag(true);
-                resultCnt++;
-                break;
+            } else {
+                log.info("DeviceId Null Channel Close!");
+                channel.close();
             }
         }
         return resultCnt;

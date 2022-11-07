@@ -53,8 +53,6 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				int s = random.nextInt();
 
 				buf.writeByte(0x02);
-				buf.writeByte(0x02);
-				buf.writeByte(0x02);
 
 				String device = deviceName;
 
@@ -79,9 +77,7 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 
 				d = Math.round(Math.random() * 100 * 10) / 10.0;
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-				buf.writeByte(0x04);
-
-				StringBuffer sb = new StringBuffer();
+				buf.writeByte(0x03);
 
 //				for (int i = 0; i < buf.readableBytes(); i++) {
 //					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");

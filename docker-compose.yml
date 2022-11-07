@@ -1,17 +1,56 @@
-#FROM adoptopenjdk/openjdk11:jdk-11.0.11_9-alpine-slim
-FROM openjdk:11
+version: "3.7"
 
-RUN apt-get update
-#RUN apt-get install -y vim
-#RUN apt-get install -y openjdk-11-jdk
-RUN apt-get install -y vim
+services:
 
-WORKDIR /home/jem/run
+  # Server
+  server:
+    #build: .
+    image: wimx2-snipe:latest
+    container_name: "wimx2-snipe-server"
+    volumes:
+      - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
+    ports:
+      - "36080:36080" # HTTP
+      - "37080:37080" # TCP
+      - "36666:36666" # JMX
+    environment:
+      - JVM_OPTS=-Dcom.sun.management.jmxremote=true 
+                -Dcom.sun.management.jmxremote.local.only=false 
+                -Dcom.sun.management.jmxremote.port=36666 
+                -Dcom.sun.management.jmxremote.ssl=false 
+                -Dcom.sun.management.jmxremote.authenticate=false 
+                -Djava.rmi.server.hostname=10.10.0.90 
+                -Dcom.sun.management.jmxremote.rmi.port=36666
+                -Dspring.profiles.active=dev-server
+                -Dtcp.port=37080
+                -Dserver.type=server
 
-COPY build/libs/snipe.jar snipe.jar
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+          
+    stdin_open: true
+    tty: true
 
-RUN mkdir -p /home/jem/run/logs/37082
-RUN mkdir -p /home/jem/run/logs/37080
-RUN mkdir -p /home/jem/run/logs/37081
-
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev-server", "-Dtcp.ip=10.10.0.251", "-Dtcp.port=37080", "-Ddevice.suffix=A", "-Dthread.count=1200", "snipe.jar"]
+  # Client
+  client:
+    #build: .
+    image: wimx2-snipe:latest
+    container_name: "wimx2-snipe-client"
+    volumes:
+      - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
+    environment:
+      - JVM_OPTS=-Dspring.profiles.active=dev-client
+                -Dtcp.ip=10.10.0.90
+                -Dtcp.port=37080
+                -Ddevice.suffix=Z
+                -Dthread.count=800
+                -Dserver.type=client
+    restart: always
+    depends_on:
+      - server
+    command: bash -c "sleep 10 && java -jar -Dspring.profiles.active=dev-client -Dtcp.ip=10.10.0.90 -Dtcp.port=37080 -Ddevice.suffix=Z -Dthread.count=800 -Dserver.type=client snipe.jar"
+    stdin_open: true
+    tty: true

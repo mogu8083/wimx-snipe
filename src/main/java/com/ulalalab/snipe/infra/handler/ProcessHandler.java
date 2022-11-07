@@ -55,7 +55,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
 
-		long startTime = System.nanoTime();
+		//long startTime = System.nanoTime();
 
 		try {
 			Device device = (Device) packet;
@@ -85,6 +85,8 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				defaultHandler.deviceId = device.getDeviceId();
 				this.deviceId = device.getDeviceId();
 			}
+
+			log.info(device.toString());
 
 			if (invocable != null) {
 				Double cvCh1 = device.getCh1();
@@ -156,13 +158,13 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				log.error("Redis Exception : {}", e.getMessage());
 			}
 
-			long endTime = System.nanoTime();
-			double diffTIme = (endTime - startTime)/1000000.0;
+//			long endTime = System.nanoTime();
+//			double diffTIme = (endTime - startTime)/1000000.0;
 
-			if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
-				log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
-						, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
-			}
+//			if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
+//				log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
+//						, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), redisSendEnum.getCode(), influxSendEnum.getCode());
+//			}
 		} catch(ScriptException e) {
 			log.error(e.getMessage());
 			e.printStackTrace();

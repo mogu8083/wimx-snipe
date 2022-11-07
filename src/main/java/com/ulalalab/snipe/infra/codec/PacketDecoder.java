@@ -16,14 +16,25 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     //ByteBuf in = Unpooled.buffer(70);
     //ByteBuf in = PooledByteBufAllocator.DEFAULT.heapBuffer(70);
-    //ByteBuf in = PooledByteBufAllocator.DEFAULT.directBuffer(70);
-    Device device = new Device();
+    //ByteBuf in = PooledByteBufAllocator.DEFAULT.heapBuffer(61);
+//    Device device;
+
+//    @Override
+//    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+//        device = new Device();
+//    }
+//
+//    @Override
+//    protected void handlerRemoved0(ChannelHandlerContext ctx) throws Exception {
+////        in.release(); // (1)
+////        in = null;
+////        //super.handlerRemoved0(ctx);
+//        device = null;
+//    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-
-        //ByteBuf in = Unpooled.buffer(70);
-        //in.writeBytes(packet);
+        Device device = new Device();
 
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
@@ -39,15 +50,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 Long time = in.readLong();
                 //LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
 
-                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
-                    StringBuilder hexString = new StringBuilder();
-
-                    for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
-                        hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
-                        hexString.append(" ");
-                    }
-                    log.info("Receive HEX : " + hexString.toString());
-                }
+//                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
+//                    StringBuffer hexString = new StringBuffer();
+//
+//                    for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
+//                        hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
+//                        hexString.append(" ");
+//                    }
+//                    log.info("Receive HEX : " + hexString.toString());
+//                }
 
                 Double ch1 = in.readDouble();
                 Double ch2 = in.readDouble();
@@ -69,12 +80,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 out.add(device);
 
-                if (deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
-                    log.info(device.toString());
-                }
+//                if (deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
+//                    log.info(device.toString());
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
-                log.error(this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님 -> 초기화");
+                log.error(device.getDeviceId() + " -> " + this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님 -> 초기화");
+
                 in.resetReaderIndex();
                 in.resetWriterIndex();
             }
