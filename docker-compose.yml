@@ -1,0 +1,17 @@
+#FROM adoptopenjdk/openjdk11:jdk-11.0.11_9-alpine-slim
+FROM openjdk:11
+
+RUN apt-get update
+#RUN apt-get install -y vim
+#RUN apt-get install -y openjdk-11-jdk
+RUN apt-get install -y vim
+
+WORKDIR /home/jem/run
+
+COPY build/libs/snipe.jar snipe.jar
+
+RUN mkdir -p /home/jem/run/logs/37082
+RUN mkdir -p /home/jem/run/logs/37080
+RUN mkdir -p /home/jem/run/logs/37081
+
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev-server", "-Dtcp.ip=10.10.0.251", "-Dtcp.port=37080", "-Ddevice.suffix=A", "-Dthread.count=1200", "snipe.jar"]

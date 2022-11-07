@@ -31,7 +31,7 @@ spring:
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path:  /home/jem/run/log
+log-file-path: /data/logs
 
 server:
   port: 36080

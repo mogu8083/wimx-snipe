@@ -32,7 +32,7 @@ spring:
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path:  d:/log/netty
+log-file-path: /data/logs
 
 #Netty
 #netty:

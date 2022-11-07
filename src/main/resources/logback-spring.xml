@@ -21,7 +21,7 @@
     <springProfile name="local-server,local-client,dev-server,dev-client">
         <appender name="ERROR_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/${tcp.port}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/${server.type}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>100MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -38,7 +38,7 @@
 
         <appender name="TCP_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/${tcp.port}/tcp-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/${server.type}/tcp-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>1024MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -51,7 +51,7 @@
 
         <appender name="HTTP_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/${tcp.port}/http-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/${server.type}/http-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>1024MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -64,7 +64,7 @@
 
         <appender name="CLIENT_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/${tcp.port}/client-%d{yyyy-MM}.%i.log</fileNamePattern>
+                <fileNamePattern>${LOG_FILE_PATH}/${server.type}/client-%d{yyyy-MM}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>1024MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>

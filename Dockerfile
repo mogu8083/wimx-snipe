@@ -1,14 +1,10 @@
-FROM cimg/openjdk:11.0.13
+FROM openjdk:11.0.16
 
-RUN sudo apt-get update
-RUN sudo apt-get install vim
+RUN apt-get update
+RUN apt-get install -y vim net-tools telnet
 
-WORKDIR /home/jem/run
+WORKDIR /run
 
 COPY build/libs/snipe.jar snipe.jar
 
-RUN mkdir -p /home/jem/run/logs/37082
-RUN mkdir -p /home/jem/run/logs/37080
-RUN mkdir -p /home/jem/run/logs/37081
-
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev-client", "-Dtcp.ip=10.10.0.251", "-Dtcp.port=37082", "-Dtcp.port=37080", "-Ddevice.suffix=D", "-Dthread.count=300", "snipe.jar"]
+CMD java -jar $JVM_OPTS snipe.jar; bash;
