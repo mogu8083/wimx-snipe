@@ -79,6 +79,33 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 				buf.writeByte(0x03);
 
+//				buf.writeByte(0x02);
+//
+//				device = deviceName;
+//
+//				buf.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+//				buf.writeBytes(device.getBytes(Charset.defaultCharset()));
+//
+//				ss = System.currentTimeMillis();
+//
+//				buf.writeBytes(ByteUtils.convertLongToByteArray(ss));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//				d = Math.round(Math.random() * 100 * 10) / 10.0;
+//				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//				buf.writeByte(0x03);
+
 //				for (int i = 0; i < buf.readableBytes(); i++) {
 //					sb.append(ByteUtils.byteToHexString(buf.getByte(i)) + " ");
 //				}

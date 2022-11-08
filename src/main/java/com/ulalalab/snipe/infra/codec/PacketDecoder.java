@@ -39,7 +39,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
 
-        if(in.readableBytes() >= 59) {
+//        if(in.readableBytes() >= 59) {
+        if(in.getByte(0)==0x02 && in.getByte(readableBytes + readerIndex - 1)==0x03) {
             try {
                 in.readByte();
                 int deviceSize = in.readInt();
@@ -50,16 +51,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 Long time = in.readLong();
                 //LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
 
-//                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
-//                    StringBuffer hexString = new StringBuffer();
-//
-//                    for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
-//                        hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
-//                        hexString.append(" ");
-//                    }
-//                    log.info("Receive HEX : " + hexString.toString());
-//                }
+                StringBuffer hexString = new StringBuffer();
 
+                if(deviceId.equals("WX-5A") || deviceId.equals("WX-5Z")) {
+                    for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
+                        hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
+                        hexString.append(" ");
+                    }
+                    log.info("Receive HEX : " + hexString.toString());
+                }
                 Double ch1 = in.readDouble();
                 Double ch2 = in.readDouble();
                 Double ch3 = in.readDouble();
@@ -87,8 +87,18 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 e.printStackTrace();
                 log.error(device.getDeviceId() + " -> " + this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님 -> 초기화");
 
-                in.resetReaderIndex();
-                in.resetWriterIndex();
+                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
+                if(index > -1) {
+                    in.slice(index, in.readableBytes());
+                }
+                //in.resetReaderIndex();
+                //in.resetWriterIndex();
+            } finally {
+                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
+
+                if(index > -1) {
+                    in.slice(index, in.readableBytes());
+                }
             }
         }
     }

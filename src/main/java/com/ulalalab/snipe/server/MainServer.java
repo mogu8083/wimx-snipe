@@ -45,7 +45,7 @@ public class MainServer {
 	public void start() throws InterruptedException {
 		log.info("Main Server 실행");
 
-		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 		try {
@@ -56,7 +56,6 @@ public class MainServer {
 					//.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					//.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
-					//.childOption(ChannelOption.SO_LINGER, 0)
 					.childOption(ChannelOption.TCP_NODELAY, true)
 					.childOption(ChannelOption.SO_LINGER, 0)
 					//ChannelOption.SO_RCVBUF, 256 * 1024);

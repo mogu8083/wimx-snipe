@@ -86,7 +86,9 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 				this.deviceId = device.getDeviceId();
 			}
 
-			log.info(device.toString());
+			if("WX-1Z".equals(this.deviceId)) {
+				log.info(device.toString());
+			}
 
 			if (invocable != null) {
 				Double cvCh1 = device.getCh1();
@@ -135,7 +137,7 @@ public class ProcessHandler extends ChannelInboundHandlerAdapter {
 					//influxDBManager.write(point);
 				}
 				//influxDBTemplate.write(pointList);
-				redisSendEnum = CommonEnum.SEND;
+				//redisSendEnum = CommonEnum.SEND;
 				pointList.clear();
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ChannelManager {
 
-    //private ConcurrentHashMap<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
-    private Map<Channel, ChannelInfo> channelGroup = new HashMap<>();
+    private ConcurrentHashMap<Channel, ChannelInfo> channelGroup = new ConcurrentHashMap<>();
+    //private Map<Channel, ChannelInfo> channelGroup = new HashMap<>();
     private static ChannelManager channelManager;
 
     static {
@@ -38,7 +38,7 @@ public class ChannelManager {
      * 채널 삭제
      * @param deviceId
      */
-    public synchronized void removeChannel(String deviceId) throws Exception {
+    public void removeChannel(String deviceId) throws Exception {
 
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
@@ -63,7 +63,7 @@ public class ChannelManager {
         return channelGroup.get(channel);
     }
 
-    public synchronized void addChannel(Channel channel) {
+    public void addChannel(Channel channel) {
         channelGroup.put(channel, new ChannelInfo());
     }
 
