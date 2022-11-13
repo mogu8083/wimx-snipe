@@ -17,10 +17,11 @@ import java.nio.charset.StandardCharsets;
 public class TestHandler extends ChannelInboundHandlerAdapter {
 
 	private ByteBuf buffer;
+	private final int bufferCapacity = 1024;
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		buffer = ctx.alloc().buffer(1024);
+		buffer = ctx.alloc().heapBuffer(bufferCapacity);
 	}
 
 	@Override
@@ -36,13 +37,17 @@ public class TestHandler extends ChannelInboundHandlerAdapter {
 		buffer.writeBytes(in);
 		in.release();
 
-		while(true) {
-			if(buffer.readableBytes() > 0 && buffer.getByte(0)==0x02) {
+		log.info("Receive HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
 
+		while(true) {
+			if(buffer.writerIndex() > 0 && buffer.getByte(0)==0x02) {
 				if(buffer.indexOf(buffer.readerIndex(), buffer.writerIndex(), (byte) 0x03) > -1) {
 					try {
-						int readerIndex = buffer.readerIndex();
-						int readableBytes = buffer.readableBytes();
+//						int readerIndex = buffer.readerIndex();
+//						int writerIndex = buffer.writerIndex();
+
+						log.info(buffer.toString());
+						log.info("처리 Data HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
 
 						buffer.readByte();
 						int deviceSize = buffer.readInt();
@@ -52,8 +57,6 @@ public class TestHandler extends ChannelInboundHandlerAdapter {
 
 						Long time = buffer.readLong();
 						//LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
-
-						log.info("Receive HEX : {}", ByteUtils.byteBufToHexString(buffer, readerIndex, readableBytes + readerIndex));
 
 						Double ch1 = buffer.readDouble();
 						Double ch2 = buffer.readDouble();
@@ -82,11 +85,11 @@ public class TestHandler extends ChannelInboundHandlerAdapter {
 				break;
 			}
 		}
-		log.info("남은 HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.readableBytes() + buffer.readerIndex()));
+		log.info("남은 HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
 
-		if(buffer.writerIndex() > 1000) {
-			log.info("buffer.writerIndex 1000 이상 buffer.clear");
-			buffer.clear();
+		// buffer 초기화
+		if(buffer.capacity() > bufferCapacity && buffer.writerIndex()==0) {
+			buffer.capacity(bufferCapacity);
 		}
 	}
 
