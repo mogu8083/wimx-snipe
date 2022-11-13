@@ -1,9 +1,24 @@
 package com.ulalalab.snipe.infra.util;
 
+import io.netty.buffer.ByteBuf;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public final class ByteUtils {
+
+    /**
+     * ByteBuf -> Hex String
+     */
+    public static String byteBufToHexString(ByteBuf buf, int startIndex, int endIndex) {
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = startIndex; i < endIndex; i++) {
+            sb.append(byteToHexString(buf.getByte(i)));
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
 
     /**
      * Hex -> 10진수 변환

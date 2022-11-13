@@ -39,8 +39,7 @@ public class TestHandler extends ChannelInboundHandlerAdapter {
 		while(true) {
 			if(buffer.readableBytes() > 0 && buffer.getByte(0)==0x02) {
 
-				//if(buffer.getByte(buffer.readableBytes()-1)==0x03) {
-				if(buffer.indexOf(buffer.readerIndex(), buffer.readerIndex() + buffer.readableBytes(), (byte) 0x03) > -1) {
+				if(buffer.indexOf(buffer.readerIndex(), buffer.writerIndex(), (byte) 0x03) > -1) {
 					try {
 						int readerIndex = buffer.readerIndex();
 						int readableBytes = buffer.readableBytes();
@@ -72,29 +71,31 @@ public class TestHandler extends ChannelInboundHandlerAdapter {
 					} catch (Exception e) {
 						e.printStackTrace();
 						log.error(e.getMessage());
-						int index = buffer.indexOf(buffer.readerIndex(), buffer.readerIndex() + buffer.readableBytes(), (byte) 0x02);
 
-						if(index > -1) {
-							//buffer.slice(index, buffer.readerIndex() + buffer.readableBytes());
-							buffer.readerIndex(index);
-						} else {
-							buffer.clear();
-						}
+						this.setBufferInit((byte) 0x02);
 					}
 				} else {
 					break;
 				}
 			} else {
-				int index = buffer.indexOf(buffer.readerIndex(), buffer.readerIndex() + buffer.readableBytes(), (byte) 0x02);
-
-				if(index > -1) {
-					buffer.slice(index, buffer.readerIndex() + buffer.readableBytes());
-				} else {
-					buffer.clear();
-				}
+				this.setBufferInit((byte) 0x02);
 				break;
 			}
 		}
 		log.info("남은 HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.readableBytes() + buffer.readerIndex()));
+
+		if(buffer.writerIndex() > 1000) {
+			log.info("buffer.writerIndex 1000 이상 buffer.clear");
+			buffer.clear();
+		}
+	}
+
+	private void setBufferInit(byte b) {
+		int index = buffer.indexOf(buffer.readerIndex(), buffer.writerIndex(), b);
+		if(index > -1) {
+			buffer.readerIndex(index);
+		} else {
+			buffer.clear();
+		}
 	}
 }
