@@ -5,6 +5,7 @@ import com.ulalalab.snipe.infra.util.ByteUtils;
 import io.netty.buffer.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.ReplayingDecoder;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
@@ -12,36 +13,31 @@ import java.util.List;
 
 //@Component
 @Slf4j(topic = "TCP.PacketDecoder")
+//public class PacketDecoder extends ReplayingDecoder<Void> {
 public class PacketDecoder extends ByteToMessageDecoder {
+
+    Device device = new Device();
 
     //ByteBuf in = Unpooled.buffer(70);
     //ByteBuf in = PooledByteBufAllocator.DEFAULT.heapBuffer(70);
     //ByteBuf in = PooledByteBufAllocator.DEFAULT.heapBuffer(61);
 //    Device device;
 
-//    @Override
-//    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-//        device = new Device();
-//    }
-//
-//    @Override
-//    protected void handlerRemoved0(ChannelHandlerContext ctx) throws Exception {
-////        in.release(); // (1)
-////        in = null;
-////        //super.handlerRemoved0(ctx);
-//        device = null;
-//    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        Device device = new Device();
-
         int readerIndex = in.readerIndex();
         int readableBytes = in.readableBytes();
 
-//        if(in.readableBytes() >= 59) {
-        if(in.getByte(0)==0x02 && in.getByte(readableBytes + readerIndex - 1)==0x03) {
+        if(readableBytes < 59) {
+            return;
+        }
+
+//        if(readableBytes >= 59) {
+        //if(in.getByte(0)==0x02 && in.getByte(readableBytes + readerIndex - 1)==0x03) {
             try {
+                int initReaderIndex = in.readerIndex();
+                int initReadableBytes = in.readableBytes();
+
                 in.readByte();
                 int deviceSize = in.readInt();
 
@@ -51,9 +47,12 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 Long time = in.readLong();
                 //LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
 
-                StringBuffer hexString = new StringBuffer();
+                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
+                    log.info("readerIndex : {} / readableBytes : {}", initReaderIndex, initReadableBytes);
+                }
 
-                if(deviceId.equals("WX-5A") || deviceId.equals("WX-5Z")) {
+                if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
+                    StringBuffer hexString = new StringBuffer();
                     for (int i = readerIndex; i < readableBytes + readerIndex; i++) {
                         hexString.append(ByteUtils.byteToHexString(in.getByte(i)));
                         hexString.append(" ");
@@ -80,27 +79,29 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 out.add(device);
 
-//                if (deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
-//                    log.info(device.toString());
+//                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
+//
+//                //log.info("index : " + index);
+//                if(index > -1) {
+//                    in.slice(index, in.readableBytes());
 //                }
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error(device.getDeviceId() + " -> " + this.getClass() + " -> " + e.getMessage() + " 올바른 데이터 형식이 아님 -> 초기화");
 
-                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
-                if(index > -1) {
-                    in.slice(index, in.readableBytes());
-                }
-                //in.resetReaderIndex();
-                //in.resetWriterIndex();
+//                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
+//                if(index > -1) {
+//                    in.slice(index, in.readableBytes());
+//                }
+                in.clear();
             } finally {
-                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
-
-                if(index > -1) {
-                    in.slice(index, in.readableBytes());
-                }
+//                int index = in.indexOf(in.readerIndex(), in.readableBytes(), (byte) 0x02);
+//
+//                if(index > 0) {
+//                    in.slice(index, in.readableBytes());
+//                }
             }
-        }
+        //}
     }
 
     @Override

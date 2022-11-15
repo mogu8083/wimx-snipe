@@ -37,7 +37,7 @@ public class ClientServer {
 	public void run() throws Exception {
 		try {
 			this.threadCnt = NumberUtils.parseNumber(THREAD_COUNT, Integer.class);
-			EventLoopGroup eventLoopGroup = new NioEventLoopGroup(1);
+			//EventLoopGroup eventLoopGroup = new NioEventLoopGroup(1);
 
 			log.info("ClientServer 실행 / Thread : {} 실행", threadCnt);
 

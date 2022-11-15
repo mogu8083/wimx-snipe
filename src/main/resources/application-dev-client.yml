@@ -39,6 +39,9 @@ spring:
 
 log-file-path: /data/logs
 
+server:
+  port: 36080
+
 #Netty
 #netty:
 #  tcp-ip: 127.0.0.1

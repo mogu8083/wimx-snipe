@@ -5,22 +5,17 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.NumberUtils;
-import org.springframework.util.StringUtils;
 
 @Component
 @Slf4j(topic = "TCP.MainServer")
@@ -52,18 +47,30 @@ public class MainServer {
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.DEBUG))
-					//.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
+					//.handler(new LoggingHandler(LogLevel.DEBUG))
+					//.option(ChannelOption.SO_RCVBUF, 10485760)
+					.option(ChannelOption.SO_REUSEADDR, true)
+					.option(ChannelOption.SO_BACKLOG, 50000)
+					//.option(NioChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
+					//.option(ChannelOption.TCP_NODELAY, true)
+					//.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					//.option(ChannelOption.TCP_FASTOPEN, 0)
+					//.option(ChannelOption.SO_RCVBUF, 512)
+					.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-					//.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
 					.childOption(ChannelOption.TCP_NODELAY, true)
 					.childOption(ChannelOption.SO_LINGER, 0)
+					//.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					//.childOption(NioChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
+					//.childOption(ChannelOption.TCP_NODELAY, true)
+					//.childOption(ChannelOption.TCP_FASTOPEN, 0)
+					//.childOption(ChannelOption.SO_LINGER, 0)
 					//ChannelOption.SO_RCVBUF, 256 * 1024);
 					//ChannelOption.SO_BACKLOG, 1024);
-					.childHandler(new ChannelInitializer<SocketChannel>() {
+					.childHandler(new ChannelInitializer<NioSocketChannel>() {
 
 						@Override
-						public void initChannel(SocketChannel ch) {
+						public void initChannel(NioSocketChannel ch) {
 							ChannelPipeline p = ch.pipeline();
 
 							// 프로토콜 선택 핸들러

@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableScheduling
 @Slf4j(topic = "HTTP.BatchService")
 @RequiredArgsConstructor
 public class BatchService {
@@ -14,7 +15,7 @@ public class BatchService {
     private final CommonService commonService;
 
     /**
-     * Perform GC
+     * Perform GC (3분)
      */
     @Scheduled(fixedRate = 1000 * 60 * 3)
     public void performGc() {

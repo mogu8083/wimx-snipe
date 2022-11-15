@@ -79,6 +79,8 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeBytes(ByteUtils.convertDoubleToByteArray(d));
 				buf.writeByte(0x03);
 
+				//Thread.sleep(1000);
+
 //				buf.writeByte(0x02);
 //
 //				device = deviceName;

@@ -45,7 +45,13 @@ public class InfluxDBConfig {
     @Bean
     public InfluxDB influxDBClient(
             @Qualifier("spring.influxdb-org.springframework.data.influxdb.InfluxDBProperties") final InfluxDBProperties properties) {
-        return new InfluxDBConnectionFactory(properties).getConnection();
+
+        InfluxDB influxDB = new InfluxDBConnectionFactory(properties).getConnection();
+        influxDB.setDatabase(DATABASE);
+        influxDB.setRetentionPolicy("autogen");
+        influxDB.setConsistency(InfluxDB.ConsistencyLevel.ALL);
+
+        return influxDB;
     }
 
 //    @Bean

@@ -10,11 +10,16 @@ spring:
     password: dak102938$&
 
   influxdb:
-    url: "http://211.62.140.76:8086"
+    url: "http://10.10.0.90:8086"
     username: ulalalab
     password: ulalalab12!@
     database: wimx
-    udp-port: 8089
+    udp-port: 7086
+    connect-timeout: 1
+    gzip: false
+    read-timeout: 1
+    retention-policy: autogen
+    write-timeout: 1
 
   datasource:
     hikari:

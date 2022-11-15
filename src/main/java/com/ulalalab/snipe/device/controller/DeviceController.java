@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -36,17 +35,17 @@ public class DeviceController {
     /**
      * 장비 계산식 변경 PUSH
      */
-    @GetMapping("/device/calculate/push")
-    public Response calculatePush(@RequestParam String deviceId) throws Exception {
-        int resultCnt = channelManager.calculatePush(deviceId);
-        //Mono mono;
-        Response response;
-
-        if(resultCnt == 0) {
-            response = new Response(Response.Code.FAIL, deviceId + " 해당 장비가 없습니다.");
-        } else {
-            response = new Response(deviceId + " 해당 장비에 계산식 적용 요청을 하였습니다.");
-        }
-        return response;
-    }
+//    @GetMapping("/device/calculate/push")
+//    public Response calculatePush(@RequestParam String deviceId) throws Exception {
+//        int resultCnt = channelManager.calculatePush(deviceId);
+//        //Mono mono;
+//        Response response;
+//
+//        if(resultCnt == 0) {
+//            response = new Response(Response.Code.FAIL, deviceId + " 해당 장비가 없습니다.");
+//        } else {
+//            response = new Response(deviceId + " 해당 장비에 계산식 적용 요청을 하였습니다.");
+//        }
+//        return response;
+//    }
 }

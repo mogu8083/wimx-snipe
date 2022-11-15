@@ -75,13 +75,16 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
         p.addLast("TCP.DefaultHandler", new DefaultHandler(ProtocolEnum.TCP, ctx));
 
         // Packet 디코더 - 패킷 처리
-        p.addLast("TCP.PacketDecoder", new PacketDecoder());
+        //p.addLast("TCP.PacketDecoder", new PacketDecoder());
 
         // 계산식 핸들러
-        p.addLast("TCP.CalculateHandler", new CalculateHandler());
+        //p.addLast("TCP.CalculateHandler", new CalculateHandler());
+
+        p.addLast("TCP.PacketHandler", new PacketHandler());
 
         // 데이터 가공 처리
-        p.addLast("TCP.ProcessHandler", new ProcessHandler());
+        //p.addLast("TCP.ProcessHandler", new ProcessHandler());
+        p.addLast("TCP.ResultHandler", new ResultHandler());
 
         p.remove(this);
     }

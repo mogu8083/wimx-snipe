@@ -24,6 +24,9 @@ public class InitServer {
 	private MainServer mainServer;
 
 //	@Autowired
+//	private MainServerLocal mainServer;
+
+//	@Autowired
 //	private EventServerChecker eventServerChecker;
 
 	@PostConstruct

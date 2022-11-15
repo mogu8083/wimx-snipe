@@ -37,9 +37,6 @@ public class Device {
     // 채널 5
     private Double ch5;
 
-    // 계산식
-    private String source;
-
     public String getCvtTime() {
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this.time), TimeZone.getDefault().toZoneId());
         return LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);

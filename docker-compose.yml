@@ -1,14 +1,27 @@
 version: "3.7"
 
-services:
+# Network
+networks:
+  default_bridge:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/21
 
+services:
+  #172.19.0.1 --subnet 172.19.0.0/21
   # Server
   server:
+#    networks:
+#      broker-net:
+#        ipv4_address: 10.10.0.250
+
     #build: .
     image: wimx2-snipe:latest
     container_name: "wimx2-snipe-server"
     volumes:
       - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
+      - "${WORK_PATH}/build/libs/snipe.jar:/run/snipe.jar"
     ports:
       - "36080:36080" # HTTP
       - "37080:37080" # TCP
@@ -21,34 +34,40 @@ services:
                -Dcom.sun.management.jmxremote.authenticate=false
                -Djava.rmi.server.hostname=10.10.0.90
                -Dcom.sun.management.jmxremote.rmi.port=36666
-               -Dio.netty.noPreferDirect=true
-               -Dio.lettuce.core.epoll=false
                -Dspring.profiles.active=dev-server
                -Dtcp.port=37080
                -Dserver.type=server
-        # - JVM_OPTS=-Dspring.profiles.active=dev-server
-        #           -Dtcp.port=37080
-        #           -Dserver.type=server
-        #           -Dio.netty.noPreferDirect=true
+#         - JVM_OPTS=-Dspring.profiles.active=dev-server
+#                   -Dtcp.port=37080
+#                   -Dserver.type=server
+    depends_on:
+      - influxdb
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 2G
-          
+          cpus: "4"
+          memory: 8G
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.2
     stdin_open: true
     tty: true
 
-  # Client1
-  client:
-    #build: .
-    image: wimx2-snipe:latest
-    container_name: "wimx2-snipe-client"
+
+  influxdb:
+    #image: influxdb:1.8.10
+    build: src/main/resources/docker/influxdb/.
+    container_name: "wimx2-influxdb"
+    ports:
+      - "8086:8086"
+      - "8088:8088"
+      - "7086:7086/udp"
     volumes:
-      - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
-    restart: always
-    depends_on:
-      - server
-    command: bash -c "sleep 30s && java -jar -Dspring.profiles.active=dev-client -Dtcp.ip=10.10.0.90 -Dtcp.port=37080 -Ddevice.suffix=A -Dthread.count=1000 -Dserver.type=client snipe.jar"
+      - ${ROOT_PATH}/data/influxdb:/var/lib/influxdb
+      - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
+      - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.3
     stdin_open: true
     tty: true

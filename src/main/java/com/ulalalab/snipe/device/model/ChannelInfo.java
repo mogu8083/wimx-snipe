@@ -24,8 +24,8 @@ public class ChannelInfo {
     // 로컬 IP
     private String localAddress;
 
-    // 계산식 유무
-    private boolean calculateFlag = false;
+    // 마지막 패킷 수신 시간
+    private LocalDateTime lastPacketTime;
 
     // 핸들러 목록
     private List<String> handlerList;
