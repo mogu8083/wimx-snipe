@@ -16,7 +16,8 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	List<Device> deviceList = new ArrayList<>();
 	private ByteBuf buffer;
-	private final int bufferCapacity = 1024;
+	private final int bufferCapacity = 256;
+	//private final int maxBufferCapacity = 4086;
 	private String deviceId;
 
 	@Override
@@ -37,6 +38,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 		buffer.writeBytes(in);
 		in.release();
 
+		//ByteBuf buffer = (ByteBuf) packet;
 		//log.info("Receive HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
 
 		while(true) {
@@ -58,7 +60,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 						int deviceSize = buffer.readInt();
 
 						String deviceId = buffer.toString(buffer.readerIndex(), deviceSize, StandardCharsets.UTF_8);
-						this.deviceId = deviceId;
+						//this.deviceId = deviceId;
 						device.setDeviceId(deviceId);
 
 						buffer.readBytes(deviceSize);
@@ -107,11 +109,11 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 			}
 		}
 
-		if(this.deviceId.equals("WX-1Z") || this.deviceId.equals("WX-1A")) {
-			log.info("남은 HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
-		}
+//		if("WX-1Z".equals(this.deviceId) || "WX-1A".equals(this.deviceId)) {
+//			log.info("남은 HEX : {}", ByteUtils.byteBufToHexString(buffer, buffer.readerIndex(), buffer.writerIndex()));
+//		}
 
-		// buffer clear
+		//buffer.readerIndex(0);
 		buffer.clear();
 
 		// buffer 초기화

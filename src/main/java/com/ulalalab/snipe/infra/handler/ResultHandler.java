@@ -19,12 +19,15 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -40,7 +43,7 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 	private RedisTemplate<String, Object> redisTemplate;
 	private InfluxDBTemplate<Point> influxDBTemplate;
 	private InfluxDBManager influxDBManager;
-	private String deviceId = null;
+
 	//private List<Point> pointList = new ArrayList<>();
 
 	JSONObject redisObject = new JSONObject();
@@ -49,6 +52,8 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
 		this.influxDBManager = (InfluxDBManager) BeansUtils.getBean("influxDBManager");
 		this.influxDBTemplate = (InfluxDBTemplate<Point>) BeansUtils.getBean("influxDBTemplate");
+
+		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
 	}
 
 	@Override
@@ -60,65 +65,13 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 
 		try {
 			for(Device device : list) {
-				ChannelInfo channelInfo = channelManager.getChannelInfo(ctx.channel());
-
-				if(!deviceSetFlag) {
-					Channel channel = ctx.channel();
-
-					channelInfo.setDeviceId(device.getDeviceId());
-					channelInfo.setRemoteAddress(channel.remoteAddress().toString());
-					channelInfo.setConnectTime(LocalDateTime.now());
-					channelInfo.setLocalAddress(channel.localAddress().toString());
-					channelInfo.setHandlerList(channel.pipeline().names()
-							.stream().filter(c -> !c.contains("TailContext")).collect(Collectors.toList()));
-
-					this.deviceSetFlag = true;
-				} else {
-					channelInfo.setLastPacketTime(LocalDateTime.now());
-				}
 				String deviceId = device.getDeviceId();
-
-				if(!StringUtils.hasText(deviceId)) {
-					continue;
-				}
-
-				if(deviceId==null) {
-					DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
-
-					defaultHandler.deviceId = device.getDeviceId();
-					this.deviceId = device.getDeviceId();
-				}
 
 				if("WX-1Z".equals(device.getDeviceId()) || "WX-1A".equals(device.getDeviceId())) {
 					log.info(device.toString());
 				}
 
-	//			if (invocable != null) {
-	//				Double cvCh1 = device.getCh1();
-	//				Double cvCh2 = device.getCh2();
-	//				Double cvCh3 = device.getCh3();
-	//				Double cvCh4 = device.getCh4();
-	//				Double cvCh5 = device.getCh5();
-	//
-	//				cvCh1 = (Double) invocable.invokeFunction("add", cvCh1);
-	//				cvCh2 = (Double) invocable.invokeFunction("add", cvCh2);
-	//				cvCh3 = (Double) invocable.invokeFunction("add", cvCh3);
-	//				cvCh4 = (Double) invocable.invokeFunction("add", cvCh4);
-	//				cvCh5 = (Double) invocable.invokeFunction("add", cvCh5);
-	//
-	//				device.setCh1(cvCh1);
-	//				device.setCh2(cvCh2);
-	//				device.setCh3(cvCh3);
-	//				device.setCh4(cvCh4);
-	//				device.setCh5(cvCh5);
-	//
-	//				if(cvCh1.isNaN()) {
-	//					throw new ScriptException("isNaN");
-	//				}
-	//			}
-
 				// 1. InfluxDB Insert
-
 				Point p = Point.measurement(device.getDeviceId())
 						.time(device.getTime(), TimeUnit.MILLISECONDS)
 						//.tag("test", "default")
@@ -129,30 +82,6 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 						.addField("ch5", device.getCh5())
 						.addField("insert_time", System.currentTimeMillis())
 						.build();
-
-
-
-				//pointList.add(p);
-				//influxDBManager.udpWrite(p);
-				//influxDBManager.write(p);
-				//influxDBTemplate.write(p);
-				//batchPoints.point(p);
-
-				//pointList.add(p);
-				//AtomicReference<CommonEnum> redisSendEnum = new AtomicReference<>(CommonEnum.NOT_SEND);
-				//AtomicReference<CommonEnum> influxSendEnum = new AtomicReference<>(CommonEnum.NOT_SEND);
-	//
-//				try {
-//	//				for (Point point : pointList) {
-//						//influxDBManager.udpWrite(point);
-//						//influxDBManager.write(point);
-//	//				}
-//					redisSendEnum.set(CommonEnum.SEND);
-//	//				pointList.clear();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					log.error("InfluxDB Exception : {}, {} => {} / pointList : {}", device.getCvtTime(), deviceId, e.getMessage(), pointList.size());
-//				}
 
 				// 2. Redis Insert
 				ValueOperations<String, Object> vop = redisTemplate.opsForValue();
@@ -181,21 +110,10 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 					}
 				});
 			}
-//			ctx.channel().eventLoop().execute(() -> {
-//				for(Point p : pointList) {
-//					influxDBManager.udpWrite(p);
-//				}
-//				//pointList.clear();
-//			});
 		} catch(Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			// 참조 해체
-			//ReferenceCountUtil.release(packet);
-			//ctx.alloc().heapBuffer().release();
-//			ReferenceCountUtil.release(object);
-//			packet = null;
 			list.clear();
 			obj = null;
 		}

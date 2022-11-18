@@ -6,28 +6,28 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/21
+        - subnet: 172.20.0.0/16
 
 services:
   #172.19.0.1 --subnet 172.19.0.0/21
   # Server
-  server:
+  server1:
 #    networks:
 #      broker-net:
 #        ipv4_address: 10.10.0.250
 
-    #build: .
-    image: wimx2-snipe:latest
-    container_name: "wimx2-snipe-server"
+    build: .
+    #image: wimx2-snipe:latest
+    container_name: "wimx2-snipe-server1"
     volumes:
       - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
       - "${WORK_PATH}/build/libs/snipe.jar:/run/snipe.jar"
     ports:
       - "36080:36080" # HTTP
       - "37080:37080" # TCP
-      - "36666:36666" # JMX
+      #- "36666:36666" # JMX
     environment:
-     - JVM_OPTS=-Dcom.sun.management.jmxremote=true
+      - JVM_OPTS=-Dcom.sun.management.jmxremote=true
                -Dcom.sun.management.jmxremote.local.only=false
                -Dcom.sun.management.jmxremote.port=36666
                -Dcom.sun.management.jmxremote.ssl=false
@@ -42,16 +42,58 @@ services:
 #                   -Dserver.type=server
     depends_on:
       - influxdb
+      #- haproxy
     deploy:
       resources:
         limits:
-          cpus: "4"
-          memory: 8G
+          cpus: "2"
+          memory: 4G
     networks:
       default_bridge:
-        ipv4_address: 172.20.0.2
+        ipv4_address: 172.20.0.5
     stdin_open: true
     tty: true
+
+#  server2:
+#    #    networks:
+#    #      broker-net:
+#    #        ipv4_address: 10.10.0.250
+#
+#    build: .
+#    #image: wimx2-snipe:latest
+#    container_name: "wimx2-snipe-server2"
+#    volumes:
+#      - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
+#      - "${WORK_PATH}/build/libs/snipe.jar:/run/snipe.jar"
+#    ports:
+#      - "36084:36080" # HTTP
+#      - "37084:37080" # TCP
+#      #- "36666:36666" # JMX
+#    environment:
+#      #     - JVM_OPTS=-Dcom.sun.management.jmxremote=true
+#      #               -Dcom.sun.management.jmxremote.local.only=false
+#      #               -Dcom.sun.management.jmxremote.port=36666
+#      #               -Dcom.sun.management.jmxremote.ssl=false
+#      #               -Dcom.sun.management.jmxremote.authenticate=false
+#      #               -Djava.rmi.server.hostname=10.10.0.90
+#      #               -Dcom.sun.management.jmxremote.rmi.port=36666
+#      #               -Dspring.profiles.active=dev-server
+#      #               -Dtcp.port=37080
+#      #               -Dserver.type=server
+#        - JVM_OPTS=-Dspring.profiles.active=dev-server -Dtcp.port=37080 -Dserver.type=server
+#    depends_on:
+#      - influxdb
+#      - haproxy
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "2"
+#          memory: 4G
+#    networks:
+#      default_bridge:
+#        ipv4_address: 172.20.0.6
+#    stdin_open: true
+#    tty: true
 
 
   influxdb:
@@ -71,3 +113,19 @@ services:
         ipv4_address: 172.20.0.3
     stdin_open: true
     tty: true
+
+#  haproxy:
+#    #image: haproxy:2.6
+#    build: src/main/resources/docker/haproxy/.
+#    container_name: "wimx2-haproxy"
+#    ports:
+#      - "37080:37080"
+#      - "39000:39000"
+#    #restart: always
+#    #user: haproxy
+#    volumes:
+#      - ${WORK_PATH}/src/main/resources/docker/haproxy/conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+#    #command: haproxy -f /usr/local/etc/haproxy/haproxy.cfg; /bin/bash;
+#    networks:
+#      default_bridge:
+#        ipv4_address: 172.20.0.4

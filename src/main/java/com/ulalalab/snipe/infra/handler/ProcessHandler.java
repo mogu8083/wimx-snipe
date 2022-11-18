@@ -6,7 +6,6 @@ import com.ulalalab.snipe.infra.constant.CommonEnum;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.manage.InfluxDBManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
-import com.ulalalab.snipe.infra.util.ScriptUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;

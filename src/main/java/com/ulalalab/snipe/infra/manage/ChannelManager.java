@@ -48,6 +48,7 @@ public class ChannelManager {
                 if(channelDeviceId.equals(deviceId)) {
                     log.info("{} DeviceId Client Channel Close!", channelInfo.getDeviceId());
                     channel.close();
+                    channelGroup.remove(channel);
                     break;
                 }
             } else {

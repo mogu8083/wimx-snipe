@@ -36,7 +36,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		Channel channel = ctx.channel();
-		//channelManager.removeChannel(channel);
+		channelManager.removeChannel(channel);
 
 		log.info("{} 연결 해제 !! / 연결 갯수 : {}",
 				StringUtils.hasText(deviceId) ? deviceId : "NoDevice" , channelManager.channelSize());
@@ -44,7 +44,8 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getStackTrace().toString());
-		ctx.channel().close();
+		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
+		ctx.channel().alloc().buffer().clear();
+		//ctx.channel().close();
 	}
 }

@@ -1,37 +1,37 @@
 package com.ulalalab.snipe.server;
 
+import com.ulalalab.snipe.infra.util.BeansUtils;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PostConstruct;
 
-@Service
 @Slf4j
+@Component
 @Profile({"local-server", "dev-server"})
 public class InitServer {
 
-	//@Autowired
-	//private TcpServer tcpServer;
-
-	//@Autowired
-	//private HttpServer httpServer;
-
-	@Autowired
 	private MainServer mainServer;
-
-//	@Autowired
-//	private MainServerLocal mainServer;
-
-//	@Autowired
-//	private EventServerChecker eventServerChecker;
 
 	@PostConstruct
 	public void init() throws Exception {
 		log.info("Init Server");
+
+		boolean isLinux = System.getProperty("os.name").contains("Linux");
+
+		if(isLinux) {
+			mainServer = (MainServer<EpollSocketChannel,  EpollServerSocketChannel>) BeansUtils.getBean("mainServer", EpollServerSocketChannel.class);
+		} else {
+			mainServer = (MainServer<NioSocketChannel, NioServerSocketChannel>) BeansUtils.getBean("mainServer", NioServerSocketChannel.class);
+		}
 
 		// Main Server
 		mainServer.start();

@@ -7,6 +7,6 @@ WORKDIR /run
 
 #COPY build/libs/snipe.jar snipe.jar
 
-EXPOSE ["36080", "37080", "36666"]
+EXPOSE 36080 37080
 
 CMD java -jar $JVM_OPTS snipe.jar; bash;

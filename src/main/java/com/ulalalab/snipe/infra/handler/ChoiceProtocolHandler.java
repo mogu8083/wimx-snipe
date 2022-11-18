@@ -82,6 +82,8 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
 
         p.addLast("TCP.PacketHandler", new PacketHandler());
 
+
+        p.addLast("TCP.SettingHandler", new SettingHandler());
         // 데이터 가공 처리
         //p.addLast("TCP.ProcessHandler", new ProcessHandler());
         p.addLast("TCP.ResultHandler", new ResultHandler());
