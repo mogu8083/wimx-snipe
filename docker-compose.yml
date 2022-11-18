@@ -1,21 +1,9 @@
 version: "3.7"
 
-# Network
-networks:
-  default_bridge:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
-
 services:
-  #172.19.0.1 --subnet 172.19.0.0/21
+
   # Server
   server1:
-#    networks:
-#      broker-net:
-#        ipv4_address: 10.10.0.250
-
     build: .
     #image: wimx2-snipe:latest
     container_name: "wimx2-snipe-server1"
@@ -25,7 +13,7 @@ services:
     ports:
       - "36080:36080" # HTTP
       - "37080:37080" # TCP
-      #- "36666:36666" # JMX
+      - "36666:36666" # JMX
     environment:
       - JVM_OPTS=-Dcom.sun.management.jmxremote=true
                -Dcom.sun.management.jmxremote.local.only=false
@@ -50,7 +38,7 @@ services:
           memory: 4G
     networks:
       default_bridge:
-        ipv4_address: 172.20.0.5
+        ipv4_address: 172.20.0.11
     stdin_open: true
     tty: true
 
@@ -114,6 +102,17 @@ services:
     stdin_open: true
     tty: true
 
+  redis:
+    build: src/main/resources/docker/redis/.
+    container_name: "wimx2-redis"
+    ports:
+      - "6379:6379"
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.4
+    volumes:
+      - "${WORK_PATH}/src/main/resources/docker/redis/conf:/usr/local/etc/redis"
+    command: redis-server /usr/local/etc/redis/redis.conf
 #  haproxy:
 #    #image: haproxy:2.6
 #    build: src/main/resources/docker/haproxy/.
@@ -129,3 +128,12 @@ services:
 #    networks:
 #      default_bridge:
 #        ipv4_address: 172.20.0.4
+
+
+# Network
+networks:
+  default_bridge:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

@@ -12,10 +12,15 @@ plugins {
 }
 
 bootJar {
+	mainClass = 'com.ulalalab.snipe.TestMainApplication'
 	archiveBaseName = ''
 	archiveFileName = 'snipe.jar'
 	//destinationDir new File("D:/run/snipe")
 }
+
+//springBoot {
+//	mainClassName = 'com.ulalalab.snipe.TestMainApplication'
+//}
 
 group = 'com.ulalalab'
 version = '0.0.1-SNAPSHOT'

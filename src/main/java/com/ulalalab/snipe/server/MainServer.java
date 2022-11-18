@@ -1,28 +1,24 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
-import com.ulalalab.snipe.infra.util.ClassUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.NumberUtils;
 
-import java.net.ServerSocket;
-
 @Component
 @Slf4j(topic = "TCP.MainServer")
+@Profile({"local-server", "dev-server"})
 public class MainServer
 		<SC extends SocketChannel, SSC extends ServerSocketChannel> {
 
