@@ -1,3 +1,5 @@
+import java.sql.DriverManager
+
 buildscript {
 	ext {
 		queryDslVersion = "5.0.0"
@@ -10,17 +12,6 @@ plugins {
 	id 'java'
 	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
-
-bootJar {
-	mainClass = 'com.ulalalab.snipe.TestMainApplication'
-	archiveBaseName = ''
-	archiveFileName = 'snipe.jar'
-	//destinationDir new File("D:/run/snipe")
-}
-
-//springBoot {
-//	mainClassName = 'com.ulalalab.snipe.TestMainApplication'
-//}
 
 group = 'com.ulalalab'
 version = '0.0.1-SNAPSHOT'
@@ -80,8 +71,26 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
+//ext.profile = (!project.hasProperty('profile')) ? 'server' : project.getProperties('profile')
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.bootJar {
+	println System.getProperty("profile")
+
+	def profile = System.getProperty("profile")
+
+	destinationDir new File("D:/run/snipe")
+	archiveFileName = 'snipe-' + profile + '.jar'
+	archiveBaseName = ''
+
+	if(profile=='client') {
+		mainClass = 'com.ulalalab.snipe.TestMainApplication'
+	} else {
+		mainClass = 'com.ulalalab.snipe.MainApplication'
+	}
 }
 
 def querydslDir ="$buildDir/generated/querydsl"

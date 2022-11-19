@@ -9,7 +9,7 @@ services:
     container_name: "wimx2-snipe-server1"
     volumes:
       - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
-      - "${WORK_PATH}/build/libs/snipe.jar:/run/snipe.jar"
+      - "${BUILD_PATH}/snipe-server.jar:/run/snipe-server.jar"
     ports:
       - "36080:36080" # HTTP
       - "37080:37080" # TCP
@@ -22,6 +22,8 @@ services:
                -Dcom.sun.management.jmxremote.authenticate=false
                -Djava.rmi.server.hostname=10.10.0.90
                -Dcom.sun.management.jmxremote.rmi.port=36666
+               -Dio.netty.noPreferDirect=true
+               -Xms3G -Xmx6G
                -Dspring.profiles.active=dev-server
                -Dtcp.port=37080
                -Dserver.type=server
@@ -34,8 +36,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 4G
+          cpus: "4"
+          memory: 8G
     networks:
       default_bridge:
         ipv4_address: 172.20.0.11

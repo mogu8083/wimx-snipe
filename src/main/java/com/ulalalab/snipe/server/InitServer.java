@@ -31,8 +31,5 @@ public class InitServer {
 
 		// Main Server
 		mainServer.start();
-
-		// Http Server
-		//httpServer.start();
 	}
 }

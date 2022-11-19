@@ -58,16 +58,20 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object obj) {
+		List<Device> list = null;
 
-		List<Device> list = (List<Device>) obj;
-
-		//BatchPoints batchPoints = influxDBManager.getBatchPoints();
+		if(obj instanceof List) {
+			list = (List<Device>) obj;
+		} else if(obj instanceof Device) {
+			list = new ArrayList<>();
+			list.add((Device) obj);
+		}
 
 		try {
 			for(Device device : list) {
 				String deviceId = device.getDeviceId();
 
-				if("WX-1Z".equals(device.getDeviceId()) || "WX-1A".equals(device.getDeviceId())) {
+				if("WX-1Z".equals(device.getDeviceId()) || "WX-1S".equals(device.getDeviceId())) {
 					log.info(device.toString());
 				}
 

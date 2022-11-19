@@ -17,12 +17,11 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 	List<Device> deviceList = new ArrayList<>();
 	private ByteBuf buffer;
 	private final int bufferCapacity = 256;
-	//private final int maxBufferCapacity = 4086;
 	private String deviceId;
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		buffer = ctx.alloc().buffer(bufferCapacity);
+		buffer = ctx.alloc().heapBuffer(bufferCapacity);
 	}
 
 	@Override

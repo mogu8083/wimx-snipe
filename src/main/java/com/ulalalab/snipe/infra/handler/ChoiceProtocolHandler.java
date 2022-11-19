@@ -58,10 +58,11 @@ public class ChoiceProtocolHandler extends ChannelInboundHandlerAdapter {
     private void httpHandler(ChannelHandlerContext ctx) {
         ChannelPipeline p = ctx.pipeline();
 
-        p.addLast("HTTP.DefaultHandler", new DefaultHandler(ProtocolEnum.HTTP, ctx));
+        //p.addLast("HTTP.DefaultHandler", new DefaultHandler(ProtocolEnum.HTTP, ctx));
         p.addLast("HTTP.HttpRequestDecoder", new HttpRequestDecoder());
         p.addLast("HTTP.HttpResponseEncoder", new HttpResponseEncoder());
-        p.addLast("HTTP.HttpResponseHandler", new HttpResponseHandler());
+        p.addLast("HTTP.HttpResponseHandler", new HttpResponse2Handler());
+        p.addLast("HTTP.ResultHandler", new ResultHandler());
         p.remove(this);
     }
 
