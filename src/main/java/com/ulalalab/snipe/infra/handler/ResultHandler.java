@@ -96,6 +96,7 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 				redisObject.put("ch5", device.getCh5());
 				redisObject.put("time", device.getTime());
 
+				Device finalDevice = device;
 				ctx.channel().eventLoop().execute(() -> {
 					long startTime = System.nanoTime();
 
@@ -110,9 +111,10 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 
 					if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
 						log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
-								, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), CommonEnum.SEND.getCode(), CommonEnum.SEND.getCode());
+								, finalDevice.getCvtTime(), channelManager.channelSize(), diffTIme, finalDevice.getDeviceId(), CommonEnum.SEND.getCode(), CommonEnum.SEND.getCode());
 					}
 				});
+				device = null;
 			}
 		} catch(Exception e) {
 			log.error(e.getMessage());

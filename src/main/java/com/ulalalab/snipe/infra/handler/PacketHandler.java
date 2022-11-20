@@ -18,10 +18,12 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 	private ByteBuf buffer;
 	private final int bufferCapacity = 256;
 	private String deviceId;
+	Device device;
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		buffer = ctx.alloc().heapBuffer(bufferCapacity);
+		buffer = ctx.alloc().buffer(bufferCapacity);
+		device = new Device();
 	}
 
 	@Override
@@ -66,7 +68,9 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 						if(deviceId.equals("WX-1A") || deviceId.equals("WX-1Z")) {
 							log.info(buffer.toString());
-							log.info("처리 Data HEX : {}", ByteUtils.byteBufToHexString(buffer, initReaderIndex, buffer.writerIndex()));
+							String logString = ByteUtils.byteBufToHexString(buffer, initReaderIndex, buffer.writerIndex());
+							log.info("처리 Data HEX : {}", logString);
+							logString = null;
 						}
 
 						Long time = buffer.readLong();
@@ -91,19 +95,21 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 						buffer.readByte();
 
 						buffer.slice();
+						device = null;
 					} catch (Exception e) {
 						e.printStackTrace();
 						log.error(e.getMessage());
 
 						log.error("Error Data HEX : {}", ByteUtils.byteBufToHexString(buffer, initReaderIndex, buffer.writerIndex()));
 
-						this.setBufferInit((byte) 0x02);
+						this.setBufferInit(buffer, (byte) 0x02, true);
 					}
 				} else {
+					this.setBufferInit(buffer, (byte) 0x02, false);
 					break;
 				}
 			} else {
-				this.setBufferInit((byte) 0x02);
+				this.setBufferInit(buffer, (byte) 0x02, false);
 				break;
 			}
 		}
@@ -125,8 +131,14 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 		}
 	}
 
-	private void setBufferInit(byte b) {
-		int index = buffer.indexOf(buffer.readerIndex(), buffer.writerIndex(), b);
+	private void setBufferInit(ByteBuf buffer, byte b, boolean isInit) {
+		int readerIndex = 0;
+
+		if(!isInit) {
+			readerIndex = buffer.readerIndex();
+		}
+
+		int index = buffer.indexOf(readerIndex, buffer.writerIndex(), b);
 		if(index > -1) {
 			buffer.readerIndex(index);
 		} else {

@@ -64,7 +64,7 @@ public class MainServer
 					.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.TCP_NODELAY, true)
-					//.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					//.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024))
 					//.childOption(ChannelOption.TCP_NODELAY, true)
 					//.childOption(ChannelOption.TCP_FASTOPEN, 0)

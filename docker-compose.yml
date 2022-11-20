@@ -22,14 +22,15 @@ services:
                -Dcom.sun.management.jmxremote.authenticate=false
                -Djava.rmi.server.hostname=10.10.0.90
                -Dcom.sun.management.jmxremote.rmi.port=36666
-               -Dio.netty.noPreferDirect=true
-               -Xms3G -Xmx6G
+               -Xms2G -Xmx4G
                -Dspring.profiles.active=dev-server
                -Dtcp.port=37080
                -Dserver.type=server
+               #-Dio.netty.noPreferDirect=true
 #         - JVM_OPTS=-Dspring.profiles.active=dev-server
 #                   -Dtcp.port=37080
 #                   -Dserver.type=server
+
     depends_on:
       - influxdb
       #- haproxy
@@ -37,7 +38,7 @@ services:
       resources:
         limits:
           cpus: "4"
-          memory: 8G
+          memory: 6G
     networks:
       default_bridge:
         ipv4_address: 172.20.0.11
