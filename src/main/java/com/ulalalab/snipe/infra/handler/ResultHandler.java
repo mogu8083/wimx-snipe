@@ -40,11 +40,9 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 	private ChannelManager channelManager = ChannelManager.getInstance();
 	private boolean deviceSetFlag = false;
 
-	private RedisTemplate<String, Object> redisTemplate;
-	private InfluxDBTemplate<Point> influxDBTemplate;
-	private InfluxDBManager influxDBManager;
-
-	//private List<Point> pointList = new ArrayList<>();
+	private final RedisTemplate<String, Object> redisTemplate;
+	private final InfluxDBTemplate<Point> influxDBTemplate;
+	private final InfluxDBManager influxDBManager;
 
 	JSONObject redisObject = new JSONObject();
 
@@ -95,8 +93,8 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 				redisObject.put("ch4", device.getCh4());
 				redisObject.put("ch5", device.getCh5());
 				redisObject.put("time", device.getTime());
-
-				Device finalDevice = device;
+//
+				//Device finalDevice = device;
 				ctx.channel().eventLoop().execute(() -> {
 					long startTime = System.nanoTime();
 
@@ -109,19 +107,18 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 					long endTime = System.nanoTime();
 					double diffTIme = (endTime - startTime)/1000000.0;
 
-					if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1A")) {
+					if(deviceId.equals("WX-1Z") || deviceId.equals("WX-1S")) {
 						log.info("Receive [{}, Count : {}, {}ms] => {} / Redis : {} , Influx : {}"
-								, finalDevice.getCvtTime(), channelManager.channelSize(), diffTIme, finalDevice.getDeviceId(), CommonEnum.SEND.getCode(), CommonEnum.SEND.getCode());
+								, device.getCvtTime(), channelManager.channelSize(), diffTIme, device.getDeviceId(), CommonEnum.SEND.getCode(), CommonEnum.SEND.getCode());
 					}
 				});
-				device = null;
 			}
 		} catch(Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
 		} finally {
 			list.clear();
-			obj = null;
+			//obj = null;
 		}
 	}
 
