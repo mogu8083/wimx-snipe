@@ -3,6 +3,8 @@ package com.ulalalab.snipe.server;
 import com.ulalalab.snipe.infra.handler.ChoiceProtocolHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.UnpooledHeapByteBuf;
+import io.netty.buffer.UnpooledUnsafeHeapByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -58,13 +60,12 @@ public class MainServer
 					.option(ChannelOption.SO_BACKLOG, 50000)
 					//.option(NioChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(256 * 1024))
 					//.option(ChannelOption.TCP_NODELAY, true)
-					//.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					//.option(ChannelOption.ALLOCATOR, new UnpooledUnsafeHeapByteBuf(256, 1024))
 					//.option(ChannelOption.TCP_FASTOPEN, 0)
 					//.option(ChannelOption.SO_RCVBUF, 512)
-					.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					//.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+					//.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.TCP_NODELAY, true)
-					.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 					//.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024))
 					//.childOption(ChannelOption.TCP_NODELAY, true)
 					//.childOption(ChannelOption.TCP_FASTOPEN, 0)
@@ -77,6 +78,8 @@ public class MainServer
 						@Override
 						public void initChannel(SC ch) {
 							ChannelPipeline p = ch.pipeline();
+
+//							ch.alloc().heapBuffer().
 
 							// 프로토콜 선택 핸들러
 							p.addLast(new ChoiceProtocolHandler());

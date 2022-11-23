@@ -75,6 +75,19 @@
             </encoder>
         </appender>
 
+        <appender name="NETTY_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/${server.type}/netty-%d{yyyy-MM}.%i.log</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>1024MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxHistory>1</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] - %-4relative - [ %thread{10} ] %logger{20} : %msg%n </pattern>
+            </encoder>
+        </appender>
+
         <logger name="HTTP" level="INFO">
             <appender-ref ref="HTTP_ROLLING" />
         </logger>
@@ -85,6 +98,10 @@
 
         <logger name="CLIENT" level="INFO">
             <appender-ref ref="CLIENT_ROLLING" />
+        </logger>
+
+        <logger name="io.netty" level="INFO">
+            <appender-ref ref="NETTY_ROLLING" />
         </logger>
 
         <root level="INFO">

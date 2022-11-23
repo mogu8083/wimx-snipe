@@ -4,32 +4,38 @@ services:
 
   # Server
   server1:
-    build: .
+    build:
+      dockerfile: ./dockerfile-server
     #image: wimx2-snipe:latest
     container_name: "wimx2-snipe-server1"
     volumes:
       - "${ROOT_PATH}/data/snipe2/logs:/data/logs"
-      - "${BUILD_PATH}/snipe-server.jar:/run/snipe-server.jar"
+      - "${BUILD_PATH}:/run"
     ports:
       - "36080:36080" # HTTP
       - "37080:37080" # TCP
       - "36666:36666" # JMX
     environment:
       - JVM_OPTS=-Dcom.sun.management.jmxremote=true
-               -Dcom.sun.management.jmxremote.local.only=false
-               -Dcom.sun.management.jmxremote.port=36666
-               -Dcom.sun.management.jmxremote.ssl=false
-               -Dcom.sun.management.jmxremote.authenticate=false
-               -Djava.rmi.server.hostname=10.10.0.90
-               -Dcom.sun.management.jmxremote.rmi.port=36666
-               -Xms2G -Xmx4G
-               -Dspring.profiles.active=dev-server
-               -Dtcp.port=37080
-               -Dserver.type=server
-               #-Dio.netty.noPreferDirect=true
+                -Dcom.sun.management.jmxremote.local.only=false
+                -Dcom.sun.management.jmxremote.port=36666
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Djava.rmi.server.hostname=10.10.0.90
+                -Dcom.sun.management.jmxremote.rmi.port=36666
+                -Dspring.profiles.active=dev-server
+                -Dtcp.port=37080
+                -Dserver.type=server
+                -Xms1G -Xmx2G
+                -Dio.netty.leakDetectionLevel=advanced
+                -Dio.netty.allocator.type=unpooled
+                -Dio.netty.noPreferDirect=true
+                #-Dio.netty.allocator.chunkSize=0
 #         - JVM_OPTS=-Dspring.profiles.active=dev-server
-#                   -Dtcp.port=37080
-#                   -Dserver.type=server
+#                    -Dio.netty.noPreferDirect=true
+#                    -Dio.netty.leakDetectionLevel=advanced
+#                    -Dtcp.port=37080
+#                    -Dserver.type=server
 
     depends_on:
       - influxdb
@@ -37,11 +43,39 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "4"
-          memory: 6G
+          cpus: "2"
+          memory: 4G
     networks:
       default_bridge:
         ipv4_address: 172.20.0.11
+    stdin_open: true
+    tty: true
+
+  client:
+    build:
+      dockerfile: ./dockerfile-client
+    #image: wimx2-snipe:latest
+    container_name: "wimx2-snipe-client"
+    volumes:
+      #- "${ROOT_PATH}/data/snipe2/logs:/data/logs"
+      - "${BUILD_PATH}:/run"
+    #ports:
+    #  - "36080:36080" # HTTP
+    #  - "37080:37080" # TCP
+    #  - "36666:36666" # JMX
+    environment:
+      - JVM_OPTS=-Dspring.profiles.active=local-client
+        -Dtcp.port=37080
+        -Dtcp.ip=172.20.0.11
+        -Ddevice.suffix=Z
+        -Dthread.count=7500
+
+    depends_on:
+      - server1
+      #- haproxy
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.12
     stdin_open: true
     tty: true
 

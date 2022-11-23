@@ -15,9 +15,9 @@ public class BatchService {
     private final CommonService commonService;
 
     /**
-     * Perform GC (3분)
+     * Perform GC (10분)
      */
-    @Scheduled(fixedRate = 1000 * 60 * 3)
+    @Scheduled(fixedRate = 1000 * 60 * 10)
     public void performGc() {
         log.info("Perform GC 실행");
         commonService.performGc();

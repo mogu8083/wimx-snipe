@@ -10,7 +10,7 @@ spring:
     password: ulalalab12!@
 
   influxdb:
-    url: "http://172.20.0.3:8086"
+    url: "http://10.10.0.90:8086"
     username: ulalalab
     password: ulalalab12!@
     database: wimx

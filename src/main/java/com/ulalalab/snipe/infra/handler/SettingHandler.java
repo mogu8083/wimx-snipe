@@ -65,10 +65,10 @@ public class SettingHandler extends ChannelInboundHandlerAdapter {
 			}
 
 			// 알람
-			if(device.getCh1() > 95) {
-				jdbcTemplate.update("insert into t_alarm values(?, ?, ?)"
-						, device.getDeviceId(), "알람 발생", LocalDateTime.now());
-			}
+//			if(device.getCh1() > 95) {
+//				jdbcTemplate.update("insert into t_alarm values(?, ?, ?)"
+//						, device.getDeviceId(), "알람 발생", LocalDateTime.now());
+//			}
 			ctx.fireChannelRead(obj);
 		}
 	}
