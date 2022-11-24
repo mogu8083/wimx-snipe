@@ -36,20 +36,19 @@ import java.util.stream.Collectors;
 public class ResultHandler extends ChannelInboundHandlerAdapter {
 
 	private ChannelManager channelManager = ChannelManager.getInstance();
-	private boolean deviceSetFlag = false;
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final InfluxDBTemplate<Point> influxDBTemplate;
 	private final InfluxDBManager influxDBManager;
 
-	JSONObject redisObject = new JSONObject();
+	JSONObject redisObject;
 
 	public ResultHandler() {
 		this.redisTemplate = (RedisTemplate<String, Object>) BeansUtils.getBean("redisTemplate");
 		this.influxDBManager = (InfluxDBManager) BeansUtils.getBean("influxDBManager");
 		this.influxDBTemplate = (InfluxDBTemplate<Point>) BeansUtils.getBean("influxDBTemplate");
-
 		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+		redisObject = new JSONObject();
 	}
 
 	@Override
@@ -89,7 +88,7 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 				//influxDBTemplate.write(p);
 
 				// Redis
-				//vop.set(deviceId, redisObject.toString());
+				vop.set(deviceId, redisObject.toString());
 
 				long endTime = System.nanoTime();
 				double diffTIme = (endTime - startTime)/1000000.0;

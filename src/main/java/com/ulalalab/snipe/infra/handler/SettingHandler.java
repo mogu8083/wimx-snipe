@@ -4,15 +4,11 @@ import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
-import com.ulalalab.snipe.infra.util.ByteUtils;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
