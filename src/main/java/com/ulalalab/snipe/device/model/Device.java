@@ -11,7 +11,6 @@ import java.util.TimeZone;
 
 @Getter
 @Setter
-@ToString
 public class Device {
 
     // UTC Timestamp
@@ -29,16 +28,20 @@ public class Device {
     private Double ch2;
 
     // 채널 3
-    private Double ch3;
+    private double ch3;
 
     // 채널 4
-    private Double ch4;
+    private double ch4;
 
     // 채널 5
-    private Double ch5;
+    private double ch5;
 
     public String getCvtTime() {
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this.time), TimeZone.getDefault().toZoneId());
         return LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
+    }
+
+    public void setInitValue() {
+        this.deviceId = null;
     }
 }

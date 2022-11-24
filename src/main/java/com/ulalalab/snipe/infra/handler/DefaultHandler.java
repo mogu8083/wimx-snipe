@@ -12,20 +12,16 @@ import org.springframework.util.StringUtils;
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
-	//private static Set<Channel> channelGroup = ChannelManager.getInstance();
 	private static ChannelManager channelManager = ChannelManager.getInstance();
-	private final ProtocolEnum protocolEnum;
-	private final ChannelHandlerContext ctx;
-	public String deviceId;
-
-	public DefaultHandler(ProtocolEnum protocolEnum, ChannelHandlerContext ctx) {
-		this.protocolEnum = protocolEnum;
-		this.ctx = ctx;
-	}
+	public String deviceId = null;
 
 	// 클라이언트 연결
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		// TODO : 1. 인증 관련 추가
+		//////////////////////////
+
+		// 2. 연결 채널 추가
 		Channel channel = ctx.channel();
 		channelManager.addChannel(channel);
 
@@ -46,6 +42,6 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
 		ctx.channel().alloc().buffer().clear();
-		//ctx.channel().close();
+		ctx.channel().close();
 	}
 }

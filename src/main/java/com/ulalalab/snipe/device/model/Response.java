@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Getter
@@ -15,7 +16,7 @@ public class Response<T> {
 
     private String code;
     private String message;
-    private LocalDateTime timestamp;
+    private String timestamp;
     private Integer size;
     private T data;
 
@@ -42,7 +43,7 @@ public class Response<T> {
 
     private void init() {
         this.code = Code.SUCCESS.getCode();
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
     }
 
     public enum Code {

@@ -28,8 +28,8 @@ services:
                 -Dserver.type=server
                 -Xms1G -Xmx2G
                 -Dio.netty.leakDetectionLevel=advanced
-                -Dio.netty.allocator.type=unpooled
                 -Dio.netty.noPreferDirect=true
+                #-Dio.netty.allocator.type=unpooled
                 #-Dio.netty.allocator.chunkSize=0
 #         - JVM_OPTS=-Dspring.profiles.active=dev-server
 #                    -Dio.netty.noPreferDirect=true

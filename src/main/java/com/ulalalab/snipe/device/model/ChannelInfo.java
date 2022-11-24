@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,11 @@ public class ChannelInfo {
     // 핸들러 목록
     private List<String> handlerList;
 
-//    public ChannelInfo(Channel channel) {
-//        this.connectTime = LocalDateTime.now();
-//        this.remoteAddress = channel.remoteAddress().toString();
-//    }
+    public String getConnectTime() {
+        return DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.connectTime);
+    }
+
+    public String getLastPacketTime() {
+        return DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.lastPacketTime);
+    }
 }
