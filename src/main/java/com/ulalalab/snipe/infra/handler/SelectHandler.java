@@ -29,5 +29,8 @@ public class SelectHandler extends ChannelInboundHandlerAdapter {
         p.addLast("TCP.ResultHandler", new ResultHandler());
 
         p.remove(this);
+
+        ctx.fireChannelActive();
+        ctx.fireChannelRead(packet);
     }
 }

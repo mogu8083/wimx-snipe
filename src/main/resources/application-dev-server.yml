@@ -42,7 +42,12 @@ spring:
 #  file:
 #    path: "d:/log/netty"
 
-log-file-path: /data/logs
+log:
+  file:
+    path: /data/logs
 
 server:
-  port: 36080
+  tcp:
+    port: 37080
+  http:
+    port: 36080

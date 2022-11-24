@@ -20,12 +20,11 @@ public class SettingHandler extends ChannelInboundHandlerAdapter {
 	private ChannelManager channelManager = ChannelManager.getInstance();
 	private boolean isSettingDevice = false;
 
-	private Map<Integer, LocalDateTime> alarmMap = new HashMap<>();
-
-	private JdbcTemplate jdbcTemplate;
+//	private Map<Integer, LocalDateTime> alarmMap = new HashMap<>();
+//	private JdbcTemplate jdbcTemplate;
 
 	public SettingHandler() {
-		this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
+		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
 
 		// 알람 기준 설정
 		//alarmMap.put(1, );

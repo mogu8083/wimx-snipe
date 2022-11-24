@@ -68,7 +68,7 @@ services:
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
         -Ddevice.suffix=Z
-        -Dthread.count=7500
+        -Dthread.count=8500
 
     depends_on:
       - server1

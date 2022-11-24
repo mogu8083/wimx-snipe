@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 public class InitServer {
 
 	private MainServer mainServer;
+	private HttpServer httpServer;
 
 	@PostConstruct
 	public void init() throws Exception {
@@ -29,7 +30,12 @@ public class InitServer {
 			mainServer = (MainServer<NioSocketChannel, NioServerSocketChannel>) BeansUtils.getBean("mainServer", NioServerSocketChannel.class);
 		}
 
+		httpServer = (HttpServer) BeansUtils.getBean("httpServer");
+
 		// Main Server
 		mainServer.start();
+
+		// Http Server
+		httpServer.start();
 	}
 }

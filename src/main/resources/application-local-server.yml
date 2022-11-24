@@ -27,15 +27,21 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
-    #url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
     username: ulalalab
     password: ulalalab12!@
 
 log-file-path:  d:/log/netty
 
-server:
-  port: 26080
+log:
+  file:
+    path: d:/log/netty
+
+
+#server:
+#  port: 26080
 #Netty
-#netty:
-#  tcp-port: 37080
-#  http-port: 36081
+server:
+  tcp:
+    port: 27080
+  http:
+    port: 26080

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <springProperty name="LOG_FILE_PATH" source="log-file-path"/>
+    <springProperty name="LOG_FILE_PATH" source="log.file.path"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <springProfile name="local-server,local-client,dev-server,dev-client">
+    <springProfile name="local-server,local-client">
         <logger name="p6spy" level="OFF" />
 
         <root level="INFO">
@@ -18,7 +18,7 @@
     </springProfile>
 
     <!-- Profile : Local -->
-    <springProfile name="local-server,local-client,dev-server,dev-client">
+    <springProfile name="dev-server,dev-client">
         <appender name="ERROR_ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <fileNamePattern>${LOG_FILE_PATH}/${server.type}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>

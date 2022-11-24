@@ -43,5 +43,6 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
 		ctx.channel().alloc().buffer().clear();
 		ctx.channel().close();
+		cause.printStackTrace();
 	}
 }
