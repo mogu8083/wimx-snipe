@@ -73,7 +73,9 @@ public class ChannelManager {
         for (Channel channel : channelGroup.keySet()) {
             ChannelInfo channelInfo = channelGroup.get(channel);
 
-            list.add(channelInfo);
+            if(channelInfo.getDeviceId() != null) {
+                list.add(channelInfo);
+            }
         }
         return list;
     }

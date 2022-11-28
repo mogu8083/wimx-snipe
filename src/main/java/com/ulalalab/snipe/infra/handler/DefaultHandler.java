@@ -1,10 +1,14 @@
 package com.ulalalab.snipe.infra.handler;
 
-import com.ulalalab.snipe.infra.constant.ProtocolEnum;
+import com.ulalalab.snipe.device.model.ChannelInfo;
+import com.ulalalab.snipe.infra.channel.SpChannelGroup;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import com.ulalalab.snipe.infra.manage.EventManager;
+import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.internal.PlatformDependent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -12,30 +16,44 @@ import org.springframework.util.StringUtils;
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
+	//private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+	//private static final SpChannelGroup spChannelGroup = new SpChannelGroup(GlobalEventExecutor.INSTANCE);
+
 	private static ChannelManager channelManager = ChannelManager.getInstance();
+	private static SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+
 	public String deviceId = null;
+
 
 	// 클라이언트 연결
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		Channel channel = ctx.channel();
+
 		// TODO : 1. 인증 관련 추가
 		//////////////////////////
 
 		// 2. 연결 채널 추가
-		Channel channel = ctx.channel();
-		channelManager.addChannel(channel);
+		spChannelGroup.add(channel);
+		spChannelGroup.addChannelInfo(channel.id(), new ChannelInfo());
 
-		log.info("{} 연결 !! / 연결 갯수 : {}", ctx.channel().remoteAddress(), channelManager.channelSize());
+		log.info("채널 ID : {} / {} 연결 / 연결 갯수 : {}"
+				, channel.id()
+				, channel.remoteAddress()
+				, spChannelGroup.size());
 	}
 
 	// 클라이언트 연결 해제
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		Channel channel = ctx.channel();
-		channelManager.removeChannel(channel);
-
-		log.info("{} 연결 해제 !! / 연결 갯수 : {}",
-				StringUtils.hasText(deviceId) ? deviceId : "NoDevice" , channelManager.channelSize());
+//
+//		// 1. 연결 채널 해제
+		spChannelGroup.remove(ctx.channel());
+		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
+				, channel.id()
+				, channel.remoteAddress()
+				, spChannelGroup.size());
 	}
 
 	@Override

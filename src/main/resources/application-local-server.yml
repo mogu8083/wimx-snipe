@@ -36,10 +36,6 @@ log:
   file:
     path: d:/log/netty
 
-
-#server:
-#  port: 26080
-#Netty
 server:
   tcp:
     port: 27080

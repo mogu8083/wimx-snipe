@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  influxdb:
+    build: src/main/resources/docker/influxdb/.
+    container_name: "wimx2-influxdb"
+    ports:
+      - "8086:8086"
+      - "8088:8088"
+      - "7086:7086/udp"
+    volumes:
+      - ${ROOT_PATH}/data/influxdb:/var/lib/influxdb
+      - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
+      - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.2
+    stdin_open: true
+    tty: true
+
+  redis:
+    build: src/main/resources/docker/redis/.
+    container_name: "wimx2-redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "${WORK_PATH}/src/main/resources/docker/redis/conf:/usr/local/etc/redis"
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.3
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+networks:
+  default_bridge:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

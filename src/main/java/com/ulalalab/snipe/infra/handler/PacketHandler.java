@@ -23,13 +23,15 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		ctx.alloc().buffer().release();
+		ctx.alloc().heapBuffer().release();
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
-		WeakReference<Device> refDevice = new WeakReference<>(new Device());
-		Device device = refDevice.get();
+		//WeakReference<Device> refDevice = new WeakReference<>(new Device());
+		//Device device = refDevice.get();
+		Device device = new Device();
+
 		String deviceId = null;
 
 		ByteBuf in = (ByteBuf) packet;
@@ -86,9 +88,9 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 			}
 		} finally {
 			if (DevUtils.isTest()) {
-				log.info("-------------남은 HEX----------");
-				System.out.println(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
-				log.info(buffer.toString());
+//				log.info("-------------남은 HEX----------");
+//				System.out.println(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
+//				log.info(buffer.toString());
 			}
 
 			if (isDevice) {

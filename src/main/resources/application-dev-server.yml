@@ -3,15 +3,18 @@ spring:
     lettuce:
       pool:
         max-active: 10
-        max-idle: 10
-        min-idle: 2
-    host: 172.20.0.4
+        max-idle: 20
+        min-idle: 10
+        max-wait: -1
+        time-between-eviction-runs: 5000
+    host: 172.20.0.3
     port: 6379
     password: ulalalab12!@
 
   influxdb:
+    #url: "http://external-host:8086"
+    url: "http://172.20.0.2:8086"
     #url: "http://10.10.0.90:8086"
-    url: "http://172.20.0.3:8086"
     username: ulalalab
     password: ulalalab12!@
     database: wimx
@@ -28,19 +31,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     url: "jdbc:postgresql://211.62.140.76:5432/timescale?serverTimezone=Asia/Seoul"
-    #url: "jdbc:postgresql://127.0.0.1:45432/timescale?serverTimezone=Asia/Seoul"
     username: ulalalab
     password: ulalalab12!@
-
-#Log
-#logging:
-#  level:
-#    root: info
-##    jdbc.sqltiming: off
-##    p6spy: off
-##    org.springframework: info
-#  file:
-#    path: "d:/log/netty"
 
 log:
   file:

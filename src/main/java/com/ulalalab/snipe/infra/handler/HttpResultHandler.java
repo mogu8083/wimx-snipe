@@ -5,10 +5,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ulalalab.snipe.common.service.CommonService;
 import com.ulalalab.snipe.device.model.Response;
 import com.ulalalab.snipe.device.service.DeviceService;
+import com.ulalalab.snipe.infra.channel.SpChannelGroup;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
+import com.ulalalab.snipe.infra.manage.EventManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
@@ -21,11 +24,11 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 @Slf4j(topic = "HTTP.HttpResultHandler")
 public class HttpResultHandler extends ChannelInboundHandlerAdapter {
 
+    private final SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+
     String uri = "";
     HttpMethod method;
     HttpRequest request;
-
-    private ChannelManager channelManager = ChannelManager.getInstance();
 
     private final DeviceService deviceService;
     private final CommonService commonService;
@@ -60,8 +63,8 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
 
                     // 장비 정보
                     if (uri.equals("/device/info") && method == HttpMethod.POST) {
-                        Response responseString = new Response<>(channelManager.getChannelGroup());
-                        future = this.writeResponse(ctx, responseString);
+                        Response responseString = new Response<>(spChannelGroup.getChannelInfoList());
+                        this.writeResponse(ctx, responseString);
                     }
 
                     // 장비 해제
@@ -69,26 +72,22 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
                         QueryStringDecoder decoder = new QueryStringDecoder(uri);
                         String deviceId = this.getParam(decoder, "deviceId");
 
-                        channelManager.removeChannel(deviceId);
+                        //channelManager.removeChannel(deviceId);
 
                         Response responseString = new Response<>(deviceId + " 장비 연결이 해제되었습니다.");
-                        future = this.writeResponse(ctx, responseString);
+                        this.writeResponse(ctx, responseString);
                     }
                 }
 
                 // 서버 정보
                 else if (uri.equals("/server/info") && method == HttpMethod.GET) {
                     Response responseString = new Response<>(commonService.serverInfo());
-                    future = this.writeResponse(ctx, responseString);
+                    this.writeResponse(ctx, responseString);
                 }
 
                 else {
                     Response responseString = new Response<>(Response.Code.FAIL, "API Not Found");
-                    future = this.writeResponse(ctx, responseString);
-                }
-                
-                if(future!=null && future.isSuccess()) {
-                    //ctx.channel().close();
+                    this.writeResponse(ctx, responseString);
                 }
             }
         }
@@ -96,8 +95,11 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
+        //ctx.flush();
+        //ctx.close();
     }
+
+
 
     /**
      * Response 생성
@@ -105,14 +107,16 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
      * @param responseString
      * @return ChannelFuture
      */
-    private ChannelFuture writeResponse(ChannelHandlerContext ctx, Response responseString) throws Exception {
+    private void writeResponse(ChannelHandlerContext ctx, Response responseString) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         String result = mapper.writeValueAsString(responseString);
         FullHttpResponse response = this.getResponse(result);
 
-        return ctx.write(response);
+        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+
+        //return ctx.write(response).;
     }
 
     /**
@@ -125,7 +129,7 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
         HttpHeaders headers = response.headers();
         headers.set(CONTENT_TYPE, "application/json; charset=UTF-8");
         headers.set(CONTENT_LENGTH, response.content().readableBytes());
-        headers.set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        //headers.set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 
         return response;
     }

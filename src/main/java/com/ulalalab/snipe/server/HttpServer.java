@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class HttpServer {
 
 	@Value("${server.http.port}")
-	private int httpPort;
+	private int HTTP_PORT;
 
 	public void start() throws Exception {
 		log.info("Http Server 실행");
@@ -33,7 +33,7 @@ public class HttpServer {
 		try {
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
-					.handler(new LoggingHandler(LogLevel.INFO))
+					.handler(new LoggingHandler(LogLevel.DEBUG))
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 
 						@Override
@@ -44,7 +44,7 @@ public class HttpServer {
 							p.addLast(new HttpResultHandler());
 						}
 					});
-			bootstrap.bind(httpPort).sync().channel();//.closeFuture().sync();
+			bootstrap.bind(HTTP_PORT).sync().channel();//.closeFuture().sync();
 		} catch(Exception e) {
 			log.error(e.getMessage());
 

@@ -37,8 +37,8 @@ services:
 #                    -Dtcp.port=37080
 #                    -Dserver.type=server
 
-    depends_on:
-      - influxdb
+#    depends_on:
+      #- influxdb
       #- haproxy
     deploy:
       resources:
@@ -48,34 +48,31 @@ services:
     networks:
       default_bridge:
         ipv4_address: 172.20.0.11
+#    extra_hosts:
+#      - "external-host:host-gateway"
     stdin_open: true
     tty: true
 
   client:
     build:
       dockerfile: ./dockerfile-client
-    #image: wimx2-snipe:latest
     container_name: "wimx2-snipe-client"
     volumes:
-      #- "${ROOT_PATH}/data/snipe2/logs:/data/logs"
       - "${BUILD_PATH}:/run"
-    #ports:
-    #  - "36080:36080" # HTTP
-    #  - "37080:37080" # TCP
-    #  - "36666:36666" # JMX
     environment:
       - JVM_OPTS=-Dspring.profiles.active=local-client
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
         -Ddevice.suffix=Z
-        -Dthread.count=8500
-
+        -Dthread.count=6000
     depends_on:
       - server1
       #- haproxy
     networks:
       default_bridge:
         ipv4_address: 172.20.0.12
+#    extra_hosts:
+#      - "external-host:host-gateway"
     stdin_open: true
     tty: true
 
@@ -121,35 +118,35 @@ services:
 #    tty: true
 
 
-  influxdb:
-    #image: influxdb:1.8.10
-    build: src/main/resources/docker/influxdb/.
-    container_name: "wimx2-influxdb"
-    ports:
-      - "8086:8086"
-      - "8088:8088"
-      - "7086:7086/udp"
-    volumes:
-      - ${ROOT_PATH}/data/influxdb:/var/lib/influxdb
-      - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
-      - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
-    networks:
-      default_bridge:
-        ipv4_address: 172.20.0.3
-    stdin_open: true
-    tty: true
+#  influxdb:
+#    #image: influxdb:1.8.10
+#    build: src/main/resources/docker/influxdb/.
+#    container_name: "wimx2-influxdb"
+#    ports:
+#      - "8086:8086"
+#      - "8088:8088"
+#      - "7086:7086/udp"
+#    volumes:
+#      - ${ROOT_PATH}/data/influxdb:/var/lib/influxdb
+#      - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
+#      - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
+#    networks:
+#      default_bridge:
+#        ipv4_address: 172.20.0.3
+#    stdin_open: true
+#    tty: true
 
-  redis:
-    build: src/main/resources/docker/redis/.
-    container_name: "wimx2-redis"
-    ports:
-      - "6379:6379"
-    networks:
-      default_bridge:
-        ipv4_address: 172.20.0.4
-    volumes:
-      - "${WORK_PATH}/src/main/resources/docker/redis/conf:/usr/local/etc/redis"
-    command: redis-server /usr/local/etc/redis/redis.conf
+#  redis:
+#    build: src/main/resources/docker/redis/.
+#    container_name: "wimx2-redis"
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      default_bridge:
+#        ipv4_address: 172.20.0.4
+#    volumes:
+#      - "${WORK_PATH}/src/main/resources/docker/redis/conf:/usr/local/etc/redis"
+#    command: redis-server /usr/local/etc/redis/redis.conf
 #  haproxy:
 #    #image: haproxy:2.6
 #    build: src/main/resources/docker/haproxy/.

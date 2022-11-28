@@ -32,10 +32,14 @@ public class ChannelInfo {
     private List<String> handlerList;
 
     public String getConnectTime() {
-        return DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.connectTime);
+        return this.connectTime!=null ?
+                DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.connectTime)
+                : "";
     }
 
     public String getLastPacketTime() {
-        return DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.lastPacketTime);
+        return this.lastPacketTime!=null ?
+                DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.lastPacketTime)
+                : "";
     }
 }

@@ -3,14 +3,11 @@ package com.ulalalab.snipe.infra.handler;
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
-import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import java.time.LocalDateTime;
-import java.util.*;
 import java.util.stream.Collectors;
 
 //@Component
@@ -37,20 +34,22 @@ public class SettingHandler extends ChannelInboundHandlerAdapter {
 		ChannelInfo channelInfo = channelManager.getChannelInfo(channel);
 
 		// 1. 채널 정보
-		if(!isSettingDevice) {
-			channelInfo.setDeviceId(device.getDeviceId());
-			channelInfo.setRemoteAddress(channel.remoteAddress().toString());
-			channelInfo.setConnectTime(LocalDateTime.now());
-			channelInfo.setLocalAddress(channel.localAddress().toString());
-			channelInfo.setHandlerList(channel.pipeline().names()
-					.stream().filter(c -> !c.contains("TailContext")).collect(Collectors.toList()));
+		if(channelInfo!=null) {
+			if(isSettingDevice) {
+				channelInfo.setLastPacketTime(LocalDateTime.now());
+			} else {
+				channelInfo.setDeviceId(device.getDeviceId());
+				channelInfo.setRemoteAddress(channel.remoteAddress().toString());
+				channelInfo.setConnectTime(LocalDateTime.now());
+				channelInfo.setLocalAddress(channel.localAddress().toString());
+				channelInfo.setHandlerList(channel.pipeline().names()
+						.stream().filter(c -> !c.contains("TailContext")).collect(Collectors.toList()));
 
-			this.isSettingDevice = true;
+				this.isSettingDevice = true;
 
-			DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
-			defaultHandler.deviceId = device.getDeviceId();
-		} else {
-			channelInfo.setLastPacketTime(LocalDateTime.now());
+				DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
+				defaultHandler.deviceId = device.getDeviceId();
+			}
 		}
 
 		// TODO : 2. 알람
