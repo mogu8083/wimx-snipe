@@ -60,7 +60,8 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	//implementation 'org.springframework.session:spring-session-data-redis'
-	//implementation 'io.lettuce:lettuce-core:6.1.10.RELEASE'
+	implementation 'io.lettuce:lettuce-core:6.1.10.RELEASE'
+	implementation 'org.apache.commons:commons-pool2:2.9.0'
 
 	// InfluxDB
 	implementation 'org.influxdb:influxdb-java:2.22'

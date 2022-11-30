@@ -64,7 +64,7 @@ services:
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
         -Ddevice.suffix=Z
-        -Dthread.count=6000
+        -Dthread.count=3000
     depends_on:
       - server1
       #- haproxy

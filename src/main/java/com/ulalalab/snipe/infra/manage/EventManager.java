@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -19,6 +22,7 @@ public class EventManager {
     //private ExecutorService executorService;
     //private ThreadPoolTaskExecutor taskExecutor;
     private SpChannelGroup spChannelGroup;
+    private List<Map<String, String>> redisList;
 
     static {
         eventManager = new EventManager();
@@ -28,6 +32,7 @@ public class EventManager {
         //this.initExecutor();
         //this.initExecutorService();
         this.initSpChannelGroup();
+        this.initRedisList();
     }
 
     public static EventManager getInstance() {
@@ -72,5 +77,13 @@ public class EventManager {
 
     public SpChannelGroup getSpChannelGroup() {
         return spChannelGroup;
+    }
+
+    private void initRedisList() {
+        redisList = new ArrayList<>();
+    }
+
+    public List<Map<String, String>> getRedisList() {
+        return redisList;
     }
 }

@@ -41,13 +41,15 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 				, channel.id()
 				, channel.remoteAddress()
 				, spChannelGroup.size());
+
+		ctx.fireChannelActive();
 	}
 
 	// 클라이언트 연결 해제
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		Channel channel = ctx.channel();
-//
+//ㄱ
 //		// 1. 연결 채널 해제
 		spChannelGroup.remove(ctx.channel());
 		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
