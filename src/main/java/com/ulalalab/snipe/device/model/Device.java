@@ -11,6 +11,7 @@ import java.util.TimeZone;
 
 @Getter
 @Setter
+@ToString
 public class Device {
 
     // UTC Timestamp

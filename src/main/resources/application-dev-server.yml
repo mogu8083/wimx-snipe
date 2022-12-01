@@ -2,7 +2,7 @@ spring:
   redis:
     lettuce:
       pool:
-        max-active: 10
+        max-active: 5
         max-idle: 20
         min-idle: 10
         max-wait: -1
@@ -40,7 +40,7 @@ log:
     path: /data/logs
 
 server:
-  tcp:
-    port: 37080
-  http:
-    port: 36080
+  tcp-port: 37080
+  http-port: 36080
+  worker-count: 4
+  boss-count: 1

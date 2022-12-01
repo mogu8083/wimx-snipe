@@ -64,6 +64,7 @@ dependencies {
 	implementation 'org.apache.commons:commons-pool2:2.9.0'
 
 	// InfluxDB
+	//implementation 'org.influxdb:influxdb-java:2.22'
 	implementation 'org.influxdb:influxdb-java:2.22'
 	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
 
@@ -73,8 +74,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
-
-//ext.profile = (!project.hasProperty('profile')) ? 'server' : project.getProperties('profile')
 
 tasks.named('test') {
 	useJUnitPlatform()

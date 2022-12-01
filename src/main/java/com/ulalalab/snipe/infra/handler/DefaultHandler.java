@@ -2,28 +2,21 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
-import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.manage.EventManager;
 import io.netty.channel.*;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.internal.PlatformDependent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-//@ChannelHandler.Sharable
+@Component
+//@Scope("prototype")
+@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
-	//private static final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-	//private static final SpChannelGroup spChannelGroup = new SpChannelGroup(GlobalEventExecutor.INSTANCE);
-
-	private static ChannelManager channelManager = ChannelManager.getInstance();
-	private static SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
-
-	public String deviceId = null;
-
+	private SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+	private String deviceId = null;
 
 	// 클라이언트 연결
 	@Override

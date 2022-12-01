@@ -2,7 +2,7 @@ spring:
   redis:
     lettuce:
       pool:
-        max-active: 10
+        max-active: 5
         max-idle: 10
         min-idle: 2
     host: 10.10.0.90
@@ -37,7 +37,7 @@ log:
     path: d:/log/netty
 
 server:
-  tcp:
-    port: 27080
-  http:
-    port: 26080
+  tcp-port: 27080
+  http-port: 26080
+  worker-count: 4
+  boss-count: 1

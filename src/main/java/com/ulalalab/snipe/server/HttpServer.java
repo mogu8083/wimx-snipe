@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpServer {
 
-	@Value("${server.http.port}")
+	@Value("${server.http-port}")
 	private int HTTP_PORT;
 
 	public void start() throws Exception {

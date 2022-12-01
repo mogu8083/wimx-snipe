@@ -2,40 +2,34 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.manage.ChannelManager;
+import com.ulalalab.snipe.infra.channel.SpChannelGroup;
+import com.ulalalab.snipe.infra.manage.EventManager;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-//@Component
+@Component
+@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.SettingHandler")
 public class SettingHandler extends ChannelInboundHandlerAdapter {
 
-	private ChannelManager channelManager = ChannelManager.getInstance();
-	private boolean isSettingDevice = false;
-
-//	private Map<Integer, LocalDateTime> alarmMap = new HashMap<>();
-//	private JdbcTemplate jdbcTemplate;
-
-	public SettingHandler() {
-		//this.jdbcTemplate = (JdbcTemplate) BeansUtils.getBean("jdbcTemplate");
-
-		// 알람 기준 설정
-		//alarmMap.put(1, );
-	}
+	//private boolean isSettingDevice = false;
+    private SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object obj) {
 		Device device = (Device) obj;
 		Channel channel = ctx.channel();
-		ChannelInfo channelInfo = channelManager.getChannelInfo(channel);
+		ChannelInfo channelInfo = spChannelGroup.getChannelInfo(channel.id());
 
 		// 1. 채널 정보
 		if(channelInfo!=null) {
-			if(isSettingDevice) {
+			if(channelInfo.isInitSetting()) {
 				channelInfo.setLastPacketTime(LocalDateTime.now());
 			} else {
 				channelInfo.setDeviceId(device.getDeviceId());
@@ -45,10 +39,7 @@ public class SettingHandler extends ChannelInboundHandlerAdapter {
 				channelInfo.setHandlerList(channel.pipeline().names()
 						.stream().filter(c -> !c.contains("TailContext")).collect(Collectors.toList()));
 
-				this.isSettingDevice = true;
-
-				DefaultHandler defaultHandler = (DefaultHandler) ctx.channel().pipeline().get("TCP.DefaultHandler");
-				defaultHandler.deviceId = device.getDeviceId();
+				channelInfo.setInitSetting(true);
 			}
 		}
 

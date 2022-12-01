@@ -31,6 +31,9 @@ public class ChannelInfo {
     // 핸들러 목록
     private List<String> handlerList;
 
+    // 디바이스 ID
+    private boolean isInitSetting;
+
     public String getConnectTime() {
         return this.connectTime!=null ?
                 DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(this.connectTime)

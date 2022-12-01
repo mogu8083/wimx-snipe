@@ -25,13 +25,16 @@ public class InfluxDBManager {
     @Autowired
     private InfluxDB influxDBClient;
 
-
     public InfluxDB getInfluxDB() {
         return this.influxDBClient;
     }
 
     public void udpWrite(Point point) {
         this.influxDBClient.write(UDP_PORT, point);
+    }
+
+    public void udpWrite(String record) {
+        this.influxDBClient.write(UDP_PORT, record);
     }
 
     public void write(Point point) {

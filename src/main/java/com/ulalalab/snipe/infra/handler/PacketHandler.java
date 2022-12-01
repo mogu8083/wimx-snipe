@@ -4,21 +4,24 @@ import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 
+@Component
+//@Scope("prototype")
+@ChannelHandler.Sharable
 @Slf4j(topic = "TCP.PacketHandler")
 public class PacketHandler extends ChannelInboundHandlerAdapter {
 
-	private boolean isDevice = false;
-	private ByteBuf buffer;
-
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		buffer = ctx.alloc().heapBuffer(64);
+		ctx.alloc().heapBuffer(64);
 	}
 
 	@Override
@@ -28,10 +31,11 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
-		//WeakReference<Device> refDevice = new WeakReference<>(new Device());
-		//Device device = refDevice.get();
-		Device device = new Device();
+		boolean isDevice = false;
+		ByteBuf buffer;
 
+		WeakReference<Device> refDevice = new WeakReference<>(new Device());
+		Device device = refDevice.get();
 		String deviceId = null;
 
 		ByteBuf in = (ByteBuf) packet;
@@ -105,7 +109,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		buffer.clear();
-		buffer.release();
+		ctx.channel().alloc().buffer().clear();
+		ctx.channel().alloc().buffer().release();
 	}
 }

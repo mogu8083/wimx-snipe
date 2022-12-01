@@ -9,7 +9,7 @@ services:
       - "8088:8088"
       - "7086:7086/udp"
     volumes:
-      - ${ROOT_PATH}/data/influxdb:/var/lib/influxdb
+      - ${ROOT_PATH}/data/snipe2/influxdb:/var/lib/influxdb
       - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
       - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
     networks:
@@ -24,7 +24,8 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - "${WORK_PATH}/src/main/resources/docker/redis/conf:/usr/local/etc/redis"
+      - ${ROOT_PATH}/data/snipe2/redis/access.log:/data/access.log
+      - ${WORK_PATH}/src/main/resources/docker/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       db_network:
         ipv4_address: 172.19.0.3
