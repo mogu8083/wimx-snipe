@@ -29,9 +29,8 @@ services:
                 -Xms1G -Xmx2G
                 -Dio.netty.leakDetectionLevel=advanced
                 -Dio.netty.noPreferDirect=true
-                #-Dio.netty.allocator.type=unpooled
-                #-Dio.netty.allocator.chunkSize=0
 #         - JVM_OPTS=-Dspring.profiles.active=dev-server
+#                    -Xms1G -Xmx2G
 #                    -Dio.netty.noPreferDirect=true
 #                    -Dio.netty.leakDetectionLevel=advanced
 #                    -Dtcp.port=37080
@@ -64,7 +63,7 @@ services:
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
         -Ddevice.suffix=Z
-        -Dthread.count=2000
+        -Dthread.count=2500
     depends_on:
       - server1
       #- haproxy
@@ -98,4 +97,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.20.0.0/28

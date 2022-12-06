@@ -1,22 +1,20 @@
 package com.ulalalab.snipe.infra.config;
 
-import io.lettuce.core.RedisClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
+import java.time.Duration;
+
+//@Configuration
 public class RedisConfig {
 
     @Value("${spring.redis.host}")
@@ -43,14 +41,27 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
+    //@Bean
+//    public LettuceConnectionFactory reactiveConnectionFactory() {
+//        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
+//                .commandTimeout(Duration.ofMinutes(1))
+//                .shutdownTimeout(Duration.ZERO)
+//                .build();
+//
+//        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+//        redisStandaloneConfiguration.setPassword(password);
+//        return new LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration);
+//    }
+
+
 //    @Bean
 //    public RedisConnection redisConnection() {
 //        return redisConnectionFactory().getConnection();
 //    }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
@@ -60,6 +71,16 @@ public class RedisConfig {
         //redisTemplate.setEnableTransactionSupport(true);
         return redisTemplate;
     }
+
+//    @Bean
+//    public ReactiveRedisTemplate<String, String> reactiveRedisTemplate() {
+//        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+//
+//        RedisSerializationContext<String, String> serializationContext = RedisSerializationContext.<String, String>newSerializationContext(stringRedisSerializer)
+//                .value(stringRedisSerializer)
+//                .build();
+//        return new ReactiveRedisTemplate<>(reactiveConnectionFactory(), serializationContext);
+//    }
 
 //    @Bean
 //    public RedisConnectionFactory redisConnectionFactory() {

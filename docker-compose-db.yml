@@ -13,8 +13,8 @@ services:
       - ${WORK_PATH}/src/main/resources/docker/influxdb/conf/influxdb.conf:/etc/influxdb/influxdb.conf
       - ${WORK_PATH}/src/main/resources/docker/influxdb/scripts:/docker-entrypoint-initdb.d
     networks:
-      db_network:
-        ipv4_address: 172.19.0.2
+      db_bridge:
+        ipv4_address: 172.26.0.2
     stdin_open: true
     tty: true
 
@@ -27,13 +27,20 @@ services:
       - ${ROOT_PATH}/data/snipe2/redis/access.log:/data/access.log
       - ${WORK_PATH}/src/main/resources/docker/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      db_network:
-        ipv4_address: 172.19.0.3
+      db_bridge:
+        ipv4_address: 172.26.0.3
     command: redis-server /usr/local/etc/redis/redis.conf
 
+#networks:
+#  db_network:
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.19.0.0/16
+
 networks:
-  db_network:
+  db_bridge:
     ipam:
       driver: default
       config:
-        - subnet: 172.19.0.0/16
+        - subnet: 172.26.0.0/28

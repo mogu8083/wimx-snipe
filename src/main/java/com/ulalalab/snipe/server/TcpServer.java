@@ -1,6 +1,11 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.InitTcpHandler;
+import com.ulalalab.snipe.infra.manage.RedisManager;
+import io.lettuce.core.FlushMode;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAclAsyncCommands;
+import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -11,10 +16,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 @Component
 @Slf4j(topic = "TCP.MainServer")
@@ -35,9 +44,15 @@ public class TcpServer {
 	private Class serverSocketChannel = null;
 
 	private InitTcpHandler initTcpHandler;
+	private ThreadPoolTaskScheduler threadPoolTaskScheduler;
+	private Executor threadPoolTaskExecutor;
+	private RedisManager redisManager;
 
-	public TcpServer(InitTcpHandler initTcpHandler) {
+	public TcpServer(InitTcpHandler initTcpHandler, ThreadPoolTaskScheduler threadPoolTaskScheduler, ThreadPoolTaskExecutor threadPoolTaskExecutor, RedisManager redisManager) {
 		this.initTcpHandler = initTcpHandler;
+		this.threadPoolTaskScheduler = threadPoolTaskScheduler;
+		this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+		this.redisManager = redisManager;
 	}
 
 	public void start() throws InterruptedException {
@@ -79,14 +94,35 @@ public class TcpServer {
 
 		if(isLinux) {
 			bossGroup = new EpollEventLoopGroup(BOSS_COUNT);
-			workerGroup = new EpollEventLoopGroup(WORKER_COUNT);
+			workerGroup = new EpollEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
 
 			serverSocketChannel = EpollServerSocketChannel.class;
 		} else {
 			bossGroup = new NioEventLoopGroup(BOSS_COUNT);
-			workerGroup = new NioEventLoopGroup(WORKER_COUNT);
+			workerGroup = new NioEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
 
 			serverSocketChannel = NioServerSocketChannel.class;
 		}
+
+//		threadPoolTaskScheduler.scheduleAtFixedRate(() -> {
+//			Map<StatefulRedisConnection<String, String>, Integer> map = redisManager.getRedisConnectionMap();
+//			log.info("Redis Flush!");
+//
+//			map.entrySet().forEach(entry -> {
+//				entry.getKey().async().save();
+//			});
+//		}, 1000);
+
+//		threadPoolTaskScheduler.scheduleAtFixedRate(() -> {
+//			Map<RedisAsyncCommands<String, String>, Integer> map = redisManager.getRedisCommandsMap();
+//			log.info("Redis Flush!");
+//
+//			map.entrySet().forEach(entry -> {
+//				entry.getKey().flushCommands();
+//			});
+//		}, 1000);
+
 	}
+
+
 }

@@ -11,6 +11,9 @@ spring:
     host: 10.10.0.90
     port: 6379
     password: ulalalab12!@
+    #host: 211.62.140.72
+    #port: 46379
+    #password: dak102938$&
 
   influxdb:
     #url: "http://external-host:8086"

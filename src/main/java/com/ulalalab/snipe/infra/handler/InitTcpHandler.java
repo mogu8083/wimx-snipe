@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Scope("prototype")
 @Component
 @RequiredArgsConstructor
 @ChannelHandler.Sharable

@@ -1,20 +1,20 @@
 import java.sql.DriverManager
 
-buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
-}
+//buildscript {
+//	ext {
+//		queryDslVersion = "5.0.0"
+//	}
+//}
 
 plugins {
 	id 'org.springframework.boot' version '2.7.3'
 	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
 	id 'java'
-	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+	//id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
 group = 'com.ulalalab'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 sourceCompatibility = '11'
 
 repositories {
@@ -37,16 +37,8 @@ dependencies {
 	//implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'javax.validation:validation-api:2.0.1.Final'
 
-//	implementation 'com.fasterxml.jackson.core:jackson-databind'
-//	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation("ch.qos.logback:logback-classic:1.1.3")
 	implementation("ch.qos.logback:logback-core:1.1.3")
-
-	//implementation 'mysql:mysql-connector-java'
-
-	//querydsl 추가
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	// P6Spy
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
@@ -59,13 +51,12 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	//implementation 'org.springframework.session:spring-session-data-redis'
 	implementation 'io.lettuce:lettuce-core:6.1.10.RELEASE'
 	implementation 'org.apache.commons:commons-pool2:2.9.0'
 
 	// InfluxDB
-	//implementation 'org.influxdb:influxdb-java:2.22'
 	implementation 'org.influxdb:influxdb-java:2.22'
+	implementation "com.influxdb:influxdb-client-java:6.7.0"
 	implementation 'com.github.miwurster:spring-data-influxdb:1.8'
 
 	compileOnly 'org.projectlombok:lombok'
@@ -80,7 +71,7 @@ tasks.named('test') {
 }
 
 tasks.bootJar {
-	println System.getProperty("profile")
+	//println System.getProperty("profile")
 
 	def profile = System.getProperty("profile")
 
@@ -93,23 +84,28 @@ tasks.bootJar {
 	} else {
 		mainClass = 'com.ulalalab.snipe.MainApplication'
 	}
-}
-
-def querydslDir ="$buildDir/generated/querydsl"
-
-querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-sourceSets {
-	main.java.srcDir querydslDir
-}
-compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+	doLast {
+		exec {
+			executable 'd:\\run\\bat\\docker-snipe2.bat'
+		}
 	}
-	querydsl.extendsFrom compileClasspath
 }
+
+//def querydslDir ="$buildDir/generated/querydsl"
+
+//querydsl {
+//	jpa = true
+//	querydslSourcesDir = querydslDir
+//}
+//sourceSets {
+//	main.java.srcDir querydslDir
+//}
+//compileQuerydsl {
+//	options.annotationProcessorPath = configurations.querydsl
+//}
+//configurations {
+//	compileOnly {
+//		extendsFrom annotationProcessor
+//	}
+//	querydsl.extendsFrom compileClasspath
+//}

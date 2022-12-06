@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
-//@Scope("prototype")
 @ChannelHandler.Sharable
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {

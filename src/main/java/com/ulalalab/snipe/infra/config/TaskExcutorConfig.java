@@ -26,7 +26,7 @@ import java.time.Period;
 @Slf4j
 public class TaskExcutorConfig {
 
-    @Bean(name = "taskExecutor")
+    @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 
@@ -39,8 +39,9 @@ public class TaskExcutorConfig {
         return taskExecutor;
     }
 
-    @Bean(name = "taskScheduler")
-    public ThreadPoolTaskScheduler taskScheduler() {
+    //@Bean(name = "taskScheduler")
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.initialize();
         return taskScheduler;

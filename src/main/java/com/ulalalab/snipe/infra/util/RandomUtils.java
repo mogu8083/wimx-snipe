@@ -22,6 +22,17 @@ public final class RandomUtils {
     }
 
     /**
+     * Float 형 난수
+     */
+    public static float getFloatRandom() {
+        return (float) (Math.round(Math.random() * 1000) / 10.0);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("##@@ " + getFloatRandom());
+    }
+
+    /**
      * Boolean 형 난수
      */
     public static boolean getBooleanRandom() {

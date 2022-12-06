@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.infra.manage;
 
+import lombok.RequiredArgsConstructor;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class InfluxDBManager {
 
     @Value("${spring.influxdb.url}")
@@ -22,8 +24,7 @@ public class InfluxDBManager {
     @Value("${spring.influxdb.udp-port}")
     private int UDP_PORT;
 
-    @Autowired
-    private InfluxDB influxDBClient;
+    private final InfluxDB influxDBClient;
 
     public InfluxDB getInfluxDB() {
         return this.influxDBClient;
@@ -39,7 +40,6 @@ public class InfluxDBManager {
 
     public void write(Point point) {
         this.influxDBClient.write(point);
-        //this.influxDBClient.write();
     }
 
     public void write(BatchPoints batchPoints) {

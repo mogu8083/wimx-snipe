@@ -8,13 +8,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 
 @Component
-//@Scope("prototype")
 @ChannelHandler.Sharable
 @Slf4j(topic = "TCP.PacketHandler")
 public class PacketHandler extends ChannelInboundHandlerAdapter {
@@ -85,7 +83,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 			}
 		} catch (Exception e) {
 			isDevice = false;
-			log.warn(e.getMessage());
+			log.warn(e.getMessage());;;
 
 			if (DevUtils.isTest()) {
 				e.printStackTrace();

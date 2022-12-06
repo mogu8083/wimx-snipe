@@ -1,0 +1,1 @@
+docker-compose -f c:\workspace\source\wimx2-snipe\docker-compose-db.yml up --build -d && docker-compose  -f c:\workspace\source\wimx2-snipe\docker-compose.yml stop && docker-compose -f c:\workspace\source\wimx2-snipe\docker-compose.yml up --build -d
