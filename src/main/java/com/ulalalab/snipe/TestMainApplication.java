@@ -4,7 +4,7 @@ import com.ulalalab.snipe.server.ClientServer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 
-@Profile("local-client")
+@Profile({"local-client", "dev-client"})
 @SpringBootApplication
 public class TestMainApplication {
 

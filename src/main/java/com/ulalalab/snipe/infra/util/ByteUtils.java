@@ -187,6 +187,14 @@ public final class ByteUtils {
         return data;
     }
 
+    /**
+     * double -> byte 배열 (8byte)
+     */
+//    public static byte[] convertShortToByteArray(int number) {
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(Short.BYTES);
+//        byteBuffer.putShort();
+//        return byteBuffer.array();
+//    }
 
     /**
      * double -> byte 배열 (8byte)
@@ -222,5 +230,20 @@ public final class ByteUtils {
         ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
         byteBuffer.putLong(number);
         return byteBuffer.array();
+    }
+
+    /**
+     * Byte 배열 CRC 체크
+     */
+    public static int getCRC(byte[] bytes) {
+        int checksum = 0;
+
+        for (byte b : bytes) {
+            checksum += b;
+        }
+        checksum = 256 - checksum;
+        checksum &= 0xFF;
+
+        return checksum;
     }
 }

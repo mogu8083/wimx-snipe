@@ -15,21 +15,22 @@ public class ClientServer {
 
 	private String TCP_IP = System.getProperty("tcp.ip");
 	private String TCP_PORT = System.getProperty("tcp.port");
+	private String THREAD_START = System.getProperty("thread.start");
 	private String THREAD_COUNT = System.getProperty("thread.count");
-	private int threadCnt;
-	private EventLoopGroup eventLoopGroup;
 
-	public static void main(String[] args) throws Exception {
-		ClientServer clientServer = new ClientServer();
-		clientServer.run();
-	}
+	private int threadCnt;
+	private int threadStart;
+
+	private EventLoopGroup eventLoopGroup;
 
 	public void run() throws Exception {
 		try {
 			this.threadCnt = NumberUtils.parseNumber(THREAD_COUNT, Integer.class);
+			this.threadStart = NumberUtils.parseNumber(THREAD_START, Integer.class);
+
 			log.info("ClientServer 실행 / Thread : " + THREAD_COUNT + " 실행");
 
-			for(int i = 1; i < this.threadCnt + 1; i++) {
+			for(int i = this.threadStart; i < this.threadCnt + this.threadStart + 1; i++) {
 				eventLoopGroup = new NioEventLoopGroup(1);
 				Bootstrap bootstrap = new Bootstrap();
 
@@ -44,6 +45,9 @@ public class ClientServer {
 			}
 		} catch(Exception e) {
 			log.info(this.getClass() + "{} 연결 실패 => {}" + e.getMessage());
+
+			Thread.sleep(5000);
+			this.run();
 		}
 	}
 }

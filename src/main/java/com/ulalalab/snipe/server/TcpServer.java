@@ -94,12 +94,14 @@ public class TcpServer {
 
 		if(isLinux) {
 			bossGroup = new EpollEventLoopGroup(BOSS_COUNT);
-			workerGroup = new EpollEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
+			//workerGroup = new EpollEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
+			workerGroup = new EpollEventLoopGroup(WORKER_COUNT);
 
 			serverSocketChannel = EpollServerSocketChannel.class;
 		} else {
 			bossGroup = new NioEventLoopGroup(BOSS_COUNT);
-			workerGroup = new NioEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
+			//workerGroup = new NioEventLoopGroup(WORKER_COUNT, threadPoolTaskExecutor);
+			workerGroup = new NioEventLoopGroup(WORKER_COUNT);
 
 			serverSocketChannel = NioServerSocketChannel.class;
 		}

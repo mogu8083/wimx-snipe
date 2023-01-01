@@ -81,12 +81,23 @@ tasks.bootJar {
 
 	if(profile=='client') {
 		mainClass = 'com.ulalalab.snipe.TestMainApplication'
-	} else {
+	} else if(profile=='server') {
 		mainClass = 'com.ulalalab.snipe.MainApplication'
+	} else if(profile=='wimx-client') {
+		mainClass = 'com.ulalalab.snipe.WimxPacketApplication'
 	}
-	doLast {
-		exec {
-			executable 'd:\\run\\bat\\docker-snipe2.bat'
+
+	if(profile=='server') {
+		doLast {
+			exec {
+				executable 'd:\\run\\bat\\docker-snipe2.bat'
+			}
+		}
+	} else if(profile=='client') {
+		doLast {
+			exec {
+				executable 'd:\\run\\bat\\docker-snipe2-client.bat'
+			}
 		}
 	}
 }

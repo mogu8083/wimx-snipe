@@ -36,4 +36,24 @@ public class SpChannelGroup extends DefaultChannelGroup {
 		}
 		return list;
 	}
+
+	public boolean channelDisconnect(String deviceId) {
+		ChannelId removeChannelId = null;
+
+		for (ChannelId channelId : channelInfos.keySet()) {
+			ChannelInfo channelInfo = channelInfos.get(channelId);
+
+			if(deviceId.equals(channelInfo.getDeviceId())) {
+				this.find(channelId).close();
+				removeChannelId = channelId;
+				break;
+			}
+		}
+
+		if(removeChannelId != null) {
+			channelInfos.remove(removeChannelId);
+			return true;
+		}
+		return false;
+	}
 }

@@ -57,13 +57,15 @@ services:
       dockerfile: ./dockerfile-client
     container_name: "wimx2-snipe-client"
     volumes:
+      - "${ROOT_PATH}/data/snipe2:/data/logs"
       - "${BUILD_PATH}:/run"
     environment:
-      - JVM_OPTS=-Dspring.profiles.active=local-client
+      - JVM_OPTS=-Dspring.profiles.active=dev-client
+        -Dserver.type=client
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
-        -Ddevice.suffix=Z
-        -Dthread.count=2500
+        -Dthread.count=1500
+        -Dthread.start=1
     depends_on:
       - server1
       #- haproxy
@@ -72,6 +74,22 @@ services:
         ipv4_address: 172.20.0.12
 #    extra_hosts:
 #      - "external-host:host-gateway"
+    stdin_open: true
+    tty: true
+
+  wimx15:
+    build:
+      dockerfile: ./dockerfile-wimx-client
+    container_name: "wimx2-snipe-wimx15"
+    volumes:
+      - "${BUILD_PATH}:/run"
+    environment:
+      - JVM_OPTS=-Dspring.profiles.active=wimx-client
+        -Dtcp.port=50300
+        -Dtcp.ip=211.62.140.76
+    networks:
+      default_bridge:
+        ipv4_address: 172.20.0.13
     stdin_open: true
     tty: true
 

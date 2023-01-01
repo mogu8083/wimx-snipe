@@ -56,7 +56,6 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
             // TODO : Body가 대량일 경우 작업 필요
 
             if (msg instanceof LastHttpContent) {
-                ChannelFuture future = null;
 
                 // 장비
                 if(uri.startsWith("/device")) {
@@ -72,9 +71,14 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
                         QueryStringDecoder decoder = new QueryStringDecoder(uri);
                         String deviceId = this.getParam(decoder, "deviceId");
 
-                        //channelManager.removeChannel(deviceId);
+                        boolean result = spChannelGroup.channelDisconnect("W" + deviceId);
+                        String responseMessage = deviceId + " 장비 연결이 해제되었습니다.";
 
-                        Response responseString = new Response<>(deviceId + " 장비 연결이 해제되었습니다.");
+                        if(!result) {
+                            responseMessage = deviceId + " 해당 장비가 존재 하지 않습니다.";
+                        }
+
+                        Response responseString = new Response<>(responseMessage);
                         this.writeResponse(ctx, responseString);
                     }
                 }

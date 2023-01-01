@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.TimeZone;
 
 @Getter
@@ -14,35 +15,31 @@ import java.util.TimeZone;
 @ToString
 public class Device {
 
-    // UTC Timestamp
-    private long time;
+    private String cvtTime;
 
-    private LocalDateTime cvtTime;
+    // 디바이스 보낼때 시간 Unix Time
+    private int timestamp;
 
-    // 장비 이름
-    private String deviceId;
+    // 장비 Index
+    private DeviceCode deviceCode;
 
-    // 채널 1
-    private Double ch1;
+    // 장비 Index
+    private short deviceIndex;
 
-    // 채널 2
-    private Double ch2;
+    // 디바이스 펌웨어 버전
+    private float version;
 
-    // 채널 3
-    private double ch3;
+    // 무선 통신 디바이스의 신호 세기
+    private byte rssi;
 
-    // 채널 4
-    private double ch4;
+    // Data Length
+    private int dataLength;
 
-    // 채널 5
-    private double ch5;
+    // 채널 데이터 목록
+    private List<Float> channelDataList;
 
     public String getCvtTime() {
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(this.time), TimeZone.getDefault().toZoneId());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(this.timestamp), TimeZone.getDefault().toZoneId());
         return LocalDateUtils.getLocalDateTimeString(localDateTime, LocalDateUtils.DATE_TIME_FORMAT);
-    }
-
-    public void setInitValue() {
-        this.deviceId = null;
     }
 }

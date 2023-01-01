@@ -2,12 +2,12 @@ spring:
   redis:
     lettuce:
       pool:
-        max-active: 15
+        max-active: 1
         max-idle: 20
         min-idle: 10
         max-wait: -1
         time-between-eviction-runs: 5000
-    #host: 172.26.0.3
+    #host: 172.20.0.3
     host: 10.10.0.90
     port: 6379
     password: ulalalab12!@

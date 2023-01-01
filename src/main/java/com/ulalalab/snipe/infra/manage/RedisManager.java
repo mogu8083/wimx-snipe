@@ -45,9 +45,9 @@ public class RedisManager {
 
     @PostConstruct
     private void init() {
-        this.initRedisPool();
+        //this.initRedisPool();
         this.initRedisConnectionMap();
-        this.initRedisCommandsMap();
+        //this.initRedisCommandsMap();
     }
 
     private GenericObjectPool<StatefulRedisConnection<String, String>> nonClusterPoolUsage() {

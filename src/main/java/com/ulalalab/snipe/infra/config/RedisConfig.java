@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
-//@Configuration
+@Configuration
 public class RedisConfig {
 
     @Value("${spring.redis.host}")
@@ -36,7 +36,8 @@ public class RedisConfig {
         LettuceConnectionFactory lettuceConnectionFactory
                 = new LettuceConnectionFactory(redisStandaloneConfiguration);
 
-        lettuceConnectionFactory.setShareNativeConnection(false);
+        // false 일 경우 commons-pool을 사용
+        //lettuceConnectionFactory.setShareNativeConnection(false);
 
         return lettuceConnectionFactory;
     }

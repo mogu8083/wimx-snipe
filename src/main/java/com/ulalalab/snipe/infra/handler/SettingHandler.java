@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "TCP.SettingHandler")
 public class SettingHandler extends ChannelInboundHandlerAdapter {
 
-	//private boolean isSettingDevice = false;
     private SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
 
 	@Override
@@ -32,7 +31,7 @@ public class SettingHandler extends ChannelInboundHandlerAdapter {
 			if(channelInfo.isInitSetting()) {
 				channelInfo.setLastPacketTime(LocalDateTime.now());
 			} else {
-				channelInfo.setDeviceId(device.getDeviceId());
+				channelInfo.setDeviceId("W"+device.getDeviceIndex());
 				channelInfo.setRemoteAddress(channel.remoteAddress().toString());
 				channelInfo.setConnectTime(LocalDateTime.now());
 				channelInfo.setLocalAddress(channel.localAddress().toString());

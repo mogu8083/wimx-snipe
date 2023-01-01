@@ -28,6 +28,16 @@ public final class RandomUtils {
         return (float) (Math.round(Math.random() * 1000) / 10.0);
     }
 
+    /**
+     * Float 형 난수
+     * @param min
+     * @param max
+     */
+    public static float getFloatRandom(int min, int max) {
+        Random random = new Random();
+        return random.nextFloat() * (max - min) + min;
+    }
+
     public static void main(String[] args) {
         System.out.println("##@@ " + getFloatRandom());
     }

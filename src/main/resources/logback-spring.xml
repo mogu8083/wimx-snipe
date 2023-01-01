@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <springProfile name="local-server,local-client">
+    <springProfile name="local-server,local-client,wimx-client">
         <logger name="p6spy" level="OFF" />
 
         <root level="INFO">

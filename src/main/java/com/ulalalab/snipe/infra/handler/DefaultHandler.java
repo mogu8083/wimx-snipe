@@ -5,7 +5,6 @@ import com.ulalalab.snipe.infra.channel.SpChannelGroup;
 import com.ulalalab.snipe.infra.manage.EventManager;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -22,10 +21,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		Channel channel = ctx.channel();
 
-		// TODO : 1. 인증 관련 추가
-		//////////////////////////
-
-		// 2. 연결 채널 추가
+		// 연결 채널 추가
 		spChannelGroup.add(channel);
 		spChannelGroup.addChannelInfo(channel.id(), new ChannelInfo());
 
@@ -43,16 +39,18 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		Channel channel = ctx.channel();
 //ㄱ
 //		// 1. 연결 채널 해제
-		spChannelGroup.remove(ctx.channel());
+		spChannelGroup.remove(channel);
 		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
 				, channel.id()
 				, channel.remoteAddress()
 				, spChannelGroup.size());
+
+		ctx.channel().close();
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.warn("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
+		log.error("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
 		ctx.channel().alloc().buffer().clear();
 		ctx.channel().close();
 		cause.printStackTrace();
