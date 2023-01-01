@@ -30,7 +30,7 @@ public class ClientServer {
 
 			log.info("ClientServer 실행 / Thread : " + THREAD_COUNT + " 실행");
 
-			for(int i = this.threadStart; i < this.threadCnt + this.threadStart + 1; i++) {
+			for(int i = this.threadStart; i < this.threadCnt + this.threadStart; i++) {
 				eventLoopGroup = new NioEventLoopGroup(1);
 				Bootstrap bootstrap = new Bootstrap();
 

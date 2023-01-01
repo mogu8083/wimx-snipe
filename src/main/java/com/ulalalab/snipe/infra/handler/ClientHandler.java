@@ -46,9 +46,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		ctx.executor().scheduleAtFixedRate(() -> {
 			//CompletableFuture.runAsync(() -> {
 				//sendPacket(ctx);
-			if(ctx.channel().isOpen()) {
+			//if(ctx.channel().isOpen()) {
+			if(ctx.channel().isWritable()) {
 				sendPackData(ctx);
 			}
+			//}
 			//});
 		}, 1000, 1000, TimeUnit.MILLISECONDS);
 		//channelRead(ctx, null);
@@ -216,6 +218,66 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 				// Data Length (2 Byte)
 				int dataLength = Integer.BYTES * channelCount;
+				buf.writeShort(dataLength);
+
+				//////////채널 데이터//////////////////////////////////////
+				for(int i = 0; i < channelCount; i++) {
+					buf.writeFloat(RandomUtils.getFloatRandom(100, 5));
+				}
+				/////////////////////////////////////////////////////////
+
+				// CRC (2 Byte)
+				//buf.writeByte(ByteUtils.getCRC(buf.getBytes(2, buf, 20 + dataLength).array()));
+				buf.writeByte(0x00);
+				buf.writeByte(0x00);
+
+				// ETC (1 Byte)
+				buf.writeByte(0xF5);
+
+
+
+				Thread.sleep(1000);
+
+				channelCount = 4;
+
+				// STX 0x16 0x16
+				buf.writeByte(0x16);
+				buf.writeByte(0x16);
+
+				// Transaction ID (2 Byte)
+				buf.writeShort(transactionId++);
+
+				// Cmd (1 Byte)
+				/* 0x01 : Data
+				 * 0x02 : Write
+				 * 0x03 : Update
+				 * 0x04 : Reboot
+				 * 0x05 : Interval
+				 */
+				buf.writeByte(0x01);
+
+				// Timestamp
+				timestamp = (int) Instant.now().getEpochSecond();
+				buf.writeInt(timestamp);
+
+				// Device Code (2 Byte)
+				buf.writeShort(DeviceCode.WICON_L.getCode());
+
+				// TODO : Device 등록년월 (2 Byte)
+				buf.writeByte(0x00);
+				buf.writeByte(0x00);
+
+				// Device Index (2 Byte)
+				buf.writeShort(deviceId);
+
+				// Version (4 Byte)
+				buf.writeFloat(1.17f);
+
+				// RSSI (1 Byte)
+				buf.writeByte(0x00);
+
+				// Data Length (2 Byte)
+				dataLength = Integer.BYTES * channelCount;
 				buf.writeShort(dataLength);
 
 				//////////채널 데이터//////////////////////////////////////
