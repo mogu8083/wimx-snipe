@@ -64,7 +64,7 @@ services:
         -Dserver.type=client
         -Dtcp.port=37080
         -Dtcp.ip=172.20.0.11
-        -Dthread.count=1500
+        -Dthread.count=1600
         -Dthread.start=1
     depends_on:
       - server1

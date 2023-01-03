@@ -4,18 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ulalalab.snipe.common.service.CommonService;
 import com.ulalalab.snipe.device.model.Response;
+import com.ulalalab.snipe.device.service.CommandService;
 import com.ulalalab.snipe.device.service.DeviceService;
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
 import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.manage.EventManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -32,10 +32,12 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
 
     private final DeviceService deviceService;
     private final CommonService commonService;
+    private final CommandService commandService;
 
     public HttpResultHandler() {
         this.deviceService = (DeviceService) BeansUtils.getBean("deviceService");
         this.commonService = (CommonService) BeansUtils.getBean("commonService");
+        this.commandService = (CommandService) BeansUtils.getBean("commandService");
     }
 
     @Override
@@ -80,6 +82,25 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
 
                         Response responseString = new Response<>(responseMessage);
                         this.writeResponse(ctx, responseString);
+                    }
+
+                    // 장비 Reboot
+                    else if(uri.contains("/device/reboot?") && method == HttpMethod.GET) {
+                        QueryStringDecoder decoder = new QueryStringDecoder(uri);
+                        String deviceId = this.getParam(decoder, "deviceId");
+                        Channel channel = spChannelGroup.getChannel(Integer.valueOf(deviceId));
+
+                        if(!StringUtils.hasText(deviceId) || channel == null) {
+                            Response responseString = new Response<>(deviceId + " -> 해당 장비 ID가 존재하지 않습니다.");
+                            this.writeResponse(ctx, responseString);
+                        } else {
+                            boolean isSend = commandService.reboot(channel);
+
+                            if(isSend) {
+                                Response responseString = new Response<>(deviceId + " -> 장비 재부팅을 요청하였습니다.");
+                                this.writeResponse(ctx, responseString);
+                            }
+                        }
                     }
                 }
 

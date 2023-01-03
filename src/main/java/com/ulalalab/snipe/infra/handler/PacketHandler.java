@@ -55,114 +55,92 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 					break;
 				}
 
-				if (buffer.getShort(buffer.readerIndex()) == 0x1616) {
+				// STX : 0x1616
+				buffer.skipBytes(2);
 
-					// 초기 Command
-					if(buffer.getByte(4)==0x00) {
-						clientBuf.writeByte(0x16);
-						clientBuf.writeByte(0x16);
-						clientBuf.writeShort(0x0000);
-						clientBuf.writeByte(0x00);
+				// Transaction ID
+				short transactionId = buffer.readShort();
 
-						clientBuf.writeInt((int) Instant.now().getEpochSecond());
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0xF5);
+				// CMD (1 byte)
+				byte cmd = buffer.readByte();
 
-						ctx.writeAndFlush(clientBuf);
-						clientBuf.unwrap();
+				// Timestamp (4 byte)
+				int timestamp = buffer.readInt();
 
-						break;
-					} else {
+				// Device Code (2 byte)
+				short deviceCode = buffer.readShort();
 
-						// STX : 0x1616
-						buffer.skipBytes(2);
+				// TODO : Device 등록년월
+				buffer.skipBytes(2);
 
-						// Transaction ID
-						short transactionId = buffer.readShort();
+				// Device index 2 Byte
+				short deviceIndex = buffer.readShort();
 
-						// CMD (1 byte)
-						byte cmd = buffer.readByte();
+				// Version 4 Byte
+				float version = buffer.readFloat();
 
-						// Timestamp (4 byte)
-						int timestamp = buffer.readInt();
+				// RSSI 1 byte
+				byte rssi = buffer.readByte();
 
-						// Device Code (2 byte)
-						short deviceCode = buffer.readShort();
+				// Data Length (2 Byte)
+				short dataLength = buffer.readShort();
 
-						// TODO : Device 등록년월
-						buffer.skipBytes(2);
+				// Data Length (2 Byte)
+				int channelCount = dataLength / Float.BYTES;
+				List<Float> channelDataList = new ArrayList<>();
 
-						// Device index 2 Byte
-						short deviceIndex = buffer.readShort();
-
-						// Version 4 Byte
-						float version = buffer.readFloat();
-
-						// RSSI 1 byte
-						byte rssi = buffer.readByte();
-
-						// Data Length (2 Byte)
-						short dataLength = buffer.readShort();
-
-						// Data Length (2 Byte)
-						int channelCount = dataLength / Float.BYTES;
-						List<Float> channelDataList = new ArrayList<>();
-
-						for(int i = 0; i < channelCount; i++) {
-							float chData = buffer.readFloat();
-							channelDataList.add(chData);
-						}
-
-						// CRC (2 Byte)
-						buffer.skipBytes(2);
-
-						// ETX (1 Byte)
-						buffer.skipBytes(1);
-
-						// Device Setting
-						device.setTimestamp(timestamp);
-						device.setDeviceCode(DeviceCode.codeToDevice(deviceCode));
-						device.setDeviceIndex(deviceIndex);
-						device.setDataLength(dataLength);
-						device.setVersion(version);
-						device.setRssi(rssi);
-						device.setChannelDataList(channelDataList);
-
-						if(DevUtils.isPrint2(deviceIndex)) {
-							log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
-							log.info(buffer.toString());
-							log.info(device.toString());
-						}
-
-						buffer.discardReadBytes();
-
-						// Client ByteBuf Setting
-						// TODO : 응답 시간을 찍어야 할지, 시스템 시간을 찍어야 할지 확인 필요
-						int receiveTimestamp = (int) Instant.now().getEpochSecond();
-
-						clientBuf = Unpooled.buffer(14);
-
-						clientBuf.writeByte(0x16);
-						clientBuf.writeByte(0x16);
-						clientBuf.writeShort(transactionId);
-						clientBuf.writeByte(0x01);
-						clientBuf.writeInt(timestamp);
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0x00);
-
-						// TODO : CRC 값 2byte 계산 필요
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0x00);
-						clientBuf.writeByte(0xF5);
-
-						ctx.writeAndFlush(clientBuf);
-						clientBuf.unwrap();
-
-						ctx.fireChannelRead(device);
-					}
+				for(int i = 0; i < channelCount; i++) {
+					float chData = buffer.readFloat();
+					channelDataList.add(chData);
 				}
+
+				// CRC (2 Byte)
+				buffer.skipBytes(2);
+
+				// ETX (1 Byte)
+				buffer.skipBytes(1);
+
+				// Device Setting
+				device.setTimestamp(timestamp);
+				device.setDeviceCode(DeviceCode.codeToDevice(deviceCode));
+				device.setDeviceIndex(deviceIndex);
+				device.setDataLength(dataLength);
+				device.setVersion(version);
+				device.setRssi(rssi);
+				device.setChannelDataList(channelDataList);
+
+				if(DevUtils.isPrint2(deviceIndex)) {
+					log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
+					log.info(buffer.toString());
+					log.info(device.toString());
+				}
+
+				buffer.discardReadBytes();
+
+				// Client ByteBuf Setting
+				// TODO : 응답 시간을 찍어야 할지, 시스템 시간을 찍어야 할지 확인 필요
+				int receiveTimestamp = (int) Instant.now().getEpochSecond();
+
+				clientBuf = Unpooled.buffer(14);
+
+				clientBuf.writeByte(0x16);
+				clientBuf.writeByte(0x16);
+				clientBuf.writeShort(transactionId);
+				clientBuf.writeByte(0x01);
+				clientBuf.writeInt(timestamp);
+				clientBuf.writeByte(0x00);
+				clientBuf.writeByte(0x00);
+
+				// TODO : CRC 값 2byte 계산 필요
+				clientBuf.writeByte(0x00);
+				clientBuf.writeByte(0x00);
+				clientBuf.writeByte(0xF5);
+
+				ctx.channel().writeAndFlush(clientBuf);
+				clientBuf.clear();
+				clientBuf.unwrap();
+
+				ctx.fireChannelRead(device);
 			} catch(Exception e) {
 				e.printStackTrace();
 				log.error(e.getMessage());

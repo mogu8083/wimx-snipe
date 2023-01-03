@@ -39,13 +39,12 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 		Channel channel = ctx.channel();
 //ㄱ
 //		// 1. 연결 채널 해제
-		spChannelGroup.remove(channel);
+		spChannelGroup.remove(channel.id());
+
 		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
 				, channel.id()
 				, channel.remoteAddress()
 				, spChannelGroup.size());
-
-		ctx.channel().close();
 	}
 
 	@Override

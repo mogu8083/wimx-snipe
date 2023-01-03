@@ -63,9 +63,15 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		//buf.clear();
 		//buf.release();
 
+		log.info("Receive -> " + ByteBufUtil.prettyHexDump(buf));
+
 		if(msg !=null) {
 			if(DevUtils.isPrint2(deviceId)) {
-				log.info("Response -> " + ByteBufUtil.hexDump(buf));
+				if(buf.getByte(4) == 0x04) {
+					log.info("재부팅 Response -> " + ByteBufUtil.hexDump(buf));
+				} else {
+					log.info("Response -> " + ByteBufUtil.hexDump(buf));
+				}
 			}
 			buf.clear();
 		}

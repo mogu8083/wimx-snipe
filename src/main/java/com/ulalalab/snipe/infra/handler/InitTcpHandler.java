@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class InitTcpHandler extends ChannelInboundHandlerAdapter {
 
     private final DefaultHandler defaultHandler;
+    private final InitMessageHandler initMessageHandler;
     private final SettingHandler settingHandler;
     private final PacketHandler packetHandler;
     private final ResultHandler resultHandler;
@@ -25,6 +26,7 @@ public class InitTcpHandler extends ChannelInboundHandlerAdapter {
         ChannelPipeline p = ctx.pipeline();
 
         p.addLast("TCP.DefaultHandler", defaultHandler);
+        p.addLast("TCP.InitMessageHandler", initMessageHandler);
         p.addLast("TCP.PacketHandler", packetHandler);
         p.addLast("TCP.SettingHandler", settingHandler);
         p.addLast("TCP.ResultHandler", resultHandler);
