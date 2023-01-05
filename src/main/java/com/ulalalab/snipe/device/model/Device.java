@@ -26,6 +26,12 @@ public class Device {
     // 장비 Index
     private short deviceIndex;
 
+    // 디바이스 등록 년
+    private byte deviceRegYear;
+
+    // 디바이스 등록 월
+    private byte deviceRegMonth;
+
     // 디바이스 펌웨어 버전
     private float version;
 

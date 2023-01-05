@@ -37,6 +37,7 @@ log:
     path: d:/log/netty
 
 server:
+  port : 8081
   tcp-port: 27080
   http-port: 26080
   worker-count: 4

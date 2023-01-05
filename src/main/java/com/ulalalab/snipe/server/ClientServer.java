@@ -29,19 +29,29 @@ public class ClientServer {
 			this.threadStart = NumberUtils.parseNumber(THREAD_START, Integer.class);
 
 			log.info("ClientServer 실행 / Thread : " + THREAD_COUNT + " 실행");
+			//this.eventLoopGroup = new NioEventLoopGroup(50);
 
 			for(int i = this.threadStart; i < this.threadCnt + this.threadStart; i++) {
-				eventLoopGroup = new NioEventLoopGroup(1);
-				Bootstrap bootstrap = new Bootstrap();
 
-				bootstrap.group(eventLoopGroup)
-						.channel(NioSocketChannel.class)
-						.handler(new LoggingHandler(LogLevel.DEBUG))
-						.handler(new ClientHandler(i, this));
-				bootstrap.remoteAddress(TCP_IP, NumberUtils.parseNumber(TCP_PORT, Integer.class));
-				Channel channel = bootstrap.connect().sync().channel();
+				//this.eventLoopGroup = new EpollEventLoopGroup(1);
+				this.eventLoopGroup = new NioEventLoopGroup(1);
 
-				eventLoopGroup.register(channel);
+				try {
+					Bootstrap bootstrap = new Bootstrap();
+
+					bootstrap.group(eventLoopGroup)
+							//.channel(NioSocketChannel.class)
+							.channel(NioSocketChannel.class)
+							.handler(new LoggingHandler(LogLevel.DEBUG))
+							.handler(new ClientHandler(i, this));
+					bootstrap.remoteAddress(TCP_IP, NumberUtils.parseNumber(TCP_PORT, Integer.class));
+
+					if(bootstrap.connect().isSuccess()) {
+						eventLoopGroup.register(bootstrap.connect().channel());
+					}
+				} catch(Exception e) {
+					log.error(this.getClass() + "{} 연결 실패 => {}" + e.getMessage());
+				}
 			}
 		} catch(Exception e) {
 			log.info(this.getClass() + "{} 연결 실패 => {}" + e.getMessage());

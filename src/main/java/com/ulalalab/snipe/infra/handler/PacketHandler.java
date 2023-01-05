@@ -2,6 +2,8 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.device.model.DeviceCode;
+import com.ulalalab.snipe.infra.util.ByteUtils;
+import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -33,19 +35,13 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object packet) {
-		//ByteBuf buffer;
-
 		WeakReference<Device> refDevice = new WeakReference<>(new Device());
 		Device device = refDevice.get();
 
-		ByteBuf buffer = (ByteBuf) packet;
-//		buffer = ctx.alloc().heapBuffer(128);
-//		buffer.writeBytes(in);
-//		in.release();
-//		in.unwrap();
-
-		boolean isDevice = false;
-		ByteBuf clientBuf = Unpooled.buffer(14);
+		ByteBuf in = (ByteBuf) packet;
+		ByteBuf buffer = ctx.alloc().heapBuffer(128);
+		buffer.writeBytes(in);
+		in.release();
 
 		while(true) {
 			try {
@@ -70,8 +66,11 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				// Device Code (2 byte)
 				short deviceCode = buffer.readShort();
 
-				// TODO : Device 등록년월
-				buffer.skipBytes(2);
+				// Device 등록 년
+				byte deviceRegYear = buffer.readByte();
+
+				// Device 등록 월
+				byte deviceRegMonth = buffer.readByte();
 
 				// Device index 2 Byte
 				short deviceIndex = buffer.readShort();
@@ -85,7 +84,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				// Data Length (2 Byte)
 				short dataLength = buffer.readShort();
 
-				// Data Length (2 Byte)
+				// Data (4 * 채널수 Byte)
 				int channelCount = dataLength / Float.BYTES;
 				List<Float> channelDataList = new ArrayList<>();
 
@@ -95,7 +94,13 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				}
 
 				// CRC (2 Byte)
-				buffer.skipBytes(2);
+				int checkCRC = CRC16ModubusUtils.calc(ByteBufUtil.getBytes(buffer, 0, buffer.readerIndex()));
+				int receiveCRC = buffer.readUnsignedShort();
+
+				if(checkCRC != receiveCRC) {
+					log.warn("CRC 일치 하지 않음.");
+					throw new Exception();
+				}
 
 				// ETX (1 Byte)
 				buffer.skipBytes(1);
@@ -104,13 +109,15 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				device.setTimestamp(timestamp);
 				device.setDeviceCode(DeviceCode.codeToDevice(deviceCode));
 				device.setDeviceIndex(deviceIndex);
+				device.setDeviceRegYear(deviceRegYear);
+				device.setDeviceRegMonth(deviceRegMonth);
 				device.setDataLength(dataLength);
 				device.setVersion(version);
 				device.setRssi(rssi);
 				device.setChannelDataList(channelDataList);
 
 				if(DevUtils.isPrint2(deviceIndex)) {
-					log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
+					//log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
 					log.info(buffer.toString());
 					log.info(device.toString());
 				}
@@ -121,7 +128,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				// TODO : 응답 시간을 찍어야 할지, 시스템 시간을 찍어야 할지 확인 필요
 				int receiveTimestamp = (int) Instant.now().getEpochSecond();
 
-				clientBuf = Unpooled.buffer(14);
+				ByteBuf clientBuf = Unpooled.buffer(14);
 
 				clientBuf.writeByte(0x16);
 				clientBuf.writeByte(0x16);
@@ -130,10 +137,9 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				clientBuf.writeInt(timestamp);
 				clientBuf.writeByte(0x00);
 				clientBuf.writeByte(0x00);
-
-				// TODO : CRC 값 2byte 계산 필요
-				clientBuf.writeByte(0x00);
-				clientBuf.writeByte(0x00);
+				//clientBuf.writeShort(ByteUtils.CRC16(ByteBufUtil.getBytes(clientBuf, 0, clientBuf.writerIndex())));
+				// TODO :  어디서부터 시작 인지 확인 필요.
+				clientBuf.writeShort(CRC16ModubusUtils.calc(ByteBufUtil.getBytes(clientBuf, 0, clientBuf.writerIndex())));
 				clientBuf.writeByte(0xF5);
 
 				ctx.channel().writeAndFlush(clientBuf);
@@ -142,20 +148,28 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 				ctx.fireChannelRead(device);
 			} catch(Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				log.error(e.getMessage());
-				log.error(ByteBufUtil.hexDump(buffer));
-				break;
+				log.error(ByteBufUtil.prettyHexDump(buffer));
+
+				// 오류 인 경우
+				int stx = buffer.indexOf(0, buffer.writerIndex(), (byte) 0x1616);
+
+				if(stx > 0) {
+					buffer.readerIndex(stx);
+				}
+				buffer.discardReadBytes();
+				//break;
 			}
 		}
 		buffer.clear();
 		buffer.release();
 	}
 
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		ByteBuf buffer = ctx.channel().alloc().buffer();
-		buffer.clear();
-		buffer.release();
-	}
+//	@Override
+//	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+////		ByteBuf buffer = ctx.channel().alloc().buffer();
+////		buffer.clear();
+////		buffer.release();
+//	}
 }

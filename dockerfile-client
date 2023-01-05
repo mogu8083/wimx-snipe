@@ -5,4 +5,4 @@ RUN apt-get install -y vim net-tools telnet iputils-ping
 
 WORKDIR /run
 
-CMD sleep 30s; java -jar $JVM_OPTS snipe-client.jar; bash;
+CMD java -jar $JVM_OPTS snipe-client.jar; bash;

@@ -40,10 +40,10 @@ spring:
 
 log:
   file:
-    path: /data/logs
+    path: d:/data/snipe2
 
 server:
   tcp-port: 37080
   http-port: 36080
-  worker-count: 4
+  worker-count: 6
   boss-count: 1

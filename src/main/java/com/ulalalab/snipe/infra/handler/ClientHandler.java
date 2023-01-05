@@ -1,10 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.DeviceCode;
-import com.ulalalab.snipe.infra.util.ByteUtils;
-import com.ulalalab.snipe.infra.util.DevUtils;
-import com.ulalalab.snipe.infra.util.LocalDateUtils;
-import com.ulalalab.snipe.infra.util.RandomUtils;
+import com.ulalalab.snipe.infra.util.*;
 import com.ulalalab.snipe.server.ClientServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -15,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.TimeZone;
@@ -27,8 +25,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 	private String deviceSuffix;
 	private String deviceName;
 	private ClientServer clientServer;
-	//private ByteBuf buffer;
 	private short transactionId = 1;
+	private final int PACKET_SIZE = 1;
+	private final int CHANNEL_COUNT = 4;
+	private boolean isAuth = false;
 
 	public ClientHandler(int deviceId, ClientServer clientServer) {
 		this.clientServer = clientServer;
@@ -41,18 +41,28 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		log.info("클라이언트 연결 Deivce Index : {}", deviceId);
 
-		this.sendInit(ctx);
+		//CompletableFuture.runAsync(() -> {
+			this.sendInit(ctx);
+		//});
+
+//		while(true) {
+//			sendPackData(ctx);
+//		}
 
 		ctx.executor().scheduleAtFixedRate(() -> {
 			//CompletableFuture.runAsync(() -> {
 				//sendPacket(ctx);
 			//if(ctx.channel().isOpen()) {
-			if(ctx.channel().isWritable()) {
+			//if(ctx.channel().isWritable()) {
+			try {
 				sendPackData(ctx);
+			} catch (Exception e) {
+				log.error(e.getMessage());
 			}
 			//}
+			//}
 			//});
-		}, 1000, 1000, TimeUnit.MILLISECONDS);
+		}, 0, 1000, TimeUnit.MILLISECONDS);
 		//channelRead(ctx, null);
 	}
 
@@ -63,7 +73,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		//buf.clear();
 		//buf.release();
 
-		log.info("Receive -> " + ByteBufUtil.prettyHexDump(buf));
+		//log.info("Receive -> " + ByteBufUtil.prettyHexDump(buf));
 
 		if(msg !=null) {
 			if(DevUtils.isPrint2(deviceId)) {
@@ -165,7 +175,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		buf.writeByte(0);
 		buf.writeShort(0);
 
-		buf.writeShort(0);
+		buf.writeShort(CRC16ModubusUtils.calc(ByteBufUtil.getBytes(buf, 0, buf.writerIndex())));
 		buf.writeByte(0xF5);
 
 		if(DevUtils.isPrint2(deviceId)) {
@@ -176,141 +186,78 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		buf.clear();
 	}
 
-	private void sendPackData(ChannelHandlerContext ctx) {
+	private void sendPackData(ChannelHandlerContext ctx) throws Exception {
+		Thread.sleep(1000);
+
 		ByteBuf buf = Unpooled.buffer();
-		Random random = new Random();
 
 		//if (ctx.channel().isWritable()) {
 			try {
-				Thread.sleep(1000);
 
-				int channelCount = 4;
+				for(int i=0; i<PACKET_SIZE; i++) {
+					//Thread.sleep(1000);
 
-				// STX 0x16 0x16
-				buf.writeByte(0x16);
-				buf.writeByte(0x16);
+					int channelCount = 4;
 
-				// Transaction ID (2 Byte)
-				buf.writeShort(transactionId++);
+					// STX 0x16 0x16
+					buf.writeByte(0x16);
+					buf.writeByte(0x16);
 
-				// Cmd (1 Byte)
-				/* 0x01 : Data
-				 * 0x02 : Write
-				 * 0x03 : Update
-				 * 0x04 : Reboot
-				 * 0x05 : Interval
-				 */
-				buf.writeByte(0x01);
+					// Transaction ID (2 Byte)
+					buf.writeShort(transactionId++);
 
-				// Timestamp
-				int timestamp = (int) Instant.now().getEpochSecond();
-				buf.writeInt(timestamp);
+					// Cmd (1 Byte)
+					/* 0x01 : Data
+					 * 0x02 : Write
+					 * 0x03 : Update
+					 * 0x04 : Reboot
+					 * 0x05 : Interval
+					 */
+					buf.writeByte(0x01);
 
-				// Device Code (2 Byte)
-				buf.writeShort(DeviceCode.WICON_L.getCode());
+					// Timestamp
+					int timestamp = (int) Instant.now().getEpochSecond();
+					buf.writeInt(timestamp);
 
-				// TODO : Device 등록년월 (2 Byte)
-				buf.writeByte(0x00);
-				buf.writeByte(0x00);
+					// Device Code (2 Byte)
+					buf.writeShort(DeviceCode.WICON_L.getCode());
 
-				// Device Index (2 Byte)
-				buf.writeShort(deviceId);
+					// Device 등록년
+					buf.writeByte(Integer.parseInt(LocalDateUtils.getLocalDateString(LocalDate.now(), "YY")));
 
-				// Version (4 Byte)
-				buf.writeFloat(1.16f);
+					// Device 등록월
+					buf.writeByte(Integer.parseInt(LocalDateUtils.getLocalDateString(LocalDate.now(), "MM")));
 
-				// RSSI (1 Byte)
-				buf.writeByte(0x00);
+					// Device Index (2 Byte)
+					buf.writeShort(deviceId);
 
-				// Data Length (2 Byte)
-				int dataLength = Integer.BYTES * channelCount;
-				buf.writeShort(dataLength);
+					// Version (4 Byte)
+					buf.writeFloat(1.16f);
 
-				//////////채널 데이터//////////////////////////////////////
-				for(int i = 0; i < channelCount; i++) {
-					buf.writeFloat(RandomUtils.getFloatRandom(100, 5));
+					// RSSI (1 Byte)
+					buf.writeByte(RandomUtils.getNumberRandom(10));
+
+					// Data Length (2 Byte)
+					int dataLength = Integer.BYTES * channelCount;
+					buf.writeShort(dataLength);
+
+					//////////채널 데이터//////////////////////////////////////
+					for(int x = 0; x < CHANNEL_COUNT; x++) {
+						buf.writeFloat(RandomUtils.getFloatRandom(100, 5));
+					}
+
+					// CRC (2 Byte)
+					buf.writeShort(CRC16ModubusUtils.calc(ByteBufUtil.getBytes(buf, 0, buf.writerIndex())));
+
+					// ETC (1 Byte)
+					buf.writeByte(0xF5);
 				}
-				/////////////////////////////////////////////////////////
-
-				// CRC (2 Byte)
-				//buf.writeByte(ByteUtils.getCRC(buf.getBytes(2, buf, 20 + dataLength).array()));
-				buf.writeByte(0x00);
-				buf.writeByte(0x00);
-
-				// ETC (1 Byte)
-				buf.writeByte(0xF5);
-
-
-
-				Thread.sleep(1000);
-
-				channelCount = 4;
-
-				// STX 0x16 0x16
-				buf.writeByte(0x16);
-				buf.writeByte(0x16);
-
-				// Transaction ID (2 Byte)
-				buf.writeShort(transactionId++);
-
-				// Cmd (1 Byte)
-				/* 0x01 : Data
-				 * 0x02 : Write
-				 * 0x03 : Update
-				 * 0x04 : Reboot
-				 * 0x05 : Interval
-				 */
-				buf.writeByte(0x01);
-
-				// Timestamp
-				timestamp = (int) Instant.now().getEpochSecond();
-				buf.writeInt(timestamp);
-
-				// Device Code (2 Byte)
-				buf.writeShort(DeviceCode.WICON_L.getCode());
-
-				// TODO : Device 등록년월 (2 Byte)
-				buf.writeByte(0x00);
-				buf.writeByte(0x00);
-
-				// Device Index (2 Byte)
-				buf.writeShort(deviceId);
-
-				// Version (4 Byte)
-				buf.writeFloat(1.17f);
-
-				// RSSI (1 Byte)
-				buf.writeByte(0x00);
-
-				// Data Length (2 Byte)
-				dataLength = Integer.BYTES * channelCount;
-				buf.writeShort(dataLength);
-
-				//////////채널 데이터//////////////////////////////////////
-				for(int i = 0; i < channelCount; i++) {
-					buf.writeFloat(RandomUtils.getFloatRandom(100, 5));
-				}
-				/////////////////////////////////////////////////////////
-
-				// CRC (2 Byte)
-				//buf.writeByte(ByteUtils.getCRC(buf.getBytes(2, buf, 20 + dataLength).array()));
-				buf.writeByte(0x00);
-				buf.writeByte(0x00);
-
-				// ETC (1 Byte)
-				buf.writeByte(0xF5);
 
 				if(DevUtils.isPrint2(deviceId)) {
 					log.info(ByteBufUtil.hexDump(buf));
 				}
 				ctx.writeAndFlush(buf);
 				buf.clear();
-
-//				if(future.isDone()) {
-//					buf.clear();
-//					//buf.release();
-//					buf = null;
-//				}
 			} catch(Exception e) {
 				e.printStackTrace();
 				log.error(e.getMessage());

@@ -6,7 +6,6 @@ import com.ulalalab.snipe.infra.manage.EventManager;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 @ChannelHandler.Sharable
@@ -47,11 +46,14 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 				, spChannelGroup.size());
 	}
 
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
-		ctx.channel().alloc().buffer().clear();
-		ctx.channel().close();
-		cause.printStackTrace();
-	}
+//	@Override
+//	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+//		log.error("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
+//
+//		Channel channel = ctx.channel();
+//
+//		channel.alloc().buffer().clear();
+//		channel.close();
+//		//cause.printStackTrace();
+//	}
 }

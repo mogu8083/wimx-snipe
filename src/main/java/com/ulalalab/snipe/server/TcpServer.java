@@ -65,7 +65,7 @@ public class TcpServer {
 			bootstrap.group(bossGroup, workerGroup)
 					.channel(serverSocketChannel)
 					.handler(new LoggingHandler(LogLevel.DEBUG))
-					.option(ChannelOption.SO_REUSEADDR, true)
+					//.option(ChannelOption.SO_REUSEADDR, true)
 					.option(ChannelOption.SO_BACKLOG, 50000)
 					.childOption(ChannelOption.SO_LINGER, 0)
 					.childHandler(new ChannelInitializer<SocketChannel>() {
