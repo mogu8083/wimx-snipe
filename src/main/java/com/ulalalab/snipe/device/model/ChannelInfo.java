@@ -3,6 +3,8 @@ package com.ulalalab.snipe.device.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,10 +13,11 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class ChannelInfo {
 
     // 디바이스 ID
-    private String deviceId;
+    private short deviceIndex;
 
     // 접속 시간
     private LocalDateTime connectTime;
@@ -32,7 +35,7 @@ public class ChannelInfo {
     private List<String> handlerList;
 
     // 디바이스 ID
-    private boolean isInitSetting;
+    private boolean isInitSetting = false;
 
     public String getConnectTime() {
         return this.connectTime!=null ?

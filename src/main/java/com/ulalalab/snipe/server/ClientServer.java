@@ -2,6 +2,7 @@ package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.ClientHandler;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -30,6 +31,8 @@ public class ClientServer {
 
 			log.info("ClientServer 실행 / Thread : " + THREAD_COUNT + " 실행");
 			//this.eventLoopGroup = new NioEventLoopGroup(50);
+
+			PooledByteBufAllocator.DEFAULT.heapBuffer(41209202);
 
 			for(int i = this.threadStart; i < this.threadCnt + this.threadStart; i++) {
 

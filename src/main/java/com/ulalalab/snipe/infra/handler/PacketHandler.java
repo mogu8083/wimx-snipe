@@ -1,8 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.device.model.DeviceCode;
-import com.ulalalab.snipe.infra.util.ByteUtils;
+import com.ulalalab.snipe.device.model.DeviceCodeEnum;
 import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;
@@ -12,6 +11,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import java.lang.ref.WeakReference;
 import java.time.Instant;
@@ -20,17 +21,21 @@ import java.util.List;
 
 @Component
 @ChannelHandler.Sharable
+@Scope(scopeName = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Slf4j(topic = "TCP.PacketHandler")
 public class PacketHandler extends ChannelInboundHandlerAdapter {
 
+	private DeviceCodeEnum deviceCodeEnum;
+	private short deviceIndex = 0;
+
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		ctx.alloc().heapBuffer(200);
+		//ctx.alloc().heapBuffer(200);
 	}
 
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		ctx.alloc().heapBuffer().release();
+		//ctx.alloc().heapBuffer().release();
 	}
 
 	@Override
@@ -73,7 +78,11 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				byte deviceRegMonth = buffer.readByte();
 
 				// Device index 2 Byte
-				short deviceIndex = buffer.readShort();
+				if(deviceIndex == 0) {
+					deviceIndex = buffer.readShort();
+				} else {
+					buffer.skipBytes(2);
+				}
 
 				// Version 4 Byte
 				float version = buffer.readFloat();
@@ -106,8 +115,13 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 				buffer.skipBytes(1);
 
 				// Device Setting
+				if(deviceCodeEnum == null) {
+					deviceCodeEnum = DeviceCodeEnum.codeToDevice(deviceCode);
+				}
+
 				device.setTimestamp(timestamp);
-				device.setDeviceCode(DeviceCode.codeToDevice(deviceCode));
+				device.setTransactionId(transactionId);
+				device.setDeviceCode(deviceCodeEnum);
 				device.setDeviceIndex(deviceIndex);
 				device.setDeviceRegYear(deviceRegYear);
 				device.setDeviceRegMonth(deviceRegMonth);

@@ -7,7 +7,6 @@ import com.ulalalab.snipe.device.model.Response;
 import com.ulalalab.snipe.device.service.CommandService;
 import com.ulalalab.snipe.device.service.DeviceService;
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
-import com.ulalalab.snipe.infra.manage.ChannelManager;
 import com.ulalalab.snipe.infra.manage.EventManager;
 import com.ulalalab.snipe.infra.util.BeansUtils;
 import io.netty.buffer.Unpooled;
@@ -71,9 +70,9 @@ public class HttpResultHandler extends ChannelInboundHandlerAdapter {
                     // 장비 해제
                     else if(uri.contains("/device/disconnect?") && method == HttpMethod.GET) {
                         QueryStringDecoder decoder = new QueryStringDecoder(uri);
-                        String deviceId = this.getParam(decoder, "deviceId");
+                        short deviceId = Short.parseShort(this.getParam(decoder, "deviceId"));
 
-                        boolean result = spChannelGroup.channelDisconnect("W" + deviceId);
+                        boolean result = spChannelGroup.channelDisconnect(deviceId);
                         String responseMessage = deviceId + " 장비 연결이 해제되었습니다.";
 
                         if(!result) {

@@ -80,20 +80,19 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 
 				Point p = builder.build();
 
-				ctx.channel().eventLoop().execute(() -> {
+				ctx.executor().execute(() -> {
 					influxDB.write(UDP_PORT, p);
 
-					if (DevUtils.isPrint(deviceIndex)) {
-						log.info(p.lineProtocol());
+					if (DevUtils.isPrint2(device.getDeviceIndex())) {
 						log.info("InfluxDB Execute -> " + finalDevice);
 					}
 				});
 
 				// 2. Redis
-				ctx.channel().eventLoop().execute(() -> {
+				ctx.executor().execute(() -> {
 					reactiveCommands.set(deviceIndex, device.toString()).flux().subscribe();
 
-					if (DevUtils.isPrint(deviceIndex)) {
+					if (DevUtils.isPrint2(device.getDeviceIndex())) {
 						log.info("Redis Execute -> " + finalDevice);
 					}
 

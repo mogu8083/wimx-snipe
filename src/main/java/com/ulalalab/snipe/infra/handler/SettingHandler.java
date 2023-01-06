@@ -18,20 +18,21 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "TCP.SettingHandler")
 public class SettingHandler extends ChannelInboundHandlerAdapter {
 
-    private SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+    private final SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object obj) {
 		Device device = (Device) obj;
+
 		Channel channel = ctx.channel();
 		ChannelInfo channelInfo = spChannelGroup.getChannelInfo(channel.id());
 
 		// 1. 채널 정보
-		if(channelInfo!=null) {
+		if(device.getDeviceIndex() != 0 ) {
 			if(channelInfo.isInitSetting()) {
 				channelInfo.setLastPacketTime(LocalDateTime.now());
 			} else {
-				channelInfo.setDeviceId("W"+device.getDeviceIndex());
+				channelInfo.setDeviceIndex(device.getDeviceIndex());
 				channelInfo.setRemoteAddress(channel.remoteAddress().toString());
 				channelInfo.setConnectTime(LocalDateTime.now());
 				channelInfo.setLocalAddress(channel.localAddress().toString());

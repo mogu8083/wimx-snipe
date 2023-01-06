@@ -20,8 +20,11 @@ public class Device {
     // 디바이스 보낼때 시간 Unix Time
     private int timestamp;
 
+    // Transaction Id
+    private int transactionId;
+
     // 장비 Index
-    private DeviceCode deviceCode;
+    private DeviceCodeEnum deviceCode;
 
     // 장비 Index
     private short deviceIndex;

@@ -38,14 +38,13 @@ public class SpChannelGroup extends DefaultChannelGroup {
 		return list;
 	}
 
-	public Channel getChannel(int deviceId) {
+	public Channel getChannel(int deviceIndex) {
 		Channel channel = null;
-		String tempDeviceId = "W" + deviceId;
 
 		for (ChannelId channelId : channelInfos.keySet()) {
 			ChannelInfo channelInfo = channelInfos.get(channelId);
 
-			if(tempDeviceId.equals(channelInfo.getDeviceId())) {
+			if(deviceIndex == channelInfo.getDeviceIndex()) {
 				channel = this.find(channelId);
 				break;
 			}
@@ -58,13 +57,13 @@ public class SpChannelGroup extends DefaultChannelGroup {
 		super.remove(channelId);
 	}
 
-	public boolean channelDisconnect(String deviceId) {
+	public boolean channelDisconnect(short deviceIndex) {
 		ChannelId removeChannelId = null;
 
 		for (ChannelId channelId : channelInfos.keySet()) {
 			ChannelInfo channelInfo = channelInfos.get(channelId);
 
-			if(deviceId.equals(channelInfo.getDeviceId())) {
+			if(deviceIndex == channelInfo.getDeviceIndex()) {
 				this.find(channelId).close();
 				removeChannelId = channelId;
 				break;

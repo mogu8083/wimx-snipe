@@ -2,7 +2,7 @@ package com.ulalalab.snipe.device.model;
 
 import java.util.Arrays;
 
-public enum DeviceCode {
+public enum DeviceCodeEnum {
 
     WICON_4CH("WICON_4CH", "SENSOR", 0x0100),
     WICON_L("WICON_L", "SENSOR", 0x0101),
@@ -22,7 +22,7 @@ public enum DeviceCode {
     private String deviceType;
     private int code;
 
-    DeviceCode(String device, String deviceType, int code) {
+    DeviceCodeEnum(String device, String deviceType, int code) {
         this.device = device;
         this.deviceType = deviceType;
         this.code = code;
@@ -40,16 +40,9 @@ public enum DeviceCode {
         return this.code;
     }
 
-    public static DeviceCode codeToDevice(final short code) {
-        DeviceCode deviceCode = Arrays.stream(DeviceCode.values())
+    public static DeviceCodeEnum codeToDevice(final short code) {
+        DeviceCodeEnum deviceCode = Arrays.stream(DeviceCodeEnum.values())
                 .filter(d -> d.getCode()==code).findFirst().orElse(null);
         return deviceCode;
     }
-
-//    public static void main(String[] args) {
-//        DeviceCode code = Arrays.stream(DeviceCode.values())
-//                .filter(d -> d.getCode()==0x0500).findFirst().orElse(null);
-//
-//        System.out.println("##@@ " + code);
-//    }
 }
