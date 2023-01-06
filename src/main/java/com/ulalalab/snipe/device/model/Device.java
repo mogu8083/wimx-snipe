@@ -1,10 +1,10 @@
 package com.ulalalab.snipe.device.model;
 
+import com.ulalalab.snipe.infra.constant.DeviceCodeEnum;
 import com.ulalalab.snipe.infra.util.LocalDateUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;

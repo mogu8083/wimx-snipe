@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.device.model;
+package com.ulalalab.snipe.infra.constant;
 
 import java.util.Arrays;
 

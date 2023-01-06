@@ -3,7 +3,7 @@ package com.ulalalab.snipe.infra.handler;
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
-import com.ulalalab.snipe.infra.manage.EventManager;
+import com.ulalalab.snipe.infra.manager.InstanceManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "TCP.SettingHandler")
 public class SettingHandler extends ChannelInboundHandlerAdapter {
 
-    private final SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+    private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object obj) {

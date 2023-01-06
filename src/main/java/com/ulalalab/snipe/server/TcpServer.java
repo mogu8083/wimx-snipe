@@ -1,11 +1,7 @@
 package com.ulalalab.snipe.server;
 
 import com.ulalalab.snipe.infra.handler.InitTcpHandler;
-import com.ulalalab.snipe.infra.manage.RedisManager;
-import io.lettuce.core.FlushMode;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAclAsyncCommands;
-import io.lettuce.core.api.async.RedisAsyncCommands;
+import com.ulalalab.snipe.infra.manager.RedisManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -22,7 +18,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.concurrent.Executor;
 
 @Component

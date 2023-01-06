@@ -2,7 +2,7 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
-import com.ulalalab.snipe.infra.manage.EventManager;
+import com.ulalalab.snipe.infra.manager.InstanceManager;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j(topic = "TCP.DefaultHandler")
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
-	private SpChannelGroup spChannelGroup = EventManager.getInstance().getSpChannelGroup();
+	private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();
 	private String deviceId = null;
 
 	// 클라이언트 연결

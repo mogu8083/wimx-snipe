@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 public class InitServer {
 
 	private final TcpServer tcpServer;
-	private final HttpServer httpServer;
+	//private final HttpServer httpServer;
 
 	@PostConstruct
 	public void init() throws Exception {
@@ -23,6 +23,6 @@ public class InitServer {
 		tcpServer.start();
 
 		// Http Server
-		httpServer.start();
+		//httpServer.start();
 	}
 }

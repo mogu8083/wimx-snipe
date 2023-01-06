@@ -1,10 +1,9 @@
-package com.ulalalab.snipe.infra.manage;
+package com.ulalalab.snipe.infra.manager;
 
 import lombok.RequiredArgsConstructor;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

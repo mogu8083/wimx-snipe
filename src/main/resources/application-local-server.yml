@@ -37,8 +37,8 @@ log:
     path: d:/log/netty
 
 server:
-  port : 8084
+  port : 26080
   tcp-port: 27080
-  http-port: 26080
+  http-port: 25080
   worker-count: 4
   boss-count: 1

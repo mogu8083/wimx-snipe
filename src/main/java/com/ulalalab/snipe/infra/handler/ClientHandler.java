@@ -1,11 +1,10 @@
 package com.ulalalab.snipe.infra.handler;
 
-import com.ulalalab.snipe.device.model.DeviceCodeEnum;
+import com.ulalalab.snipe.infra.constant.DeviceCodeEnum;
 import com.ulalalab.snipe.infra.util.*;
 import com.ulalalab.snipe.server.ClientServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;

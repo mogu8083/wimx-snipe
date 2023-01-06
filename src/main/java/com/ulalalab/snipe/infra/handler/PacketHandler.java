@@ -1,7 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.device.model.DeviceCodeEnum;
+import com.ulalalab.snipe.infra.constant.DeviceCodeEnum;
 import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;

@@ -2,8 +2,8 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.manage.InfluxDBManager;
-import com.ulalalab.snipe.infra.manage.RedisManager;
+import com.ulalalab.snipe.infra.manager.InfluxDBManager;
+import com.ulalalab.snipe.infra.manager.RedisManager;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.reactive.RedisStringReactiveCommands;
@@ -50,11 +50,6 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	@Override
-	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
-	}
-
-	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object obj) {
 		Device device = (Device) obj;
 
@@ -64,7 +59,6 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 			try {
 				WeakReference<ObjectMapper> refMapper = new WeakReference<>(new ObjectMapper());
 				ObjectMapper mapper = refMapper.get();
-				String jsonString = mapper.writeValueAsString(device);
 
 				// 1. InfluxDB
 				Device finalDevice = device;
@@ -84,7 +78,7 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 					influxDB.write(UDP_PORT, p);
 
 					if (DevUtils.isPrint2(device.getDeviceIndex())) {
-						log.info("InfluxDB Execute -> " + finalDevice);
+						log.info("InfluxDB Execute -> " + device.getDeviceIndex());
 					}
 				});
 
@@ -93,23 +87,9 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 					reactiveCommands.set(deviceIndex, device.toString()).flux().subscribe();
 
 					if (DevUtils.isPrint2(device.getDeviceIndex())) {
-						log.info("Redis Execute -> " + finalDevice);
+						log.info("Redis Execute -> " + device.getDeviceIndex());
 					}
-
-//					CompletableFuture<Boolean> redisResult = this.saveRedisData(deviceId, jsonString);
-//					redisResult.thenAccept(result -> {
-//						if (DevUtils.isPrint(deviceId)) {
-//							log.info("Redis Execute -> " + finalDevice);
-//						}
-//					});
 				});
-
-//				CompletableFuture<Boolean> redisResult = this.saveRedisData(deviceId, jsonString);
-//				redisResult.thenAccept(result -> {
-//					if (DevUtils.isPrint(deviceId)) {
-//						log.info("Redis Execute22 -> " + finalDevice);
-//					}
-//				});
 			} catch(Exception e) {
 				e.printStackTrace();
 				log.error(e.getMessage());
@@ -119,55 +99,4 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 			e.printStackTrace();
 		}
 	}
-
-	// 수신 데이터 처리 완료
-	@Override
-	public void channelReadComplete(ChannelHandlerContext ctx) {
-		//ctx.flush();
-	}
-
-//	private CompletableFuture<Boolean> saveInfluxData(String p) {
-//		influxDB.write(UDP_PORT, p);
-//		//influxDB.flush();
-//		return CompletableFuture.completedFuture(true);
-//	}
-//
-//	private CompletableFuture<Boolean> saveRedisData(String key, String value) {
-//		reactiveCommands.set(key, value).flux().subscribe();
-//		return CompletableFuture.completedFuture(true);
-//	}
-
-//	public static void main(String[] args) {
-//		ByteBuf buf = Unpooled.buffer();
-//		buf.writeByte(0x16);
-//		buf.writeByte(0x0c);
-//
-//		buf.readerIndex(0);
-//
-//		System.out.println("##@@ " + buf.getByte(0));
-//	}
-
-//	public static void main(String[] args) {
-//		byte[] b = new byte[4];
-//
-//		b[0] = (byte) 0x02;
-//		b[1] = (byte) 0xF7;
-//		b[2] = (byte) 0xF2;
-//		b[3] = (byte) 0x02;
-//
-//		log.info("##@@ " + crc(b));
-//	}
-//
-//	// https://www.scadacore.com/tools/programming-calculators/online-checksum-calculator/
-//	private static int crc(byte[] bytes) {
-//		int checksum = 0;
-//
-//		for(byte b : bytes) {
-//			checksum += b;
-//		}
-//		checksum = 256 - checksum;
-//		checksum &= 0xFF;
-//
-//		return checksum;
-//	}
 }

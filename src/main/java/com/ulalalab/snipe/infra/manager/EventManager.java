@@ -1,17 +1,12 @@
-package com.ulalalab.snipe.infra.manage;
+package com.ulalalab.snipe.infra.manager;
 
 import com.ulalalab.snipe.infra.channel.SpChannelGroup;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
 
 @Slf4j
 public class EventManager {
