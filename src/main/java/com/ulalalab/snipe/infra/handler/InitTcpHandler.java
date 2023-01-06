@@ -17,6 +17,7 @@ public class InitTcpHandler extends ChannelInboundHandlerAdapter {
 
     private final DefaultHandler defaultHandler;
     private final InitMessageHandler initMessageHandler;
+    private final ResponseWriteHandler responseWriteHandler;
     private final SettingHandler settingHandler;
     private final PacketHandler packetHandler;
     private final ResultHandler resultHandler;
@@ -28,6 +29,7 @@ public class InitTcpHandler extends ChannelInboundHandlerAdapter {
         p.addLast("TCP.DefaultHandler", defaultHandler);
         p.addLast("TCP.InitMessageHandler", initMessageHandler);
         p.addLast("TCP.PacketHandler", packetHandler);
+        p.addLast("TCP.ResponseWriteHandler", responseWriteHandler);
         p.addLast("TCP.SettingHandler", settingHandler);
         p.addLast("TCP.ResultHandler", resultHandler);
         p.remove(this);

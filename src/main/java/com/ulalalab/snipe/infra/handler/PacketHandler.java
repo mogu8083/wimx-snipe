@@ -6,16 +6,12 @@ import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import java.lang.ref.WeakReference;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +46,6 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 		while(true) {
 			try {
-				//log.info("hex : " + ByteBufUtil.prettyHexDump(buffer));
-
 				if(buffer.writerIndex()==0 || buffer.getShort(buffer.readerIndex()) != 0x1616) {
 					break;
 				}
@@ -138,28 +132,8 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 				buffer.discardReadBytes();
 
-				// Client ByteBuf Setting
-				// TODO : 응답 시간을 찍어야 할지, 시스템 시간을 찍어야 할지 확인 필요
-				int receiveTimestamp = (int) Instant.now().getEpochSecond();
-
-				ByteBuf clientBuf = Unpooled.buffer(14);
-
-				clientBuf.writeByte(0x16);
-				clientBuf.writeByte(0x16);
-				clientBuf.writeShort(transactionId);
-				clientBuf.writeByte(0x01);
-				clientBuf.writeInt(timestamp);
-				clientBuf.writeByte(0x00);
-				clientBuf.writeByte(0x00);
-				//clientBuf.writeShort(ByteUtils.CRC16(ByteBufUtil.getBytes(clientBuf, 0, clientBuf.writerIndex())));
-				// TODO :  어디서부터 시작 인지 확인 필요.
-				clientBuf.writeShort(CRC16ModubusUtils.calc(ByteBufUtil.getBytes(clientBuf, 0, clientBuf.writerIndex())));
-				clientBuf.writeByte(0xF5);
-
-				ctx.channel().writeAndFlush(clientBuf);
-				clientBuf.clear();
-				clientBuf.unwrap();
-
+				// Client 전송
+				ctx.fireUserEventTriggered(transactionId);
 				ctx.fireChannelRead(device);
 			} catch(Exception e) {
 				//e.printStackTrace();
@@ -179,11 +153,4 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 		buffer.clear();
 		buffer.release();
 	}
-
-//	@Override
-//	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-////		ByteBuf buffer = ctx.channel().alloc().buffer();
-////		buffer.clear();
-////		buffer.release();
-//	}
 }
