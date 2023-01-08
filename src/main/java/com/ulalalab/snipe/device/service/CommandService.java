@@ -21,6 +21,7 @@ public class CommandService {
     private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();
 
     /**
+     * 장비 재부팅 -> 장비 Packet 전송
      * @param deviceIndex 채널
      * @return true / false
      */

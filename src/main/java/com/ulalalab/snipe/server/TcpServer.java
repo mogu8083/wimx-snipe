@@ -53,7 +53,8 @@ public class TcpServer {
 	public void start() throws InterruptedException {
 		this.setInit();
 
-		log.info("Main Server 실행");
+		log.info("TCP Server 실행");
+		System.out.println("TCP Server 실행");
 
 		try {
 			ServerBootstrap bootstrap = new ServerBootstrap();

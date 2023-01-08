@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class DefaultHandler extends ChannelInboundHandlerAdapter {
 
 	private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();
-	private String deviceId = null;
 
 	// 클라이언트 연결
 	@Override

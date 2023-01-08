@@ -43,7 +43,8 @@ log:
     path: d:/data/snipe2
 
 server:
+  port: 36080
   tcp-port: 37080
-  http-port: 36080
+  http-port: 35080
   worker-count: 6
   boss-count: 1
