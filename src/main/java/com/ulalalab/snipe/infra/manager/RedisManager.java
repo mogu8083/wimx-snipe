@@ -33,9 +33,9 @@ public class RedisManager {
     @Value("${spring.redis.lettuce.pool.max-active}")
     private int CONNECTION_COUNT;
 
-    private GenericObjectPool<StatefulRedisConnection<String, String>> pool = null;
+    //private GenericObjectPool<StatefulRedisConnection<String, String>> pool = null;
     private Map<StatefulRedisConnection<String, String>, Integer> redisConnectionMap = new HashMap<>();
-    private Map<RedisAsyncCommands<String, String>, Integer> redisCommandsMap = new HashMap<>();
+    //private Map<RedisAsyncCommands<String, String>, Integer> redisCommandsMap = new HashMap<>();
 
     @PostConstruct
     private void init() {
@@ -70,13 +70,13 @@ public class RedisManager {
         return poolConfig;
     }
 
-    private void initRedisPool() {
-        pool = nonClusterPoolUsage();
-    }
+//    private void initRedisPool() {
+//        pool = nonClusterPoolUsage();
+//    }
 
-    public GenericObjectPool<StatefulRedisConnection<String, String>> getRedisPool() {
-        return pool;
-    }
+//    public GenericObjectPool<StatefulRedisConnection<String, String>> getRedisPool() {
+//        return pool;
+//    }
 
 //    public StatefulRedisConnection<String, String> getConnection() throws Exception {
 //        return pool.borrowObject();
@@ -97,30 +97,30 @@ public class RedisManager {
         }
     }
 
-    private void initRedisCommandsMap() {
-        for(int i=0; i<CONNECTION_COUNT; i++) {
-            RedisClient redisClient = RedisClient.create(
-                    RedisURI.builder()
-                            .withHost(REDIS_HOST)
-                            .withPort(REDIS_PORT)
-                            .withPassword(REDIS_PASSWORD)
-                            .build());
+//    private void initRedisCommandsMap() {
+//        for(int i=0; i<CONNECTION_COUNT; i++) {
+//            RedisClient redisClient = RedisClient.create(
+//                    RedisURI.builder()
+//                            .withHost(REDIS_HOST)
+//                            .withPort(REDIS_PORT)
+//                            .withPassword(REDIS_PASSWORD)
+//                            .build());
+//
+//            StatefulRedisConnection<String, String> redisConnection = redisClient.connect();
+//            RedisAsyncCommands<String, String> commands = redisConnection.async();
+//            //redisConnection.setAutoFlushCommands(true);
+//
+//            redisCommandsMap.put(commands, 0);
+//        }
+//    }
 
-            StatefulRedisConnection<String, String> redisConnection = redisClient.connect();
-            RedisAsyncCommands<String, String> commands = redisConnection.async();
-            //redisConnection.setAutoFlushCommands(true);
-
-            redisCommandsMap.put(commands, 0);
-        }
-    }
-
-    public Map<StatefulRedisConnection<String, String>, Integer> getRedisConnectionMap() {
-        return redisConnectionMap;
-    }
-
-    public Map<RedisAsyncCommands<String, String>, Integer> getRedisCommandsMap() {
-        return redisCommandsMap;
-    }
+//    public Map<StatefulRedisConnection<String, String>, Integer> getRedisConnectionMap() {
+//        return redisConnectionMap;
+//    }
+//
+//    public Map<RedisAsyncCommands<String, String>, Integer> getRedisCommandsMap() {
+//        return redisCommandsMap;
+//    }
 
     public StatefulRedisConnection<String, String> getRedisConnection() {
         Map.Entry<StatefulRedisConnection<String, String>, Integer> minEntry = null;
@@ -136,17 +136,17 @@ public class RedisManager {
         return redisConnection;
     }
 
-    public RedisAsyncCommands<String, String> getRedisCommands() {
-        Map.Entry<StatefulRedisConnection<String, String>, Integer> minEntry = null;
-        for(Map.Entry<StatefulRedisConnection<String, String>, Integer> entry : this.redisConnectionMap.entrySet()) {
-            if(minEntry==null || entry.getValue().compareTo(minEntry.getValue()) < 0) {
-                minEntry = entry;
-            }
-        }
-        int count = minEntry.getValue() + 1;
-        minEntry.setValue(count);
-        StatefulRedisConnection<String, String> redisConnection = minEntry.getKey();
-
-        return redisConnection.async();
-    }
+//    public RedisAsyncCommands<String, String> getRedisCommands() {
+//        Map.Entry<StatefulRedisConnection<String, String>, Integer> minEntry = null;
+//        for(Map.Entry<StatefulRedisConnection<String, String>, Integer> entry : this.redisConnectionMap.entrySet()) {
+//            if(minEntry==null || entry.getValue().compareTo(minEntry.getValue()) < 0) {
+//                minEntry = entry;
+//            }
+//        }
+//        int count = minEntry.getValue() + 1;
+//        minEntry.setValue(count);
+//        StatefulRedisConnection<String, String> redisConnection = minEntry.getKey();
+//
+//        return redisConnection.async();
+//    }
 }

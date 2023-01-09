@@ -8,8 +8,6 @@ import java.util.Set;
 
 public final class DevUtils {
 
-    public final static boolean isTest = false;
-
     public static boolean isPrint2(int deviceId) {
         List<Integer> list = Arrays.asList(5001, 1);
 
@@ -21,7 +19,11 @@ public final class DevUtils {
         return false;
     }
 
-    public static boolean isTest() {
-        return isTest;
+    public static void printStackTrace(Exception e) {
+        String profile = System.getProperty("spring.profiles.active");
+
+        if("local-server".equals(profile)) {
+            e.printStackTrace();
+        }
     }
 }

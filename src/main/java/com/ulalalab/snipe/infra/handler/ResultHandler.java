@@ -44,9 +44,6 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 		reactiveCommands = redisConnection.reactive();
 
 		influxDB = influxDBTemplate.getConnection();
-		//BatchOptions options = BatchOptions.DEFAULTS;
-		//options.flushDuration(5000);
-		//influxDB.enableBatch(options);
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class InitTcpHandler extends ChannelInboundHandlerAdapter {
         ChannelPipeline p = ctx.pipeline();
 
         p.addLast("TCP.DefaultHandler", defaultHandler);
-        //p.addLast("TCP.InitMessageHandler", initMessageHandler);
+        p.addLast("TCP.InitMessageHandler", initMessageHandler);
         p.addLast("TCP.PacketHandler", new PacketHandler());
         p.addLast("TCP.ResponseWriteHandler", responseWriteHandler);
         p.addLast("TCP.SettingHandler", settingHandler);

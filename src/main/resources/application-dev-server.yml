@@ -2,7 +2,7 @@ spring:
   redis:
     lettuce:
       pool:
-        max-active: 15
+        max-active: 10
         max-idle: 20
         min-idle: 10
         max-wait: -1
@@ -16,8 +16,6 @@ spring:
     #password: dak102938$&
 
   influxdb:
-    #url: "http://external-host:8086"
-    #url: "http://172.20.0.2:8086"
     url: "http://10.10.0.90:8086"
     username: ulalalab
     password: ulalalab12!@

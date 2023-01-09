@@ -1,7 +1,7 @@
 package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
-import com.ulalalab.snipe.infra.channel.SpChannelGroup;
+import com.ulalalab.snipe.device.model.SpChannelGroup;
 import com.ulalalab.snipe.infra.manager.InstanceManager;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 //		// 1. 연결 채널 해제
 		spChannelGroup.remove(channel.id());
 
-		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
+		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수- : {}"
 				, channel.id()
 				, channel.remoteAddress()
 				, spChannelGroup.size());

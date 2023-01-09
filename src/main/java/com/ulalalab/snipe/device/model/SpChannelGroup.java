@@ -1,6 +1,5 @@
-package com.ulalalab.snipe.infra.channel;
+package com.ulalalab.snipe.device.model;
 
-import com.ulalalab.snipe.device.model.ChannelInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.DefaultChannelGroup;

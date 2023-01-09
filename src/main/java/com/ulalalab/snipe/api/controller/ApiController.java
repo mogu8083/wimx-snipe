@@ -1,8 +1,9 @@
-package com.ulalalab.snipe.device.controller;//package com.ulalalab.snipe.device.service;
+package com.ulalalab.snipe.api.controller;//package com.ulalalab.snipe.device.service;
 
-import com.ulalalab.snipe.device.model.Response;
-import com.ulalalab.snipe.device.service.CommandService;
-import com.ulalalab.snipe.infra.channel.SpChannelGroup;
+import com.ulalalab.snipe.api.model.Response;
+import com.ulalalab.snipe.api.service.CommandService;
+import com.ulalalab.snipe.api.service.SystemService;
+import com.ulalalab.snipe.device.model.SpChannelGroup;
 import com.ulalalab.snipe.infra.manager.InstanceManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +13,12 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class DeviceController {
+public class ApiController {
 
     private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();
 
     private final CommandService commnadService;
+    private final SystemService systemService;
 
     /**
      * 장비 전체 목록
@@ -42,19 +44,26 @@ public class DeviceController {
     }
 
     /**
+     * 장비 업데이트
+     */
+    @PutMapping("/device/update/{deviceIndex}")
+    public Mono<Response> deviceUpdate(@PathVariable short deviceIndex) throws Exception {
+        return Mono.just(commnadService.update(deviceIndex));
+    }
+
+    /**
      * 장비 Reboot
      */
     @PutMapping("/device/reboot/{deviceIndex}")
     public Mono<Response> deviceReboot(@PathVariable short deviceIndex) throws Exception {
-        String responseMessage = "";
-        boolean isResult = commnadService.reboot(deviceIndex);
-        Response response = null;
+        return Mono.just(commnadService.reboot(deviceIndex));
+    }
 
-        if(isResult) {
-            response = new Response(deviceIndex + " 장비 재부팅을 요청하였습니다.");
-        } else {
-            response = new Response(Response.Code.FAIL, "장비 재부팅을 실패하였습니다.");
-        }
-        return Mono.just(response);
+    /**
+     * 서버 정보
+     */
+    @GetMapping("/server/info")
+    public Mono<Response> serverInfo() throws Exception {
+        return Mono.just(systemService.serverInfo());
     }
 }

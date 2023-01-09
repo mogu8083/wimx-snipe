@@ -6,7 +6,9 @@ import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -24,6 +26,8 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 	private DeviceCodeEnum deviceCodeEnum;
 	private short deviceIndex = 0;
 	private ByteBuf buffer;
+	private byte[] remainBytes;
+	private ByteBuf remainByteBuf;
 
 	@Override
 	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
@@ -41,16 +45,19 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 		Device device = refDevice.get();
 
 		ByteBuf in = (ByteBuf) packet;
-		//ByteBuf buffer = ctx.alloc().heapBuffer();
-		//log.info("in : " + ByteBufUtil.prettyHexDump(in));
+		buffer = ctx.alloc().heapBuffer(128);
 
+//		log.info("in : " + ByteBufUtil.prettyHexDump(in));
+
+		if(remainByteBuf != null) {
+			buffer.writeBytes(remainByteBuf);
+			remainByteBuf = null;
+		}
 		buffer.writeBytes(in);
 		in.clear();
 		in.release();
 
-//		log.info("받은 : " + ByteBufUtil.prettyHexDump(in));
-//
-//		log.info("병합 : " + ByteBufUtil.prettyHexDump(buffer));
+//		log.info("남은 패킷과 병합 : " + ByteBufUtil.prettyHexDump(buffer));
 
 		while(true) {
 			try {
@@ -144,29 +151,33 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 					ctx.fireChannelRead(device);
 				} else {
 					// STX가 아닌경우
-					this.setPacketDiscard();
+					this.setPacketDiscard(buffer);
 					break;
 				}
 			} catch(Exception e) {
-				e.printStackTrace();
+				DevUtils.printStackTrace(e);
 				log.error(e.getMessage());
 				log.error(ByteBufUtil.prettyHexDump(buffer));
 
 				// 오류 인 경우
-				this.setPacketDiscard();
+				this.setPacketDiscard(buffer);
 				break;
 			}
 		}
 
-		//log.info("남은.. : " + ByteBufUtil.prettyHexDump(buffer));
+//		log.info("남은.. : " + ByteBufUtil.prettyHexDump(buffer));
 		buffer.readerIndex(0);
 
 		if(buffer.readableBytes()==0) {
 			buffer.clear();
+		} else {
+			remainByteBuf = Unpooled.buffer();
+			remainByteBuf.writeBytes(buffer);
 		}
+		ReferenceCountUtil.safeRelease(buffer);
 	}
 
-	private void setPacketDiscard() {
+	private void setPacketDiscard(ByteBuf buffer) {
 		if(buffer.writerIndex() > 1) {
 			int stx = buffer.indexOf(0, buffer.writerIndex(), (byte) 0x16);
 

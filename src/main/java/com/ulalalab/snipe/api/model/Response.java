@@ -1,4 +1,4 @@
-package com.ulalalab.snipe.device.model;
+package com.ulalalab.snipe.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

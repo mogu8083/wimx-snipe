@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j(topic = "CLIENT.ClientHandler")
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 	private int deviceId;
-	private String deviceSuffix;
-	private String deviceName;
 	private ClientServer clientServer;
 	private short transactionId = 1;
 	private final int PACKET_SIZE = 1;
@@ -29,8 +27,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 	public ClientHandler(int deviceId, ClientServer clientServer) {
 		this.clientServer = clientServer;
 		this.deviceId = deviceId;
-		//this.deviceSuffix = System.getProperty("device.suffix");
-		//this.deviceName = "WX-" + deviceId + deviceSuffix;
 	}
 
 	@Override
@@ -75,8 +71,12 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
 		if(msg !=null) {
 			if(DevUtils.isPrint2(deviceId)) {
-				if(buf.getByte(4) == 0x04) {
-					log.info("재부팅 Response -> " + ByteBufUtil.hexDump(buf));
+				byte cmd = buf.getByte(4);
+
+				if(cmd == 0x03) {
+					log.info("장비 업데이트 요청 -> " + ByteBufUtil.prettyHexDump(buf));
+				} else if(cmd == 0x04) {
+					log.info("장비 재부팅 요청 -> " + ByteBufUtil.prettyHexDump(buf));
 				} else {
 					log.info("Response -> " + ByteBufUtil.hexDump(buf));
 				}
@@ -110,49 +110,49 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 //		}, 3L, 5L, TimeUnit.SECONDS);
 	}
 
-	private void sendPacket(ChannelHandlerContext ctx) {
-		//ByteBuf buf = ctx.alloc().heapBuffer();
-		//if (ctx.channel().isWritable()) {
-
-		ByteBuf buffer = Unpooled.buffer();
-			Random random = new Random();
-			int s = random.nextInt();
-
-			buffer.writeByte(0x02);
-
-			String device = deviceName;
-
-			buffer.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
-			buffer.writeBytes(device.getBytes(Charset.defaultCharset()));
-
-			long ss = System.currentTimeMillis();
-
-			buffer.writeBytes(ByteUtils.convertLongToByteArray(ss));
-
-			double d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-
-			d = Math.round(Math.random() * 100 * 10) / 10.0;
-			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
-			buffer.writeByte(0x03);
-
-			ChannelFuture future = ctx.writeAndFlush(buffer);
-			buffer.clear();
-//			if(future.isDone()) {
-//				buffer.clear();
-//				//buffer.release();
-//			}
-		//}
-	}
+//	private void sendPacket(ChannelHandlerContext ctx) {
+//		//ByteBuf buf = ctx.alloc().heapBuffer();
+//		//if (ctx.channel().isWritable()) {
+//
+//		ByteBuf buffer = Unpooled.buffer();
+//			Random random = new Random();
+//			int s = random.nextInt();
+//
+//			buffer.writeByte(0x02);
+//
+//			String device = deviceName;
+//
+//			buffer.writeBytes(ByteUtils.convertIntToByteArray(device.getBytes(StandardCharsets.UTF_8).length));
+//			buffer.writeBytes(device.getBytes(Charset.defaultCharset()));
+//
+//			long ss = System.currentTimeMillis();
+//
+//			buffer.writeBytes(ByteUtils.convertLongToByteArray(ss));
+//
+//			double d = Math.round(Math.random() * 100 * 10) / 10.0;
+//			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//			d = Math.round(Math.random() * 100 * 10) / 10.0;
+//			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//			d = Math.round(Math.random() * 100 * 10) / 10.0;
+//			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//			d = Math.round(Math.random() * 100 * 10) / 10.0;
+//			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//
+//			d = Math.round(Math.random() * 100 * 10) / 10.0;
+//			buffer.writeBytes(ByteUtils.convertDoubleToByteArray(d));
+//			buffer.writeByte(0x03);
+//
+//			ChannelFuture future = ctx.writeAndFlush(buffer);
+//			buffer.clear();
+////			if(future.isDone()) {
+////				buffer.clear();
+////				//buffer.release();
+////			}
+//		//}
+//	}
 
 	private void sendInit(ChannelHandlerContext ctx) {
 		ByteBuf buf = ctx.alloc().heapBuffer(30);

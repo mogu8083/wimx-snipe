@@ -1,12 +1,8 @@
 package com.ulalalab.snipe.infra.manager;
 
-import com.ulalalab.snipe.infra.channel.SpChannelGroup;
+import com.ulalalab.snipe.device.model.SpChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class InstanceManager {

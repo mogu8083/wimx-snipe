@@ -2,7 +2,7 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.ChannelInfo;
 import com.ulalalab.snipe.device.model.Device;
-import com.ulalalab.snipe.infra.channel.SpChannelGroup;
+import com.ulalalab.snipe.device.model.SpChannelGroup;
 import com.ulalalab.snipe.infra.manager.InstanceManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
