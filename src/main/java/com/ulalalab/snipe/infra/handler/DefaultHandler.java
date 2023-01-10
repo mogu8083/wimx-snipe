@@ -39,20 +39,9 @@ public class DefaultHandler extends ChannelInboundHandlerAdapter {
 //		// 1. 연결 채널 해제
 		spChannelGroup.remove(channel.id());
 
-		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수- : {}"
+		log.warn("채널 ID : {} / {} 연결 해제 / 연결 갯수 : {}"
 				, channel.id()
 				, channel.remoteAddress()
 				, spChannelGroup.size());
 	}
-
-//	@Override
-//	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-//		log.error("{} -> {}", (StringUtils.hasText(deviceId) ? deviceId : "NoDevice"), cause.getMessage());
-//
-//		Channel channel = ctx.channel();
-//
-//		channel.alloc().buffer().clear();
-//		channel.close();
-//		//cause.printStackTrace();
-//	}
 }

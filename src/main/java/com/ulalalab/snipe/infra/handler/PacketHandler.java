@@ -138,7 +138,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 					device.setRssi(rssi);
 					device.setChannelDataList(channelDataList);
 
-					if (DevUtils.isPrint2(deviceIndex)) {
+					if (DevUtils.isPrint(deviceIndex)) {
 						//log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
 						log.info(buffer.toString());
 						log.info(device.toString());

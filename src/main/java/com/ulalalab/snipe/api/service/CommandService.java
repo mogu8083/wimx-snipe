@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 
-@Slf4j
 @Service
+@Slf4j(topic = "API.CommandService")
 public class CommandService {
 
     private final SpChannelGroup spChannelGroup = InstanceManager.getInstance().getSpChannelGroup();

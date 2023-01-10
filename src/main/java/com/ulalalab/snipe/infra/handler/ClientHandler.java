@@ -5,14 +5,10 @@ import com.ulalalab.snipe.infra.util.*;
 import com.ulalalab.snipe.server.ClientServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j(topic = "CLIENT.ClientHandler")
@@ -70,7 +66,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		//log.info("Receive -> " + ByteBufUtil.prettyHexDump(buf));
 
 		if(msg !=null) {
-			if(DevUtils.isPrint2(deviceId)) {
+			if(DevUtils.isPrint(deviceId)) {
 				byte cmd = buf.getByte(4);
 
 				if(cmd == 0x03) {
@@ -177,7 +173,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 		buf.writeShort(CRC16ModubusUtils.calc(ByteBufUtil.getBytes(buf, 0, buf.writerIndex())));
 		buf.writeByte(0xF5);
 
-		if(DevUtils.isPrint2(deviceId)) {
+		if(DevUtils.isPrint(deviceId)) {
 			log.info("Init Message : {}", ByteBufUtil.hexDump(buf));
 		}
 
@@ -250,7 +246,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 				buf.writeByte(0xF5);
 			}
 
-			if (DevUtils.isPrint2(deviceId)) {
+			if (DevUtils.isPrint(deviceId)) {
 				log.info(ByteBufUtil.hexDump(buf));
 			}
 			ctx.writeAndFlush(buf);

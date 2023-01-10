@@ -1,5 +1,6 @@
 package com.ulalalab.snipe.device.model;
 
+import com.ulalalab.snipe.api.model.Response;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -27,14 +28,14 @@ public class SpChannelGroup extends DefaultChannelGroup {
 		return channelInfos.get(channelId);
 	}
 
-	public List<ChannelInfo> getChannelInfoList() {
+	public Response getChannelInfoList() {
 		List<ChannelInfo> list = new ArrayList<>();
 
 		for (ChannelId channelId : channelInfos.keySet()) {
 			ChannelInfo channelInfo = channelInfos.get(channelId);
 			list.add(channelInfo);
 		}
-		return list;
+		return new Response(list);
 	}
 
 	public Channel getChannel(int deviceIndex) {
@@ -56,8 +57,9 @@ public class SpChannelGroup extends DefaultChannelGroup {
 		super.remove(channelId);
 	}
 
-	public boolean channelDisconnect(short deviceIndex) {
+	public Response channelDisconnect(short deviceIndex) {
 		ChannelId removeChannelId = null;
+		Response response = null;
 
 		for (ChannelId channelId : channelInfos.keySet()) {
 			ChannelInfo channelInfo = channelInfos.get(channelId);
@@ -71,8 +73,10 @@ public class SpChannelGroup extends DefaultChannelGroup {
 
 		if(removeChannelId != null) {
 			channelInfos.remove(removeChannelId);
-			return true;
+			response = new Response("장비 연결이 해제되었습니다.");
+		} else {
+			response = new Response(Response.Code.FAIL, deviceIndex + " 해당 장비가 존재 하지 않습니다.");
 		}
-		return false;
+		return response;
 	}
 }

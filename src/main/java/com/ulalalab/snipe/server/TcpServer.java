@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
-
 import java.util.concurrent.Executor;
 
 @Component
@@ -41,13 +40,13 @@ public class TcpServer {
 	private InitTcpHandler initTcpHandler;
 	private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 	private Executor threadPoolTaskExecutor;
-	private RedisManager redisManager;
+	//private RedisManager redisManager;
 
 	public TcpServer(InitTcpHandler initTcpHandler, ThreadPoolTaskScheduler threadPoolTaskScheduler, ThreadPoolTaskExecutor threadPoolTaskExecutor, RedisManager redisManager) {
 		this.initTcpHandler = initTcpHandler;
 		this.threadPoolTaskScheduler = threadPoolTaskScheduler;
 		this.threadPoolTaskExecutor = threadPoolTaskExecutor;
-		this.redisManager = redisManager;
+		//this.redisManager = redisManager;
 	}
 
 	public void start() throws InterruptedException {

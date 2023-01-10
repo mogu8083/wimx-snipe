@@ -1,84 +1,84 @@
-package com.ulalalab.snipe.infra.manager;
-
-import com.ulalalab.snipe.device.model.SpChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-@Slf4j
-public class EventManager {
-
-    private static EventManager eventManager;
-    //private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
-    //private EventLoop eventLoop = new DefaultEventLoop();
-    //private ExecutorService executorService;
-    //private ThreadPoolTaskExecutor taskExecutor;
-    private SpChannelGroup spChannelGroup;
-    private List<Map<String, String>> redisList;
-
-    static {
-        eventManager = new EventManager();
-    }
-
-    private EventManager() {
-        //this.initExecutor();
-        //this.initExecutorService();
-        this.initSpChannelGroup();
-        this.initRedisList();
-    }
-
-    public static EventManager getInstance() {
-        return eventManager;
-    }
-
-//    public EventLoop getEventLoop() {
-//        return eventLoop;
+//package com.ulalalab.snipe.infra.manager;
+//
+//import com.ulalalab.snipe.device.model.SpChannelGroup;
+//import io.netty.util.concurrent.GlobalEventExecutor;
+//import lombok.extern.slf4j.Slf4j;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Map;
+//
+//@Slf4j
+//public class EventManager {
+//
+//    private static EventManager eventManager;
+//    //private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
+//    //private EventLoop eventLoop = new DefaultEventLoop();
+//    //private ExecutorService executorService;
+//    //private ThreadPoolTaskExecutor taskExecutor;
+//    private SpChannelGroup spChannelGroup;
+//    private List<Map<String, String>> redisList;
+//
+//    static {
+//        eventManager = new EventManager();
 //    }
 //
-//    public EventLoopGroup getEventLoopGroup() {
-//        return eventLoopGroup;
+//    private EventManager() {
+//        //this.initExecutor();
+//        //this.initExecutorService();
+//        this.initSpChannelGroup();
+//        this.initRedisList();
 //    }
-
-//    public ExecutorService getExecutorService() {
-//        return executorService;
+//
+//    public static EventManager getInstance() {
+//        return eventManager;
 //    }
-
-//    @Async
-//    public Future<ThreadPoolTaskExecutor> getTaskExecutor() {
-//        return CompletableFuture.completedFuture(taskExecutor);
+//
+////    public EventLoop getEventLoop() {
+////        return eventLoop;
+////    }
+////
+////    public EventLoopGroup getEventLoopGroup() {
+////        return eventLoopGroup;
+////    }
+//
+////    public ExecutorService getExecutorService() {
+////        return executorService;
+////    }
+//
+////    @Async
+////    public Future<ThreadPoolTaskExecutor> getTaskExecutor() {
+////        return CompletableFuture.completedFuture(taskExecutor);
+////    }
+//
+////    private void initExecutorService() {
+////        executorService = new ForkJoinPool
+////                (Runtime.getRuntime().availableProcessors(),
+////                        ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+////                        null, true);
+////    }
+//
+////    private void initExecutor() {
+////        taskExecutor = new ThreadPoolTaskExecutor();
+////        taskExecutor.setCorePoolSize(15);
+////        taskExecutor.setMaxPoolSize(25);
+////        taskExecutor.setQueueCapacity(Integer.MAX_VALUE);
+////        taskExecutor.initialize();
+////    }
+//
+//    private void initSpChannelGroup() {
+//        spChannelGroup = new SpChannelGroup(GlobalEventExecutor.INSTANCE);
 //    }
-
-//    private void initExecutorService() {
-//        executorService = new ForkJoinPool
-//                (Runtime.getRuntime().availableProcessors(),
-//                        ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-//                        null, true);
+//
+//    public SpChannelGroup getSpChannelGroup() {
+//        return spChannelGroup;
 //    }
-
-//    private void initExecutor() {
-//        taskExecutor = new ThreadPoolTaskExecutor();
-//        taskExecutor.setCorePoolSize(15);
-//        taskExecutor.setMaxPoolSize(25);
-//        taskExecutor.setQueueCapacity(Integer.MAX_VALUE);
-//        taskExecutor.initialize();
+//
+//    private void initRedisList() {
+//        redisList = new ArrayList<>();
 //    }
-
-    private void initSpChannelGroup() {
-        spChannelGroup = new SpChannelGroup(GlobalEventExecutor.INSTANCE);
-    }
-
-    public SpChannelGroup getSpChannelGroup() {
-        return spChannelGroup;
-    }
-
-    private void initRedisList() {
-        redisList = new ArrayList<>();
-    }
-
-    public List<Map<String, String>> getRedisList() {
-        return redisList;
-    }
-}
+//
+//    public List<Map<String, String>> getRedisList() {
+//        return redisList;
+//    }
+//}

@@ -25,7 +25,7 @@ public class ApiController {
      */
     @GetMapping("/device/info")
 	public Mono<Response> deviceInfo() {
-        return Mono.just(new Response<>(spChannelGroup.getChannelInfoList()));
+        return Mono.just(spChannelGroup.getChannelInfoList());
     }
 
     /**
@@ -33,14 +33,7 @@ public class ApiController {
      */
     @PutMapping("/device/disconnect/{deviceIndex}")
     public Mono<Response> deviceDisconnect(@PathVariable short deviceIndex) throws Exception {
-        boolean result = spChannelGroup.channelDisconnect(deviceIndex);
-
-        String responseMessage = deviceIndex + " 장비 연결이 해제되었습니다.";
-
-        if(!result) {
-            responseMessage = deviceIndex + " 해당 장비가 존재 하지 않습니다.";
-        }
-        return Mono.just(new Response<>(responseMessage));
+        return Mono.just(spChannelGroup.channelDisconnect(deviceIndex));
     }
 
     /**
