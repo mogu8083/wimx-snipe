@@ -29,6 +29,7 @@ public class InitTcpHandler extends ChannelInboundHandlerAdapter {
         p.addLast("TCP.DefaultHandler", defaultHandler);
         p.addLast("TCP.InitMessageHandler", initMessageHandler);
         p.addLast("TCP.PacketHandler", new PacketHandler());
+        p.addLast("TCP.CompareDeviceHandler", new CompareDeviceHandler());
         p.addLast("TCP.ResponseWriteHandler", responseWriteHandler);
         p.addLast("TCP.SettingHandler", settingHandler);
         p.addLast("TCP.ResultHandler", resultHandler);

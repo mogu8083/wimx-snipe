@@ -47,16 +47,19 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object obj) {
+	public void channelRead(ChannelHandlerContext ctx, Object obj) throws Exception{
 		Device device = (Device) obj;
+		WeakReference<ObjectMapper> refMapper = new WeakReference<>(new ObjectMapper());
+		ObjectMapper mapper = refMapper.get();
+
+		if(DevUtils.isPrint(device.getDeviceIndex())) {
+			log.info("PrevDevice : {}", mapper.writeValueAsString(device));
+		}
 
 		try {
 			String deviceIndex = String.valueOf(device.getDeviceIndex());
 
 			try {
-				WeakReference<ObjectMapper> refMapper = new WeakReference<>(new ObjectMapper());
-				ObjectMapper mapper = refMapper.get();
-
 				// 1. InfluxDB
 				Device finalDevice = device;
 
@@ -72,20 +75,24 @@ public class ResultHandler extends ChannelInboundHandlerAdapter {
 				Point p = builder.build();
 
 				ctx.executor().execute(() -> {
-					influxDB.write(UDP_PORT, p);
-
-					if (DevUtils.isPrint(device.getDeviceIndex())) {
-						log.info("InfluxDB Execute -> " + device.getDeviceIndex());
+					try {
+						influxDB.write(UDP_PORT, p);
+					} catch (Exception e) {
+						log.error(e.getMessage());
 					}
 				});
 
+				String deviceJson = mapper.writeValueAsString(device);
 				// 2. Redis
 				ctx.executor().execute(() -> {
-					reactiveCommands.set(deviceIndex, device.toString()).flux().subscribe();
-
-					if (DevUtils.isPrint(device.getDeviceIndex())) {
-						log.info("Redis Execute -> " + device.getDeviceIndex());
+					try {
+						reactiveCommands.set(deviceIndex, deviceJson).flux().subscribe();
+					} catch(Exception e) {
+						log.error(e.getMessage());
 					}
+//					if (DevUtils.isPrint(device.getDeviceIndex())) {
+//						log.info("Redis Execute -> " + device.getDeviceIndex());
+//					}
 				});
 			} catch(Exception e) {
 				e.printStackTrace();

@@ -2,16 +2,22 @@ package com.ulalalab.snipe.infra.handler;
 
 import com.ulalalab.snipe.device.model.Device;
 import com.ulalalab.snipe.infra.constant.DeviceCodeEnum;
+import com.ulalalab.snipe.infra.manager.InfluxDBManager;
+import com.ulalalab.snipe.infra.manager.RedisManager;
 import com.ulalalab.snipe.infra.util.CRC16ModubusUtils;
 import com.ulalalab.snipe.infra.util.DevUtils;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.reactive.RedisStringReactiveCommands;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.data.influxdb.InfluxDBTemplate;
 import org.springframework.stereotype.Component;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,6 +27,7 @@ import java.util.List;
 @ChannelHandler.Sharable
 @Scope(scopeName = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Slf4j(topic = "TCP.PacketHandler")
+@RequiredArgsConstructor
 public class PacketHandler extends ChannelInboundHandlerAdapter {
 
 	private DeviceCodeEnum deviceCodeEnum;
@@ -141,7 +148,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
 					if (DevUtils.isPrint(deviceIndex)) {
 						//log.info(ByteBufUtil.prettyHexDump(buffer, 0, buffer.writerIndex()));
 						log.info(buffer.toString());
-						log.info(device.toString());
+						//log.info(device.toString());
 					}
 
 					buffer.discardReadBytes();

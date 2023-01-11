@@ -12,7 +12,7 @@ import java.util.TimeZone;
 
 @Getter
 @Setter
-@ToString
+//@ToString
 public class Device {
 
     private String cvtTime;
